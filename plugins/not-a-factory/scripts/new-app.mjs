@@ -164,6 +164,11 @@ run("pnpm", ["dlx", "skills", "add", "shadcn/ui", "--skill", "shadcn", "--agent"
 
 // ---------- 6. finish ----------
 
+// drizzle-kit has no init command. `generate` with the empty schema writes
+// api/drizzle/meta/_journal.json, without which `migrate` exits 1.
+step("Creating the Drizzle migration journal");
+run("pnpm", ["db:generate"], root);
+
 step("Formatting");
 run("pnpm", ["-s", "lint:fix"], root, { optional: true });
 run("pnpm", ["--filter", "web", "exec", "tsr", "generate"], root, { optional: true });
