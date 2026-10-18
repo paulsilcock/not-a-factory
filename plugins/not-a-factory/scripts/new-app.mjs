@@ -79,7 +79,10 @@ step("Adding the kit");
 copyTree(join(kit, "files"), root);
 renameSync(join(root, "_gitignore"), join(root, ".gitignore"));
 copyTree(join(kit, "rules"), join(root, ".claude/rules"));
-copyTree(join(kit, "skills"), join(root, ".claude/skills"));
+// Plugin skills are the source of truth; projects get local, unprefixed copies.
+for (const skill of readdirSync(join(kit, "../skills"))) {
+  if (skill !== "new-app") copyTree(join(kit, "../skills", skill), join(root, ".claude/skills", skill));
+}
 writeFileSync(join(root, ".env"), readFileSync(join(root, ".env.example")));
 
 // ---------- 3. package.json files ----------

@@ -5,6 +5,8 @@ description: Start the next user-facing capability outside in. Use when the deve
 
 # Next capability (outer loop)
 
+> The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
+
 ## 1. Agree the capability
 
 Ask the developer, in one or two short questions:

@@ -7,8 +7,8 @@ For personal use first; easy to make reusable later. Keep iteration 1 small: any
 
 ## Iterations
 1. **Local + CI.** `new-app`, the rules and skills, local Postgres, local migrations, GitHub Actions. No deploy.
-2. **Railway + Neon.** Deploy, PR environments, a Neon branch per PR environment (deleted with it), migrate on deploy with a backup first. The README lists the one-off account setup so the developer can test deploys on their own accounts.
-3. **Everything else.** Migration safety checks, `adopt`, reviewer agents, `add-*` skills and the rest of the deferred list.
+2. **Railway + Neon.** Deploy, PR environments, a Neon branch per PR environment (deleted with it), migrate on deploy with a backup first. Reviewer agents `test-reviewer` and `design-reviewer`. The README lists the one-off account setup so the developer can test deploys on their own accounts.
+3. **Everything else.** Migration safety checks (with `migration-reviewer`), `adopt`, `add-*` skills and the rest of the deferred list.
 4. **Auth** (optional, final).
 
 ## Shape
@@ -18,16 +18,16 @@ One new repo, `paulsilcock/not-a-factory`, which is a Claude Code plugin plus th
 .claude-plugin/marketplace.json
 plugins/not-a-factory/
   .claude-plugin/plugin.json
-  skills/new-app/        # entry command: creates a project
+  skills/new-app/        # entry command: creates a project (plugin only)
+  skills/<others>/       # TDD skills: usable from the plugin anywhere, and copied into new projects
   skills/adopt/          # entry command: copies generic skills into an existing repo (iteration 3)
-  kit/skills/            # source of truth for the skills copied into projects
   kit/rules/             # house rules + CLAUDE.md template copied into new projects
   kit/files/             # CI workflow, docker-compose, etc. (railway.json in iteration 2)
   scripts/               # new-app / adopt implementations
 ```
 
 - Install once per machine: `/plugin marketplace add paulsilcock/not-a-factory`, `/plugin install not-a-factory@not-a-factory` (user scope; stored in local Claude Code config, not the claude.ai account). Develop with `claude --plugin-dir ./plugins/not-a-factory`; check with `claude plugin validate`.
-- Projects get their own copies of the skills in `.claude/skills/` (local, unprefixed, committed). Plugin skills would be namespaced `/not-a-factory:x` and bare names are unreliable (docs; Claude Code issues #22063, #50486). Plugins also cannot carry rules or CLAUDE.md, so the project gets those too.
+- The TDD skills are plugin skills (`/not-a-factory:tdd-cycle` etc.), so they work in any repo once the plugin is installed. New projects also get their own copies in `.claude/skills/` (local, unprefixed, committed), because plugin skills are namespaced `/not-a-factory:x` and bare names are unreliable (docs; Claude Code issues #22063, #50486). Plugins also cannot carry rules or CLAUDE.md, so the project gets those too.
 
 ## new-app: what a fresh project contains
 Piggyback existing bootstrappers, then add Litmus and the kit.
@@ -93,7 +93,7 @@ Iteration 1: local and CI migrations only. Iteration 2: per-PR Neon branch and m
 
 ## Deferred (iteration 3+)
 - Nice to have, after all iterations: evals (they cost money) kept out of the Stop hook; a separate, explicit command developers run, with which suites run where configurable.
-`adopt` and `orient` (existing repos; start from Claude Code's `/init` and community onboarding skills), `characterise` (Feathers; citypaul has characterisation-tests and finding-seams), reviewer agents (test-reviewer, design-reviewer), `add-adapter`, `/sync` to refresh copied skills, standalone `npx` entry, options for others.
+`adopt` and `orient` (existing repos; start from Claude Code's `/init` and community onboarding skills), `characterise` (Feathers; citypaul has characterisation-tests and finding-seams), `add-adapter`, `/sync` to refresh copied skills, standalone `npx` entry, options for others.
 
 ## Auth (final, optional iteration)
 Clerk (good developer experience). Deferred because nothing in iterations 1-2 needs it. When added: Hono middleware on the API, Clerk components in the web app, and a signed-in path for the browser driver in acceptance tests (check Clerk's testing support for Playwright).

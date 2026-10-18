@@ -5,6 +5,8 @@ description: Run one RED → GREEN → REFACTOR cycle for one behaviour, with th
 
 # TDD cycle (inner loop)
 
+> The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
+
 One behaviour per cycle. In guided mode, stop after each step and wait for the developer.
 
 ## Commands
