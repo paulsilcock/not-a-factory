@@ -61,6 +61,7 @@ Technique: push on each step: "can they skip this?", "what if this happens twice
 - **Start with one entity and its values.** Make an aggregate bigger only when a real rule needs it.
 - **Refer to other aggregates by ID**, not by holding the object.
 - **One aggregate changes per command.** If another must change too, do it after, with a domain event and a handler. Ask the developer whether a short delay is acceptable; usually it is.
+- **Domain events say "something happened that others care about".** Raise one (`addDomainEvent`) when another aggregate or a side effect, such as an email, must react, and a short delay is acceptable. Name it in the past tense, in business words: `OrderPlaced`, not `SendConfirmationEmail`. A rule that must hold in the same transaction does not belong in an event: keep it inside one aggregate. In Litmus, handlers run in-process after the save commits. A failing handler is logged, not retried, so a reaction that must never be lost needs more than an event, for example an outbox.
 - **Value objects** for concepts with rules but no identity (money, email address, date range). They are immutable and check themselves when created.
 - **Make states explicit.** If a thing moves through states, name the states and the allowed moves, and reject the others with a `DomainError`.
 
@@ -76,6 +77,7 @@ Technique: push on each step: "can they skip this?", "what if this happens twice
 | Design up front | Listing all the aggregates or classes before the first test | Model only what the next test needs; refactor as you learn |
 | Vague names | `Manager`, `Processor`, `Data`, `Info`, `Helper` | Name it after what it is or does in the business |
 | Primitives for concepts | Emails as strings, money as numbers, checks repeated | A value object |
+| Events as commands | Event names that give orders (`SendEmail`), or events used to keep a rule consistent | Past-tense facts; keep consistency rules inside one aggregate |
 | Infrastructure in the domain | Drizzle types, HTTP, `process.env` in `domain/` | Keep them in `infra/` and entrypoints |
 
 ## After the conversation
@@ -96,6 +98,7 @@ Short and free first:
 - Allen Holub, [Why getter and setter methods are evil](https://www.infoworld.com/article/2073723/why-getter-and-setter-methods-are-evil.html): encapsulation and behaviour-first objects.
 - Vaughn Vernon, Effective Aggregate Design, [part 1](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_1.pdf), [part 2](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_2.pdf), [part 3](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_3.pdf): the clearest guide to aggregate size and boundaries.
 - Scott Wlaschin, [Making illegal states unrepresentable](https://fsharpforfunandprofit.com/posts/designing-with-types-making-illegal-states-unrepresentable/): explicit states with types (F#, but the idea carries over).
+- Microsoft, [Domain events: design and implementation](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation): when to use domain events, and how they differ from integration events.
 - Eric Evans, [DDD Reference](https://www.domainlanguage.com/ddd/reference/): free summary of every DDD pattern, for looking things up.
 
 Books, when you want more:
