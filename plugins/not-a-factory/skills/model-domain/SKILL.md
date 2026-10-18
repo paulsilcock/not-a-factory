@@ -14,6 +14,8 @@ Domain code starts with a conversation, not code. Do not guess business rules. A
 - **Easy to change.** Small, cohesive models with few links between them, so that what we learn next costs little to add.
 - **Only as much model as the problem needs.** Plain data is fine where there are no rules.
 
+A domain model is part of the solution, not a copy of the business. It is our current best understanding of the problem, shaped by technical limits such as transactions and storage. Expect it to change as we learn more.
+
 ## What this produces
 
 - The words: each term and what it means, in the developer's words.
@@ -46,7 +48,7 @@ Ask a few at a time, and only those that matter for the next test.
 - Can a <B> exist without a <A>?
 
 **Is a model needed?**
-- Is there a real rule here, or does the app only store and show data? If it only stores and shows data, keep the domain thin.
+- Is there a real rule here, or does the app only store and show data? A domain with little or no behaviour is naturally anemic. Then plain CRUD is the right design, and you can stop here: agree the words, and go straight to `tdd-cycle`.
 
 Technique: push on each step: "can they skip this?", "what if this happens twice?", "what if it is late?". If the answer is "that is policy", ask whether the app must enforce it.
 
@@ -65,7 +67,7 @@ Technique: push on each step: "can they skip this?", "what if this happens twice
 
 | Pitfall | Sign | Instead |
 |---|---|---|
-| Anemic model | Classes with fields and getters; the use case reads them and decides | Move the decision into the model as a method |
+| Anemic model (where there are rules) | Classes with fields and getters; the use case reads them and decides | Move the decision into the model as a method. With no rules, anemic is fine |
 | Data first | Starting from tables, columns or an ER diagram | Start from what happens and the rules |
 | Big aggregate | "A customer has orders, which have lines, which have shipments" | Separate aggregates, linked by ID |
 | Rich model for CRUD | Classes and methods that only copy data | Keep it thin; add a model when a rule appears |
