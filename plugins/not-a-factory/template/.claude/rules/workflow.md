@@ -18,16 +18,18 @@ The state of the work is in the code, not in your memory. Before you start or co
 
 If the developer wrote code without a test, do not rewrite it. Say what has no test, and ask whether to add one now.
 
-## Outer loop: one acceptance test per capability
+## Outer loop: acceptance tests drive each feature
 
-Every user-facing capability starts with ONE failing acceptance test. A capability is something a user (or another system) can do or see. Use the `new-capability` skill.
+An acceptance test is an executable specification: it says what the system must do for a user, in the user's words, before any code exists. It guides the work until the specification is met, and it keeps checking it after every later change. Together with TDD, it catches mistakes in what we build, not only in how we build it.
 
-1. Write ONE acceptance test in business language, through the DSL and a driver. It reads like a requirement. No URLs, no JSON, no class names.
+A feature is new behaviour that a user (or another system) can see or use through the system's public interface. Use the `new-feature` skill. It agrees the feature's acceptance criteria with the developer; each criterion gets its own acceptance test.
+
+1. Take ONE acceptance criterion and write its acceptance test (the `acceptance-test` skill).
 2. Run it. Ask: "why does it fail? What is the first missing piece?" Build that piece with the inner loop.
 3. Come back up. Does the acceptance test pass? If not, find the next missing piece and repeat.
-4. When it passes, ask whether this capability needs a second acceptance test. Usually it does not.
+4. When it passes, review the list of criteria (as for the test list below), then take the next one. The feature is done when every criterion has a passing acceptance test.
 
-Bug fixes, refactors and internal changes can start at the component where the problem is, with the inner loop only.
+Not a feature: a new endpoint for behaviour that already exists, an internal change, a refactor, performance work. These start at the component where the change is, with the inner loop only. A bug fix gets an acceptance test only when it shows a criterion that no test covers.
 
 ## Inner loop: RED → GREEN → REFACTOR
 
@@ -47,7 +49,7 @@ A list of behaviours to test is useful, but it is a guess. It is never the final
 - Keep the list short and in business words. Write the list, not the tests.
 - After every cycle, use what you learnt to update it: remove tests that are now redundant or wrong, add behaviours you found, and change the order if needed. Say what changed and why.
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In guided and pair mode, ask first.
-- A change to the list can need another skill. A new word or rule means `model-domain`. A new user-facing capability means `new-capability`.
+- A change to the list can need another skill. A new word or rule means `model-domain`. A new user-facing feature means `new-feature`.
 - Pick the next test from the list as it is now, not as it was at the start: the most important thing the system does not do yet. Importance comes first. Between two equally important tests, take the one you are more confident about; the loop will make the other clearer.
 
 ## Discoveries

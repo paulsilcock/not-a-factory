@@ -1,7 +1,7 @@
 # Plan: not-a-factory (scaffold + Claude Code skills)
 
 ## Why
-Build apps quickly with Claude Code without becoming a "software factory". Implementation is part of discovery, so work in small batches: one acceptance test per user-facing capability, one unit test at a time, refactor every cycle, decide the next step from what was just learned. No big upfront specs or class plans.
+Build apps quickly with Claude Code without becoming a "software factory". Implementation is part of discovery, so work in small batches: one acceptance test per acceptance criterion of a feature, one unit test at a time, refactor every cycle, decide the next step from what was just learned. No big upfront specs or class plans.
 
 For personal use first; easy to make reusable later. Keep iteration 1 small: anything not needed to create a project and build features with the rules and skills is deferred.
 
@@ -26,7 +26,7 @@ plugins/not-a-factory/
 ```
 
 - Install once per machine: `/plugin marketplace add paulsilcock/not-a-factory`, `/plugin install not-a-factory@not-a-factory` (user scope; stored in local Claude Code config, not the claude.ai account). Develop with `claude --plugin-dir ./plugins/not-a-factory`; check with `claude plugin validate`.
-- The TDD skills are plugin skills (`/not-a-factory:new-capability` etc.), so they work in any repo once the plugin is installed. New projects also get their own copies in `.claude/skills/` (local, unprefixed, committed), because plugin skills are namespaced `/not-a-factory:x` and bare names are unreliable (docs; Claude Code issues #22063, #50486). Plugins also cannot carry rules or CLAUDE.md, so the project gets those too.
+- The TDD skills are plugin skills (`/not-a-factory:new-feature` etc.), so they work in any repo once the plugin is installed. New projects also get their own copies in `.claude/skills/` (local, unprefixed, committed), because plugin skills are namespaced `/not-a-factory:x` and bare names are unreliable (docs; Claude Code issues #22063, #50486). Plugins also cannot carry rules or CLAUDE.md, so the project gets those too.
 
 ## new-app: what a fresh project contains
 `new-app` copies `template/`, then runs `pnpm install`, `pnpm db:generate` (drizzle-kit writes its migration journal), installs the shadcn skill, and makes the first commit. No script.
@@ -36,7 +36,7 @@ plugins/not-a-factory/
 - **Web:** TanStack Router (no Start), TanStack Query, shadcn/ui, TanStack Intent mappings in `AGENTS.md`; the shadcn skill is installed at create time.
 - **API:** Hono, Litmus `@litmus-ts/{core,http,db,log,test}`, `@hono/node-ws`, Drizzle, pg, tsyringe.
 - **Glue:** pnpm workspace; Hono RPC type shared with web; API serves the built web app (one service); docker-compose Postgres for local; plain Vite + Vitest (not Vite+).
-- **App shell only:** one page and a liveness `/health` (process up, no dependency checks; minimal response), no feature code and no acceptance test. The first acceptance test comes from the first real capability via `new-capability`. Litmus's test package (DSL, HTTP/CLI/browser drivers) is installed and wired so that first test is quick to write.
+- **App shell only:** one page and a liveness `/health` (process up, no dependency checks; minimal response), no feature code and no acceptance test. The first acceptance test comes from the first real feature via `new-feature`. Litmus's test package (DSL, HTTP/CLI/browser drivers) is installed and wired so that first test is quick to write.
 - **CI (GitHub Actions):** install, typecheck, lint, unit tests, `db:migrate` then acceptance tests against a Postgres service container, on every push and PR.
 - **Migrations (iteration 1):** `pnpm db:generate` and `pnpm db:migrate` (drizzle-kit) against the docker-compose Postgres locally, and against the service container in CI.
 
@@ -71,7 +71,7 @@ Principles:
 - Distil, don't clone. create-agent-app is the model for the shape and most of the ideas, but it is bloated and partly out of date. Litmus `tdd-workflow.md` (68 lines) has the best TDD wording; its acceptance-test section is thin (treats ATDD as optional "for features where multiple classes must collaborate"; Litmus #118 says the trigger should be a user-facing capability), so the outer ATDD loop needs writing properly.
 
 **Always-on rules (`.claude/rules/`, no `paths:`), each short:**
-- `workflow.md`: outside-in. Every user-facing capability starts with one failing acceptance test (business language, via DSL and driver); inside it, one unit test at a time; RED for the right reason; GREEN by fixing the one thing stopping the test; REFACTOR every cycle; no upfront implementation plans or batch work; guided, pair or autonomous agreed at the start; the test list is a working list, reviewed after every cycle. Names the skills: `new-capability`, `tdd-cycle`, `model-domain`.
+- `workflow.md`: outside-in. Every feature's acceptance criteria each get one failing acceptance test (business language, via DSL and driver); inside it, one unit test at a time; RED for the right reason; GREEN by fixing the one thing stopping the test; REFACTOR every cycle; no upfront implementation plans or batch work; guided, pair or autonomous agreed at the start; the test list is a working list, reviewed after every cycle. Names the skills: `new-feature`, `acceptance-test`, `tdd-cycle`, `model-domain`.
 - `testing.md`: the few non-negotiables (fakes over mocks, only mock what you own, behaviour-named tests, no test-only behaviour in the app, no `expect` in acceptance test cases).
 - `architecture.md`: the layout and dependency direction (Litmus-inspired) in a few lines, plus "use `add-*` skills / layer rules for detail".
 
@@ -81,7 +81,7 @@ Principles:
 
 **Code navigation and docs (in always-on rules):** use the TypeScript language server (Claude Code's `typescript-lsp@claude-plugins-official` plugin, already used in Litmus) for definitions, references, types and JSDoc before falling back to grep. For Litmus APIs, read the JSDoc via the language server and the package READMEs in `node_modules/@litmus-ts/*` (or the Litmus skills once Litmus ships them) rather than guessing. `new-app` enables the plugin in `.claude/settings.json`.
 
-**Skills (procedures and depth):** `new-capability` (outer loop with the Litmus DSL/drivers), `tdd-cycle` (one component test-first: names the component, its consumer and its test), `model-domain` (discovery conversation; also triggered from the TDD loop when a test needs a new domain concept), `test-quality` (Farley's eight properties, each rated on its own with no single score; plus the acceptance-test layering checks). Iteration 4 candidates from create-agent-app and Litmus #85: `add-use-case`, `add-aggregate`, `add-adapter`/`add-repository`, `add-route`, schema migration.
+**Skills (procedures and depth):** `new-feature` (outer loop: agree the feature and its acceptance criteria, one at a time), `acceptance-test` (Farley's four layers: test case, DSL, protocol driver, system under test), `tdd-cycle` (one component test-first: names the component, its consumer and its test), `model-domain` (discovery conversation; also triggered from the TDD loop when a test needs a new domain concept), `test-quality` (Farley's eight properties, each rated on its own with no single score; plus the acceptance-test layering checks). Iteration 4 candidates from create-agent-app and Litmus #85: `add-use-case`, `add-aggregate`, `add-adapter`/`add-repository`, `add-route`, schema migration.
 
 **Sources:** create-agent-app `.claude/rules/*` and nested CLAUDE.md files (convert frontmatter to `paths:`, replace Bun/tsyringe specifics with Litmus, rewrite the client guidance for TanStack Router + shadcn, fix the known contradictions, cut duplication); Litmus `tdd-workflow.md` + `code-quality.md`; ideas from Kent Beck "Augmented Coding", citypaul/.dotfiles, Böckeler on spec-driven development.
 
@@ -105,8 +105,8 @@ Iteration 1: local and CI migrations only. Iteration 3: per-PR Neon branch and m
 Clerk (good developer experience). Deferred because nothing in iterations 1-2 needs it. When added: Hono middleware on the API, Clerk components in the web app, and a signed-in path for the browser driver in acceptance tests (check Clerk's testing support for Playwright).
 
 ## Iteration 1 test
-Create a fresh project with `new-app`, then build two or three small capabilities using only the rules and skills. Note where the agent strays from the rules or layout, and tighten the rule text.
+Create a fresh project with `new-app`, then build two or three small features using only the rules and skills. Note where the agent strays from the rules or layout, and tighten the rule text.
 
 ## Done for iteration 1
 - Plugin installs from GitHub; `/not-a-factory:new-app demo` creates a project where `pnpm dev`, `pnpm test`, `pnpm db:migrate` and CI all work.
-- Building one small capability outside in with the skills feels faster than without, and the agent keeps to one test at a time.
+- Building one small feature outside in with the skills feels faster than without, and the agent keeps to one test at a time.

@@ -4,9 +4,9 @@
 
 ## How we work
 
-Outside in, in small steps. One acceptance test for each user-facing capability, one unit test at a time, refactor every cycle. Decide the next step from what you just learned. No big specs or implementation plans up front. See `.claude/rules/workflow.md`.
+Outside in, in small steps. One acceptance test for each acceptance criterion of a feature, one unit test at a time, refactor every cycle. Decide the next step from what you just learned. No big specs or implementation plans up front. See `.claude/rules/workflow.md`.
 
-Skills: `new-capability` (a new capability, outside in), `tdd-cycle` (one component, test-first), `model-domain` (new business words or rules), `test-quality` (review tests).
+Skills: `new-feature` (a new feature, outside in), `acceptance-test` (one acceptance test), `tdd-cycle` (one component, test-first), `model-domain` (new business words or rules), `test-quality` (review tests).
 
 ## Commands
 

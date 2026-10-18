@@ -18,7 +18,7 @@ A domain model is part of the solution, not a copy of the business. It is our cu
 
 ## Questions
 
-Ask a few at a time, and only those that matter for the capability being built now.
+Ask a few at a time, and only those that matter for the feature being built now.
 
 - **What happens:** walk me through it. What happens first? Then what? Who does it?
 - **Words:** when you say "<term>", what exactly do you mean? When does an <A> become a <B>? Are <X> and <Y> the same thing?
@@ -56,7 +56,7 @@ A short summary in your reply, in plain English that the developer could read to
 - Say the rules out loud. If a sentence sounds awkward, the words or the model are wrong.
 - Do not write a test that depends on an open question.
 - "Where the rules go" is a guess in plain words, not class names. The tests may prove it wrong.
-- No class diagrams, fields, tables, code, or models for later capabilities. Design up front locks in what we do not know yet.
+- No class diagrams, fields, tables, code, or models for later features. Design up front locks in what we do not know yet.
 
 ## Into TDD
 

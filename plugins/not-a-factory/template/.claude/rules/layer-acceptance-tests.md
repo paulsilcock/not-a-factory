@@ -5,18 +5,12 @@ paths:
 
 # Acceptance tests
 
-Four layers. Each layer knows only the one below it.
+Use the `acceptance-test` skill. It explains the four layers, the DSL, drivers, stubs and isolation.
 
-```
-test case   WHAT the user does and sees, in business language
-DSL         the business words: dsl.orders.place(...), dsl.orders.confirmPlaced(...)
-driver      HOW: HTTP calls (or browser, or CLI). Holds protocol state. Does the assertions.
-system      the real app, started by system.ts
-```
-
-- Test cases have no `expect`, no URLs, no JSON, no status codes.
-- The DSL turns business words into driver calls. It uses `this.context.alias(name)` so names are unique for each test.
-- The driver interface (`driver.ts`) is in business words too. Each protocol has a class that implements it (`driver/http.ts`). An assertion that fails throws an error with a clear message.
-- Add a DSL area (`dsl/orders.ts`) when the first test needs it, not before.
-- Start the system only through `system.ts`. Do not reach into the container or the database from a test.
-- Use the `new-capability` skill.
+Always:
+- Test cases are in the user's words: no `expect`, URLs, JSON, status codes or selectors.
+- Each layer calls only the one below it: test case → DSL → driver → system.
+- The DSL aliases every name (`this.context.alias(...)`) and gives defaults for what a test does not care about.
+- Only the driver knows how the system is reached. It does the checks and throws a clear `Error` when an outcome is wrong.
+- Tests reach the system only through `system.ts` and its public interfaces. Never through the container or the database.
+- No test depends on data from another test.

@@ -51,11 +51,11 @@ In GREEN, if the missing thing is another component (a collaborator), start a ne
 
 - Remove behaviours that are now redundant or wrong. Add the ones you found. Change the order if needed. Say what changed.
 - New words or rules: use `model-domain`.
-- A behaviour that a user would see on its own may be a new capability: note it for `new-capability`.
+- A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`.
 - In pair mode, ask the developer whether to continue, or whether they want to take the next step.
 
 ## 6. Done when the consumer's need is met
 
 - Run all the package's unit tests: `pnpm --filter api test:unit` or `pnpm --filter web test`.
-- If this component is part of a capability, go back to the acceptance test (`new-capability`, step 5).
+- If this component is part of a feature, go back to its acceptance test (`new-feature`, step 4).
 - If it is a bug fix or a refactor, run `pnpm test` and stop.

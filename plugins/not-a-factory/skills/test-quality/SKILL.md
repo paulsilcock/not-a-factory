@@ -35,7 +35,7 @@ Quick checks:
 - The DSL has no protocol details. The driver does the assertions.
 - No test-only behaviour in the app.
 - Names are aliased, so tests do not depend on each other or on the order they run in.
-- One acceptance test per capability, unless there is a good reason for more.
+- One acceptance test per acceptance criterion; no criterion without one, and no test without a criterion.
 
 ## Report
 
