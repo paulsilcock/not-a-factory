@@ -56,6 +56,7 @@ Technique: push on each step: "can they skip this?", "what if this happens twice
 
 - **A model is what it does.** Group behaviours that change together and protect the same rules. Start from the behaviours and rules, not from the data or the tables.
 - **Methods are business verbs.** `loan.extend()`, `order.cancel(reason)`, not `setStatus()`. The object that holds the data makes the decision ("tell, don't ask").
+- **Behaviour methods are the only way to change state.** No setters and no public writable fields. Each method checks the rules before it changes anything, so a model is always valid. Read-only getters are fine for showing and saving data; a decision made from several getters belongs in the model.
 - **An aggregate is the smallest group that must be consistent in one transaction.** Test: "which rule breaks if these two are saved separately?" If no rule breaks, they are separate aggregates.
 - **Start with one entity and its values.** Make an aggregate bigger only when a real rule needs it.
 - **Refer to other aggregates by ID**, not by holding the object.
@@ -84,3 +85,20 @@ Technique: push on each step: "can they skip this?", "what if this happens twice
 3. Use the `tdd-cycle` skill to write that test.
 
 Come back to this skill when a later test shows a new word or rule, or when a use case starts to make business decisions. The model changes as you learn.
+
+## Further reading
+
+Short and free first:
+
+- Martin Fowler, [Anemic Domain Model](https://martinfowler.com/bliki/AnemicDomainModel.html): why behaviour belongs with the data.
+- Martin Fowler, [DDD Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html), [Ubiquitous Language](https://martinfowler.com/bliki/UbiquitousLanguage.html), [Bounded Context](https://martinfowler.com/bliki/BoundedContext.html): one page each.
+- Martin Fowler, [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html): put data and behaviour together, without dropping every query.
+- Allen Holub, [Why getter and setter methods are evil](https://www.infoworld.com/article/2073723/why-getter-and-setter-methods-are-evil.html): encapsulation and behaviour-first objects.
+- Vaughn Vernon, Effective Aggregate Design, [part 1](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_1.pdf), [part 2](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_2.pdf), [part 3](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_3.pdf): the clearest guide to aggregate size and boundaries.
+- Scott Wlaschin, [Making illegal states unrepresentable](https://fsharpforfunandprofit.com/posts/designing-with-types-making-illegal-states-unrepresentable/): explicit states with types (F#, but the idea carries over).
+- Eric Evans, [DDD Reference](https://www.domainlanguage.com/ddd/reference/): free summary of every DDD pattern, for looking things up.
+
+Books, when you want more:
+
+- Vlad Khononov, *Learning Domain-Driven Design* (O'Reilly, 2021): the easiest full introduction, including when not to build a domain model.
+- Alberto Brandolini, [*Introducing EventStorming*](https://leanpub.com/introducing_eventstorming): discovering a domain from its events, with the people who know it.
