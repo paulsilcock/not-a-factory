@@ -41,8 +41,7 @@ A short summary in your reply, in plain English that the developer could read to
 
 - **Every rule has at least one concrete example**, with real dates, amounts or names. Each example is a test, so the examples are the starting test list.
 - **Say the rules out loud.** If a sentence sounds awkward in the business's words, the words or the model are wrong. Find an easier way to say it.
-- **"Still to answer"** goes back to the developer. Do not write a test that depends on an open question. Many open questions mean the capability is not ready to build.
-- **Many examples under one rule** mean the rule is too complex. Split it.
+- **"Still to answer"** goes back to the developer. Do not write a test that depends on an open question.
 - **"Where the rules go"** is a guess, in plain words, not class names. It tells `tdd-cycle` which component to build first. The tests may prove it wrong.
 
 It does NOT produce class diagrams, fields, tables, code, or models for later capabilities. For a domain with no real rules (CRUD), the summary is "What we agreed" only.
@@ -117,7 +116,6 @@ Also come back when a use case starts to make business decisions. The model chan
 
 Short and free first:
 
-- Cucumber, [Example Mapping](https://cucumber.io/docs/bdd/example-mapping): rules, examples and questions for one story, on cards.
 - Martin Fowler, [Anemic Domain Model](https://martinfowler.com/bliki/AnemicDomainModel.html): why behaviour belongs with the data.
 - Martin Fowler, [DDD Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html), [Ubiquitous Language](https://martinfowler.com/bliki/UbiquitousLanguage.html), [Bounded Context](https://martinfowler.com/bliki/BoundedContext.html): one page each.
 - Martin Fowler, [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html): put data and behaviour together, without dropping every query.
