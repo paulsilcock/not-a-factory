@@ -1,0 +1,16 @@
+{
+  "name": "not-a-factory",
+  "owner": {
+    "name": "Paul Silcock"
+  },
+  "metadata": {
+    "description": "Scaffold apps and build them outside in, one test at a time."
+  },
+  "plugins": [
+    {
+      "name": "not-a-factory",
+      "source": "./plugins/not-a-factory",
+      "description": "Create a TanStack Router + Hono + Litmus app with TDD rules and skills."
+    }
+  ]
+}

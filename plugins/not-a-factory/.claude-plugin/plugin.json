@@ -1,0 +1,10 @@
+{
+  "name": "not-a-factory",
+  "version": "0.1.0",
+  "description": "Create a TanStack Router + Hono + Litmus app with TDD rules and skills.",
+  "author": {
+    "name": "Paul Silcock"
+  },
+  "repository": "https://github.com/paulsilcock/not-a-factory",
+  "license": "MIT"
+}
