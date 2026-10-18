@@ -1,6 +1,6 @@
 ---
 name: model-domain
-description: Have a short domain discovery conversation with the developer, then shape the domain model for the next test. Use when a test or a request needs a new business concept, rule, state or term; when a name is unclear; when a use case starts making business decisions; or when you are about to write code in api/src/domain/. Produces agreed words, rules and the next behaviour to test, not a design.
+description: Have a short domain discovery conversation with the developer, then shape the domain model for the next tests. Use when a test or a request needs a new business concept, rule, state or term; when a name is unclear; when a use case starts making business decisions; or when you are about to write code in api/src/domain/. Produces, in plain English - the agreed words, the rules with examples, open questions, a first guess at where the rules go, and the first test. Each example becomes a test.
 ---
 
 # Model the domain
@@ -18,11 +18,34 @@ A domain model is part of the solution, not a copy of the business. It is our cu
 
 ## What this produces
 
-- The words: each term and what it means, in the developer's words.
-- The rules: what must always be true, and what makes an action not allowed.
-- **The next behaviour to test.**
+A short summary in your reply, in plain English that the developer could read to someone who knows the business. Only for the capability being built now.
 
-It does NOT produce class diagrams, lists of all aggregates or tables, or an implementation plan.
+```
+**What we agreed**
+- A *loan* is one book borrowed by one member.
+- A member can *extend* a loan, or *return* the book.
+
+**Rules, with examples**
+- A loan lasts two weeks. Borrowed on 1 March, due back on 15 March.
+- A member can extend a loan by one week, at most twice. Extended twice already: the third try is refused.
+- An overdue loan cannot be extended. Due on 15 March, asked on 16 March: refused.
+
+**Still to answer**
+- Can a member extend a loan when someone else is waiting for the book?
+
+**Where the rules go (a first guess)**
+- All three rules are about one loan, so the loan keeps them. It only needs to know which member and which book.
+
+**First test:** a new loan is due back in two weeks.
+```
+
+- **Every rule has at least one concrete example**, with real dates, amounts or names. Each example is a test, so the examples are the starting test list.
+- **Say the rules out loud.** If a sentence sounds awkward in the business's words, the words or the model are wrong. Find an easier way to say it.
+- **"Still to answer"** goes back to the developer. Do not write a test that depends on an open question. Many open questions mean the capability is not ready to build.
+- **Many examples under one rule** mean the rule is too complex. Split it.
+- **"Where the rules go"** is a guess, in plain words, not class names. It tells `tdd-cycle` which component to build first. The tests may prove it wrong.
+
+It does NOT produce class diagrams, fields, tables, code, or models for later capabilities. For a domain with no real rules (CRUD), the summary is "What we agreed" only.
 
 ## Questions
 
@@ -41,6 +64,7 @@ Ask a few at a time, and only those that matter for the next test.
 - What must always be true about a <thing>?
 - What must be true before someone can <action>?
 - What would make <action> wrong or impossible? What happens then?
+- Can you give me an example? And one where it is not allowed?
 
 **Boundaries**
 - What must change together, at the same time, to stay correct?
@@ -80,18 +104,20 @@ Technique: push on each step: "can they skip this?", "what if this happens twice
 | Events as commands | Event names that give orders (`SendEmail`), or events used to keep a rule consistent | Past-tense facts; keep consistency rules inside one aggregate |
 | Infrastructure in the domain | Drizzle types, HTTP, `process.env` in `domain/` | Keep them in `infra/` and entrypoints |
 
-## After the conversation
+## Into TDD
 
-1. Write the agreed words and rules in a short list in your reply. Use these names in the code.
-2. Name the next behaviour to test, in one sentence.
-3. Use the `tdd-cycle` skill to write that test.
+1. Agree the summary with the developer. Use its words in the code and in the test names.
+2. Use the `tdd-cycle` skill. The component is the one from "Where the rules go". The test list is the examples. Start with the first test.
+3. Use "Shaping the model" while you build: in GREEN for where code goes, and in REFACTOR to check the design.
+4. After each cycle, review the test list (see the workflow rule). If a test shows a new word or rule, a rule in the wrong place, or an open question, come back to this skill and update the summary.
 
-Come back to this skill when a later test shows a new word or rule, or when a use case starts to make business decisions. The model changes as you learn.
+Also come back when a use case starts to make business decisions. The model changes as you learn.
 
 ## Further reading
 
 Short and free first:
 
+- Cucumber, [Example Mapping](https://cucumber.io/docs/bdd/example-mapping): rules, examples and questions for one story, in about 25 minutes.
 - Martin Fowler, [Anemic Domain Model](https://martinfowler.com/bliki/AnemicDomainModel.html): why behaviour belongs with the data.
 - Martin Fowler, [DDD Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html), [Ubiquitous Language](https://martinfowler.com/bliki/UbiquitousLanguage.html), [Bounded Context](https://martinfowler.com/bliki/BoundedContext.html): one page each.
 - Martin Fowler, [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html): put data and behaviour together, without dropping every query.
