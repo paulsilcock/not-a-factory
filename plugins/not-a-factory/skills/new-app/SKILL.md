@@ -17,7 +17,7 @@ The app is a copy of the plugin's `template/` folder. `PLUGIN` below is `${CLAUD
    ```sh
    cp -R "PLUGIN/template" <name>
    mkdir -p <name>/.claude/skills
-   cp -R "PLUGIN/skills/next-capability" "PLUGIN/skills/tdd-cycle" "PLUGIN/skills/model-domain" "PLUGIN/skills/test-quality" <name>/.claude/skills/
+   cp -R "PLUGIN/skills/new-capability" "PLUGIN/skills/tdd-cycle" "PLUGIN/skills/model-domain" "PLUGIN/skills/test-quality" <name>/.claude/skills/
    cd <name>
    grep -rl '{{APP_NAME}}' . | xargs sed -i.bak 's/{{APP_NAME}}/<name>/g'
    find . -name '*.bak' -delete

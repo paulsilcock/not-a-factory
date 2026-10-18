@@ -1,52 +1,61 @@
 ---
 name: tdd-cycle
-description: Run one RED → GREEN → REFACTOR cycle for one behaviour, with this project's commands. Use whenever you are about to write or change code in api/ or web/, when a test is failing and you are making it pass, or when the acceptance test points at a missing piece.
+description: Build or change one component test-first, one test at a time. Use when an acceptance test points at a missing piece, when the developer names a component to build (for example "the repository this use case needs"), or for a bug fix or refactor that starts at one component. Names the component, its consumer, its test and the rules that apply, then runs RED → GREEN → REFACTOR until the consumer's need is met.
 ---
 
 # TDD cycle (inner loop)
 
 > The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
 
-One behaviour per cycle. In guided mode, stop after each step and wait for the developer.
+The cycle itself (RED, GREEN, REFACTOR, stubs, the DO NOT list, the modes) is in `.claude/rules/workflow.md`. This skill decides **what** the cycle builds.
 
-## Commands
+## 1. Find where we are
 
-| What | Command |
-|---|---|
-| One API test file | `pnpm --filter api exec vitest run src/domain/order.test.ts` |
-| One web test file | `pnpm --filter web exec vitest run src/routes/index.test.tsx` |
-| API unit tests | `pnpm --filter api test:unit` |
-| Acceptance tests | `pnpm test:acceptance` (needs `pnpm db:up`) |
-| Typecheck | `pnpm typecheck` |
-| Lint and format | `pnpm lint:fix` |
+- What fails now? The acceptance test, a unit test, or nothing yet?
+- What changed? `git status` and `git diff`. The developer may have written the consumer, or part of the component.
+- What did the developer ask for? If they named the component, use their name and their design.
 
-Paths for `--filter <pkg> exec` are relative to that package.
+## 2. Name the component and its consumer
 
-## 1. RED
+Say it in one sentence: "Building <component> in <layer>, because <consumer> needs <behaviour>." The consumer is the code or test that will call it: the acceptance test, a route, a use case.
 
-- Pick the behaviour from the failure: "what is stopping the outer test right now?"
-- Write one test for it. Name it as behaviour: `"a basket with no items cannot be checked out"`.
-- Put it next to the code: `api/src/domain/basket.ts` → `api/src/domain/basket.test.ts`.
-- If the code does not exist, add a stub so it compiles. The stub throws `new Error()` or returns nothing.
-- Run the file. Check that it fails **for the right reason**: the assertion fails, or the stub throws. A missing import or a type error is the wrong reason; fix that and run again.
-- Say: "RED: <test name> fails because <reason>."
+| Missing piece | Component | Where | Its test | Runs against | Read first |
+|---|---|---|---|---|---|
+| A business rule, state or calculation | Aggregate or value object | `api/src/domain/` | `<name>.test.ts`, calls the model directly | Plain objects | `layer-domain.md`; `model-domain` skill if the words or rules are new |
+| Something a user intends to do | Use case | `api/src/use-cases/` | `<intent>.test.ts`, calls `handle()` | Real repositories on PGlite, fakes for other services | `layer-use-cases.md` |
+| Saving and loading | Repository and table | `api/src/infra/repositories/`, `infra/db/schema.ts` | `<name>-repository.test.ts` | PGlite (`setupTestDb`) | `layer-infra.md`; then `pnpm db:generate` |
+| Another service (email, payments) | Interface, adapter and fake | `api/src/infra/<service>/` | Use cases use the fake; the adapter is tested against a local stub of the service | Fake or stub | `layer-infra.md` |
+| An HTTP route, status or input check | Route | `api/src/entrypoints/http/` | Usually the acceptance test covers it; write a route test only for HTTP behaviour | The Hono app | `layer-entrypoints.md` |
+| What a page shows or does | Route or component | `web/src/routes/`, `web/src/components/` | `<name>.test.tsx`, by role and label | jsdom | `layer-web.md`; `shadcn` skill; TanStack Intent skills |
 
-## 2. GREEN
+If the piece does not fit a row, or fits two, ask the developer.
 
-- Name the one thing that stops the test from passing. Fix only that.
-- If the missing thing is a collaborator (a repository, a port, a value object), start a new cycle for it first. Then come back.
-- Run the file again. Then run the other tests in the package so you know nothing else broke.
-- Say: "GREEN: <what changed>."
+## 3. Start a short test list
 
-## 3. REFACTOR
+List the behaviours the consumer needs from this component, in business words. Only what the consumer needs, not everything the component could do. Write the list, not the tests.
 
-- Look at the code you changed and the code around it, and the test too.
-- Look for: unclear names, duplication, logic in the wrong layer (see the layer rules), leaked internals, missing error handling.
-- Change one thing at a time and keep the tests green.
-- Run `pnpm typecheck` and `pnpm lint:fix`.
-- Say what you changed, or "REFACTOR: nothing to change, because <reason>."
+## 4. Cycle, one test at a time
 
-## 4. Next
+Pick one behaviour from the list and run RED → GREEN → REFACTOR (see the workflow rule).
 
-- Is a planned test now redundant? Did the cycle show a new behaviour?
-- Go back to the acceptance test, or start the next cycle.
+Run one test file while you work:
+
+- API: `pnpm --filter api exec vitest run src/domain/loan.test.ts`
+- Web: `pnpm --filter web exec vitest run src/routes/index.test.tsx`
+
+Paths are relative to the package. Other commands are in `CLAUDE.md`.
+
+In GREEN, if the missing thing is another component (a collaborator), start a new `tdd-cycle` for it. Its consumer is the component you are building now. Then come back.
+
+## 5. After every cycle, review the list
+
+- Remove behaviours that are now redundant or wrong. Add the ones you found. Change the order if needed. Say what changed.
+- New words or rules: use `model-domain`.
+- A behaviour that a user would see on its own may be a new capability: note it for `new-capability`.
+- In pair mode, ask the developer whether to continue, or whether they want to take the next step.
+
+## 6. Done when the consumer's need is met
+
+- Run all the package's unit tests: `pnpm --filter api test:unit` or `pnpm --filter web test`.
+- If this component is part of a capability, go back to the acceptance test (`new-capability`, step 5).
+- If it is a bug fix or a refactor, run `pnpm test` and stop.

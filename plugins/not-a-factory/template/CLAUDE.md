@@ -6,7 +6,7 @@
 
 Outside in, in small steps. One acceptance test for each user-facing capability, one unit test at a time, refactor every cycle. Decide the next step from what you just learned. No big specs or implementation plans up front. See `.claude/rules/workflow.md`.
 
-Skills: `next-capability` (new capability), `tdd-cycle` (each RED → GREEN → REFACTOR), `model-domain` (new business words or rules), `test-quality` (review tests).
+Skills: `new-capability` (a new capability, outside in), `tdd-cycle` (one component, test-first), `model-domain` (new business words or rules), `test-quality` (review tests).
 
 ## Commands
 
