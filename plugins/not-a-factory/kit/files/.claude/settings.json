@@ -5,12 +5,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop-check.mjs\"",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if grep -Eq '\"stop_hook_active\" *: *true'; then exit 0; fi; pnpm -s lint:fix >/dev/null 2>&1; { pnpm typecheck && pnpm lint; } >&2 || exit 2",
             "timeout": 180
           },
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop-tests.mjs\"",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && (pnpm -s test:changed >/dev/null 2>&1 && echo '{\"systemMessage\":\"Related unit tests passed\"}' || echo '{\"systemMessage\":\"Related unit tests failed. Run pnpm test:changed to see why.\"}')",
             "timeout": 180
           }
         ]

@@ -103,7 +103,7 @@ editJson(join(root, "package.json"), () => ({
     test: "pnpm test:unit && pnpm test:acceptance",
     "test:unit": "pnpm --filter api test:unit && pnpm --filter web test",
     "test:acceptance": "pnpm --filter api test:acceptance",
-    "test:changed": "node scripts/test-changed.mjs",
+    "test:changed": "pnpm -r test:changed",
     "db:up": "docker compose up -d --wait db",
     "db:down": "docker compose down",
     "db:generate": "pnpm --filter api db:generate",
@@ -126,6 +126,7 @@ editJson(join(root, "api/package.json"), (pkg) => ({
     test: "vitest run",
     "test:unit": "vitest run --project unit",
     "test:acceptance": "vitest run --project acceptance",
+    "test:changed": "vitest run --project unit --changed",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
   },
@@ -139,6 +140,7 @@ editJson(join(root, "web/package.json"), (pkg) => {
   delete pkg.pnpm;
   pkg.scripts.typecheck = "tsr generate && tsc --noEmit";
   pkg.scripts.test = "vitest run";
+  pkg.scripts["test:changed"] = "vitest run --changed";
   return pkg;
 });
 
