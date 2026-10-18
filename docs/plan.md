@@ -49,7 +49,7 @@ Piggyback existing bootstrappers, then add Litmus and the kit.
 - **Layout (api):** follow Litmus conventions (domain, use cases, adapters/entrypoints, composition root). Point docs at Litmus's bookshop (`packages/test-acceptance`) as the worked outside-in example.
 
 ## Step 0 (prerequisite): publish Litmus as a release candidate
-Status 18 Oct: `0.1.0-rc.2` published under `@litmus-ts/*`. Blocker found: `@litmus-ts/test` imports `vite-plus/test` at runtime and peers on `vite-plus`; `vite-plus/test` only re-exports `vitest`. Fix in Litmus: import from `vitest`, peer on `vitest`, publish `rc.3`. All packages need Node >= 24.14.1.
+Status 18 Oct: `0.1.0-rc.3` published under `@litmus-ts/*`; `@litmus-ts/test` and `@litmus-ts/db` now peer on `vitest`, not `vite-plus`. All packages need Node >= 24.14.1.
 
 Work in the Litmus repo before the kit. Release as RC (e.g. `0.1.0-rc.0`); only what publishing needs from Litmus #79:
 - Needed: exports switched to built `dist` with every sub-path entry built (the known blocker); package metadata (description, repository, license); npm scope decision (a `litmus` org may already exist on npm; fallback `@paulsilcock/*`); a publish workflow on tag with an npm token; versioning.
