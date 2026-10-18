@@ -50,6 +50,10 @@ A list of behaviours to test is useful, but it is a guess. It is never the final
 - A change to the list can need another skill. A new word or rule means `model-domain`. A new user-facing capability means `new-capability`.
 - Pick the next test from the list as it is now, not as it was at the start: the most important thing the system does not do yet. Importance comes first. Between two equally important tests, take the one you are more confident about; the loop will make the other clearer.
 
+## Discoveries
+
+When the code shows something new about the problem (a case nobody thought of, two rules that conflict, a technical limit that changes what users get), stop and tell the developer at once, in plain words, with the options you see. Do not decide a business question alone, even in autonomous mode. Put the answer in the test list.
+
 ## Think in failures, not features
 
 In GREEN, do not describe what you "need to build". Describe what is missing.
