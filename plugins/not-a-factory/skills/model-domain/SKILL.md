@@ -117,7 +117,7 @@ Also come back when a use case starts to make business decisions. The model chan
 
 Short and free first:
 
-- Cucumber, [Example Mapping](https://cucumber.io/docs/bdd/example-mapping): rules, examples and questions for one story, in about 25 minutes.
+- Cucumber, [Example Mapping](https://cucumber.io/docs/bdd/example-mapping): rules, examples and questions for one story, on cards.
 - Martin Fowler, [Anemic Domain Model](https://martinfowler.com/bliki/AnemicDomainModel.html): why behaviour belongs with the data.
 - Martin Fowler, [DDD Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html), [Ubiquitous Language](https://martinfowler.com/bliki/UbiquitousLanguage.html), [Bounded Context](https://martinfowler.com/bliki/BoundedContext.html): one page each.
 - Martin Fowler, [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html): put data and behaviour together, without dropping every query.
