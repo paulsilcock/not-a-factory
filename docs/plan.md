@@ -22,19 +22,19 @@ plugins/not-a-factory/
   skills/new-app/        # entry command: creates a project (plugin only)
   skills/<others>/       # TDD skills: usable from the plugin anywhere, and copied into new projects
   skills/adopt/          # entry command: copies generic skills into an existing repo (iteration 4)
-  kit/rules/             # house rules + CLAUDE.md template copied into new projects
-  kit/files/             # CI workflow, docker-compose, etc. (railway.json in iteration 3)
-  scripts/               # new-app / adopt implementations
+  template/              # the whole new project: workspace, api, web, CI, CLAUDE.md, .claude/rules, settings
 ```
 
 - Install once per machine: `/plugin marketplace add paulsilcock/not-a-factory`, `/plugin install not-a-factory@not-a-factory` (user scope; stored in local Claude Code config, not the claude.ai account). Develop with `claude --plugin-dir ./plugins/not-a-factory`; check with `claude plugin validate`.
 - The TDD skills are plugin skills (`/not-a-factory:tdd-cycle` etc.), so they work in any repo once the plugin is installed. New projects also get their own copies in `.claude/skills/` (local, unprefixed, committed), because plugin skills are namespaced `/not-a-factory:x` and bare names are unreliable (docs; Claude Code issues #22063, #50486). Plugins also cannot carry rules or CLAUDE.md, so the project gets those too.
 
 ## new-app: what a fresh project contains
-Piggyback existing bootstrappers, then add Litmus and the kit.
+`new-app` copies `template/`, then runs `pnpm install`, `pnpm db:generate` (drizzle-kit writes its migration journal), installs the shadcn skill, and makes the first commit. No script.
 
-- **Web:** `npx @tanstack/cli create web --router-only --add-ons shadcn,tanstack-query --toolchain biome --package-manager pnpm --intent --no-examples --non-interactive` (flags and add-on ids verified 17 Oct via `--help` and `--list-add-ons`; this combination untested). `--router-only` = Vite + TanStack Router without Start; `--intent` sets up TanStack Intent skill mappings. Then `pnpm dlx skills add shadcn/ui`.
-- **API:** `npm create hono@latest api -- --template nodejs`, then Litmus packages `@litmus-ts/{core,http,db,log,test}`, `@hono/node-ws`, Drizzle.
+- **Template, not bootstrappers (decided 18 Oct).** The template was first made with the bootstrappers (TanStack CLI `--router-only`, `create-hono --template nodejs`), then committed. Running them at create time broke in several ways (`--router-only` ignores `--add-ons`; shadcn init prompts; Intent needs an allowlist; Hono's `@hono/node-server` 2.x clashes with Litmus).
+- **Staying current without a bot:** the template has caret version ranges and no lockfile, so each new project gets the latest minor and patch versions. Major versions are raised by hand. Upstream template changes (TanStack, Hono) do not arrive by themselves.
+- **Web:** TanStack Router (no Start), TanStack Query, shadcn/ui, TanStack Intent mappings in `AGENTS.md`; the shadcn skill is installed at create time.
+- **API:** Hono, Litmus `@litmus-ts/{core,http,db,log,test}`, `@hono/node-ws`, Drizzle, pg, tsyringe.
 - **Glue:** pnpm workspace; Hono RPC type shared with web; API serves the built web app (one service); docker-compose Postgres for local; plain Vite + Vitest (not Vite+).
 - **App shell only:** one page and a liveness `/health` (process up, no dependency checks; minimal response), no feature code and no acceptance test. The first acceptance test comes from the first real capability via `next-capability`. Litmus's test package (DSL, HTTP/CLI/browser drivers) is installed and wired so that first test is quick to write.
 - **CI (GitHub Actions):** install, typecheck, lint, unit tests, `db:migrate` then acceptance tests against a Postgres service container, on every push and PR.

@@ -9,16 +9,33 @@ disable-model-invocation: true
 
 Create the app named in the arguments: `$ARGUMENTS`.
 
-1. If no name was given, ask for one (lower case, letters, digits and `-`).
-2. Ask where to create it if the current directory is not a sensible parent (for example, if it is inside another git repository). Default: the current directory.
-3. Run the script. It is in the plugin, two directories above this skill's base directory:
+The app is a copy of the plugin's `template/` folder. `PLUGIN` below is `${CLAUDE_PLUGIN_ROOT}`. If that is empty, it is two directories above this skill's base directory.
+
+1. If no name was given, ask for one (lower case, letters, digits and `-`). The directory `<name>` must not exist. Create it in the current directory unless the developer says otherwise.
+2. Run these commands. Stop and show the error if one fails. Do not work around a failure by hand.
 
    ```sh
-   node "${CLAUDE_PLUGIN_ROOT}/scripts/new-app.mjs" <name> --dir <parent>
+   cp -R "PLUGIN/template" <name>
+   mkdir -p <name>/.claude/skills
+   cp -R "PLUGIN/skills/next-capability" "PLUGIN/skills/tdd-cycle" "PLUGIN/skills/model-domain" "PLUGIN/skills/test-quality" <name>/.claude/skills/
+   cd <name>
+   grep -rl '{{APP_NAME}}' . | xargs sed -i.bak 's/{{APP_NAME}}/<name>/g'
+   find . -name '*.bak' -delete
+   cp .env.example .env
+   pnpm install
+   pnpm db:generate
+   pnpm dlx skills add shadcn/ui --skill shadcn --agent claude-code --yes
+   git init -q -b main && git add -A && git commit -q -m "Create <name> with not-a-factory"
    ```
 
-   If `${CLAUDE_PLUGIN_ROOT}` is empty, use `<this skill's base directory>/../../scripts/new-app.mjs`.
+   `pnpm install` fails if Node is older than 24.14.1 (`engine-strict`). `pnpm db:generate` lets drizzle-kit create its migration journal.
+3. Tell the developer the next steps:
 
-   The script takes a few minutes. It needs Node 24.14.1 or later, pnpm, git and network access. Docker is needed later for the local Postgres.
-4. If the script fails, show the error and stop. Do not try to finish the setup by hand.
-5. When it succeeds, tell the developer the next steps the script printed, and that they should open Claude Code in the new directory to get its rules and skills.
+   ```sh
+   cd <name>
+   pnpm db:up        # needs Docker
+   pnpm db:migrate
+   pnpm dev          # web http://localhost:3000, API http://localhost:3001
+   ```
+
+   Then open Claude Code in `<name>/` to load its rules and skills.

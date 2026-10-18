@@ -5,8 +5,8 @@
     "includes": [
       "**",
       "!**/routeTree.gen.ts",
-      "!**/drizzle/meta/**",
-      "!.claude/skills/shadcn/**"
+      "!**/drizzle/meta",
+      "!.claude/skills/shadcn"
     ]
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },

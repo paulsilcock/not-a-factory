@@ -28,11 +28,11 @@ Needs Node.js 24.14.1 or later, pnpm, git and Docker.
 ```
 .claude-plugin/marketplace.json
 plugins/not-a-factory/
-  skills/new-app/      the /not-a-factory:new-app command
-  scripts/new-app.mjs  what new-app runs
-  kit/rules/           copied to <app>/.claude/rules/
-  kit/skills/          copied to <app>/.claude/skills/
-  kit/files/           copied to <app>/ (workspace, api, web, CI, hooks)
+  skills/new-app/   the /not-a-factory:new-app command (copies the template)
+  skills/<others>/  TDD skills: plugin skills, also copied into new projects
+  template/         the new project, with {{APP_NAME}} placeholders
 ```
+
+The template has caret version ranges and no lockfile, so each new project gets the latest minor and patch versions. Raise major versions by hand, then create a project and run its checks.
 
 Check the manifests with `claude plugin validate .` and `claude plugin validate plugins/not-a-factory`.

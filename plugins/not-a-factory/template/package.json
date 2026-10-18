@@ -1,0 +1,33 @@
+{
+  "name": "{{APP_NAME}}",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=24.14.1"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter api start",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "pnpm test:unit && pnpm test:acceptance",
+    "test:unit": "pnpm --filter api test:unit && pnpm --filter web test",
+    "test:acceptance": "pnpm --filter api test:acceptance",
+    "test:changed": "pnpm -r test:changed",
+    "db:up": "docker compose up -d --wait db",
+    "db:down": "docker compose down",
+    "db:generate": "pnpm --filter api db:generate",
+    "db:migrate": "pnpm --filter api db:migrate"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15"
+  },
+  "intent": {
+    "skills": [
+      "@tanstack/*"
+    ]
+  }
+}
