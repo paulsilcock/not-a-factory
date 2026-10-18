@@ -7,9 +7,10 @@ For personal use first; easy to make reusable later. Keep iteration 1 small: any
 
 ## Iterations
 1. **Local + CI.** `new-app`, the rules and skills, local Postgres, local migrations, GitHub Actions. No deploy.
-2. **Railway + Neon.** Deploy, PR environments, a Neon branch per PR environment (deleted with it), migrate on deploy with a backup first. Reviewer agents `test-reviewer` and `design-reviewer`. The README lists the one-off account setup so the developer can test deploys on their own accounts.
-3. **Everything else.** Migration safety checks (with `migration-reviewer`), `adopt`, `add-*` skills and the rest of the deferred list.
-4. **Auth** (optional, final).
+2. **Reviewer agents.** `test-reviewer` and `design-reviewer`, written against the rules as tightened by iteration 1 feedback. Plugin agents, also copied into new projects. No accounts needed; test on the iteration 1 demo project.
+3. **Railway + Neon.** Deploy, PR environments, a Neon branch per PR environment (deleted with it), migrate on deploy with a backup first. The README lists the one-off account setup so the developer can test deploys on their own accounts.
+4. **Everything else.** Migration safety checks (with `migration-reviewer`), `adopt`, `add-*` skills and the rest of the deferred list.
+5. **Auth** (optional, final).
 
 ## Shape
 One new repo, `paulsilcock/not-a-factory`, which is a Claude Code plugin plus the marketplace that lists it:
@@ -20,9 +21,9 @@ plugins/not-a-factory/
   .claude-plugin/plugin.json
   skills/new-app/        # entry command: creates a project (plugin only)
   skills/<others>/       # TDD skills: usable from the plugin anywhere, and copied into new projects
-  skills/adopt/          # entry command: copies generic skills into an existing repo (iteration 3)
+  skills/adopt/          # entry command: copies generic skills into an existing repo (iteration 4)
   kit/rules/             # house rules + CLAUDE.md template copied into new projects
-  kit/files/             # CI workflow, docker-compose, etc. (railway.json in iteration 2)
+  kit/files/             # CI workflow, docker-compose, etc. (railway.json in iteration 3)
   scripts/               # new-app / adopt implementations
 ```
 
@@ -39,7 +40,12 @@ Piggyback existing bootstrappers, then add Litmus and the kit.
 - **CI (GitHub Actions):** install, typecheck, lint, unit tests, `db:migrate` then acceptance tests against a Postgres service container, on every push and PR.
 - **Migrations (iteration 1):** `pnpm db:generate` and `pnpm db:migrate` (drizzle-kit) against the docker-compose Postgres locally, and against the service container in CI.
 
-## Iteration 2: Railway + Neon
+## Iteration 2: reviewer agents
+- `test-reviewer`: reviews tests against `testing.md` and the `test-quality` properties (rates each property; no single score).
+- `design-reviewer`: reviews code against `architecture.md` and the layer rules (dependency direction, thin entrypoints, rules in the domain).
+- Both report findings and ask before changing code. Exact scope comes from iteration 1 feedback.
+
+## Iteration 3: Railway + Neon
 - Railway: prefer Railway's native GitHub integration with PR environments (a temporary environment per PR, removed on merge) and "wait for CI" so Railway deploys only after Actions pass (prior knowledge, medium confidence; verify in current Railway docs). Fallback: deploy from Actions with the Railway CLI (`railway up`); token guidance is inconsistent (project vs account token; a reported auth regression in CLI v5.3.0), so test before relying on it.
 - Railway's deploy healthcheck uses `/health` (`healthcheckPath` in railway.json). A DB readiness check is optional and separate; do not fail liveness on a dependency.
 - Neon for Postgres (not Railway Postgres): a Neon branch per Railway PR environment, created with it and deleted when the PR environment is removed. How Railway PR environments hook into Neon is not verified; check the current Railway and Neon docs first.
@@ -75,7 +81,7 @@ Principles:
 
 **Code navigation and docs (in always-on rules):** use the TypeScript language server (Claude Code's `typescript-lsp@claude-plugins-official` plugin, already used in Litmus) for definitions, references, types and JSDoc before falling back to grep. For Litmus APIs, read the JSDoc via the language server and the package READMEs in `node_modules/@litmus-ts/*` (or the Litmus skills once Litmus ships them) rather than guessing. `new-app` enables the plugin in `.claude/settings.json`.
 
-**Skills (procedures and depth):** `next-capability` (outer loop with the Litmus DSL/drivers), `tdd-cycle` (inner loop with this project's exact commands), `model-domain` (discovery conversation; also triggered from the TDD loop when a test needs a new domain concept), `test-quality` (Farley index; Farley's own properties for acceptance tests). Iteration 2 candidates from create-agent-app and Litmus #85: `add-use-case`, `add-aggregate`, `add-adapter`/`add-repository`, `add-route`, schema migration.
+**Skills (procedures and depth):** `next-capability` (outer loop with the Litmus DSL/drivers), `tdd-cycle` (inner loop with this project's exact commands), `model-domain` (discovery conversation; also triggered from the TDD loop when a test needs a new domain concept), `test-quality` (Farley index; Farley's own properties for acceptance tests). Iteration 4 candidates from create-agent-app and Litmus #85: `add-use-case`, `add-aggregate`, `add-adapter`/`add-repository`, `add-route`, schema migration.
 
 **Sources:** create-agent-app `.claude/rules/*` and nested CLAUDE.md files (convert frontmatter to `paths:`, replace Bun/tsyringe specifics with Litmus, rewrite the client guidance for TanStack Router + shadcn, fix the known contradictions, cut duplication); Litmus `tdd-workflow.md` + `code-quality.md`; ideas from Kent Beck "Augmented Coding", citypaul/.dotfiles, Böckeler on spec-driven development.
 
@@ -83,15 +89,15 @@ Principles:
 1. Typecheck + lint: blocks. Run the linter's auto-fix first (`biome check --write`) so only real errors remain; if typecheck or lint still fails, exit 2 with the errors so Claude fixes them before stopping. These are mechanical fixes, not design decisions, and the rules keep code compiling in RED (stubs throw). Check `stop_hook_active` and exit 0 when true, so it cannot loop.
 2. Related tests: never blocks. Skip if no source files changed; run only tests related to changed files (`vitest related <files>` or `vitest --changed`); always exit 0 and show a short summary to the developer as JSON `systemMessage` (shown to the user, not to Claude, per the hooks docs; confirm Stop keeps `systemMessage`). A failing test may be the expected RED, so the developer decides what happens next. Command exposed as a script (e.g. `pnpm test:changed`).
 
-## Migration safety checks (Drizzle, Neon) — iteration 3
-Iteration 1: local and CI migrations only. Iteration 2: per-PR Neon branch and migrate on deploy (above).
+## Migration safety checks (Drizzle, Neon) — iteration 4
+Iteration 1: local and CI migrations only. Iteration 3: per-PR Neon branch and migrate on deploy (above).
 - Migrations run in CI, never by hand. On merge to main: back up (Neon branch or restore point), then `drizzle-kit migrate` against production.
-- Per PR, on top of the iteration 2 branch (Neon's documented pattern, verified 17 Oct): create a Neon branch from main with `neondatabase/create-branch-action` (copy-on-write, so it holds production-like schema and data), run `drizzle-kit migrate` on it, post `neondatabase/schema-diff-action` output as a PR comment, delete the branch on close. The same branch can back the Railway PR environment. The branch run doubles as a rehearsal: it shows how long the migration takes on real data volumes.
+- Per PR, on top of the iteration 3 branch (Neon's documented pattern, verified 17 Oct): create a Neon branch from main with `neondatabase/create-branch-action` (copy-on-write, so it holds production-like schema and data), run `drizzle-kit migrate` on it, post `neondatabase/schema-diff-action` output as a PR comment, delete the branch on close. The same branch can back the Railway PR environment. The branch run doubles as a rehearsal: it shows how long the migration takes on real data volumes.
 - Checks (drizzle-kit generates plain SQL migration files, so SQL linting works): fail CI if `drizzle-kit generate` would produce a new migration (schema changed without one); `drizzle-kit check` for migration history consistency; Squawk (Postgres migration linter, GitHub Action available) on the generated SQL for lock-heavy or unsafe operations.
 - `migration-reviewer` agent (reads the schema and migration diff plus Squawk and rehearsal output): flags destructive changes (drops, renames, type narrowing, NOT NULL without default) and slow ones (table rewrites, constraints without NOT VALID, non-concurrent indexes on big tables), and proposes an expand/contract split into smaller migrations. Its instructions carry the practice: expand (add alongside), migrate (dual write, batched backfill, switch reads), contract (drop later, separate release); every step backward compatible so old and new app versions run together; `CREATE INDEX CONCURRENTLY`; constraints as `NOT VALID` then validate; short `lock_timeout`; avoid full-table rewrites; pgroll (Xata; Neon guide) as an option for automating expand/contract, not a default. Run locally as a subagent and in CI (e.g. Claude Code GitHub Action) as a PR comment.
 - No branch swap: promoting a migrated branch would lose writes made to main meanwhile; Neon's reset-from-parent overwrites the child and does not apply to the root branch. Expand/contract on main gives the same protection without drift.
 
-## Deferred (iteration 3+)
+## Deferred (iteration 4+)
 - Nice to have, after all iterations: evals (they cost money) kept out of the Stop hook; a separate, explicit command developers run, with which suites run where configurable.
 `adopt` and `orient` (existing repos; start from Claude Code's `/init` and community onboarding skills), `characterise` (Feathers; citypaul has characterisation-tests and finding-seams), `add-adapter`, `/sync` to refresh copied skills, standalone `npx` entry, options for others.
 
