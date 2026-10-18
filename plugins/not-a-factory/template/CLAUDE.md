@@ -16,7 +16,7 @@ Skills: `new-feature` (a new feature, outside in), `acceptance-test` (one accept
 | Run web + API | `pnpm dev` (web on :3000, API on :3001) |
 | All tests | `pnpm test` |
 | Unit tests | `pnpm test:unit` |
-| Acceptance tests | `pnpm test:acceptance` |
+| Acceptance tests | `pnpm test:acceptance` (starts the app in Docker) |
 | Tests for changed files | `pnpm test:changed` |
 | Typecheck / lint | `pnpm typecheck` / `pnpm lint:fix` |
 | New migration / apply | `pnpm db:generate` / `pnpm db:migrate` |

@@ -18,7 +18,7 @@ api/test-acceptance/    acceptance tests, DSL, drivers
 - `domain` imports nothing from the other layers.
 - Use cases do not know which entrypoint called them.
 - Entrypoints are thin: parse input, call one use case, return the result. No business logic.
-- Only `main.ts` (and the acceptance-test system bootstrap) decides which real or fake implementation is used.
+- Only `main.ts` decides which real implementation is used. Tests swap infrastructure through configuration or fakes, never by editing app wiring.
 
 ## Litmus
 

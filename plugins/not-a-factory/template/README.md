@@ -23,10 +23,10 @@ pnpm dev          # web http://localhost:3000, API http://localhost:3001
 
 ```sh
 pnpm test:unit
-pnpm test:acceptance   # needs pnpm db:up
+pnpm test:acceptance   # builds the app image and runs it with Postgres in Docker
 pnpm test              # both
 ```
 
 ## CI
 
-GitHub Actions (`.github/workflows/ci.yml`) runs typecheck, lint, unit tests, migrations, acceptance tests against a Postgres service container, and the build, on every push and pull request.
+GitHub Actions (`.github/workflows/ci.yml`) runs typecheck, lint, unit tests, acceptance tests against the app's Docker image, and the build, on every push and pull request.

@@ -18,7 +18,7 @@ An acceptance test is an executable specification. It says what the system must 
 | Test case | WHAT the user does and sees | `api/test-acceptance/<feature>.test.ts` | URLs, JSON, status codes, selectors, `expect` |
 | DSL | The business words, shared by all test cases | `dsl.ts`, `dsl/<area>.ts` | Anything about how the system works |
 | Protocol driver | HOW to talk to the system through one channel (HTTP, browser) | `driver.ts` (interface), `driver/http.ts` | Business decisions |
-| System under test | The real app, started like production | `system.ts` | Test-only behaviour |
+| System under test | The app, deployed like production: its Docker image, with Postgres | `Dockerfile`, `docker-compose.yml`, `global-setup.ts` | Test-only behaviour |
 
 Each layer calls only the layer below it.
 
@@ -27,11 +27,21 @@ Each layer calls only the layer below it.
 Write it as if the DSL already has every word you need. Invent the words now, and do not think about the implementation.
 
 ```ts
-it("a member can borrow a book that is on the shelf", async ({ dsl }) => {
+import { acceptance } from "@litmus-ts/test";
+import { describe } from "vitest";
+
+import { createDriver } from "./driver.ts";
+import { AppDsl } from "./dsl.ts";
+
+describe("borrowing books", () => {
+  const { it } = acceptance(() => new AppDsl(createDriver()));
+
+  it("a member can borrow a book that is on the shelf", async ({ dsl }) => {
   await dsl.books.isOnShelf({ title: "Dune" });
   await dsl.members.hasJoined({ name: "Ada" });
   await dsl.loans.borrow({ member: "Ada", book: "Dune" });
   await dsl.loans.confirmBorrowed({ member: "Ada", book: "Dune" });
+  });
 });
 ```
 
@@ -74,23 +84,23 @@ The driver is the only place that knows how the system is reached. If the API ch
 
 ## 4. Run it
 
-`pnpm test:acceptance` (needs `pnpm db:up`). It must fail because the behaviour is missing: the stub route throws, or a `confirm...` check fails. If it fails for any other reason, fix the test first.
+`pnpm test:acceptance` (needs Docker). It must fail because the behaviour is missing: the stub route throws, or a `confirm...` check fails. If it fails for any other reason, fix the test first.
 
 ## Isolation
 
 - Each test starts from a running system that holds none of its data. Thanks to the aliases, tests can share one database and run in any order.
 - Never use data that another test created. Never add reset or cleanup endpoints.
-- `system.ts` starts the real API with the same wiring as `main.ts`, on a real Postgres with all migrations applied. Replace only external services, with stubs. If you change `main.ts`, change `system.ts` to match.
+- The tests treat the app as a black box: they know only its address and, through the typed client, the shape of its API. They never import or run app code.
+- `global-setup.ts` starts the app as production would: it builds the `Dockerfile`, starts it with Postgres as a separate Docker Compose project (`acceptance`), runs the migrations, and waits for `/health`. It removes the stack afterwards. Your development database is not touched.
+- With `ACCEPTANCE_URL` set, the tests start nothing and use that address, for example a deployed environment.
 
 ## External services
 
 When the app calls another system (email, payments), the test must not reach the real one.
 
-1. Write a small stub of that service: an HTTP server that records what it receives. Start it in `system.ts` on a free port, and give its URL to the app through the same configuration as production.
+1. Write a small stub of that service: an HTTP server that records what it receives. Run it as its own service in `docker-compose.yml` (profile `app`), and give its URL to the app through the same environment variable that production uses.
 2. The driver asks the stub what it received, for example in `confirmConfirmationEmailSent`.
 3. The stub is test code. The app does not know that it is talking to a stub.
-
-The Litmus bookshop example has an email stub: [`packages/test-acceptance/src/bookshop`](https://github.com/paulsilcock/litmus/tree/main/packages/test-acceptance/src/bookshop).
 
 ## A browser driver
 

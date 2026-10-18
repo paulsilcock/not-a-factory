@@ -11,7 +11,7 @@ Follow `.claude/rules/workflow.md`: the mode (guided, pair or autonomous), one t
 
 ## 1. Find where we are
 
-- Are there acceptance tests for this feature already, and do they fail? Run `pnpm test:acceptance` (needs `pnpm db:up`).
+- Are there acceptance tests for this feature already, and do they fail? Run `pnpm test:acceptance` (needs Docker).
 - What changed? `git status` and `git diff`. The developer may have written some of it.
 - If a test for this feature already fails, go to step 4.
 

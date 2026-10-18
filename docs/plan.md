@@ -37,8 +37,8 @@ plugins/not-a-factory/
 - **API:** Hono, Litmus `@litmus-ts/{core,http,db,log,test}`, `@hono/node-ws`, Drizzle, pg, tsyringe.
 - **Glue:** pnpm workspace; Hono RPC type shared with web; API serves the built web app (one service); docker-compose Postgres for local; plain Vite + Vitest (not Vite+).
 - **App shell only:** one page and a liveness `/health` (process up, no dependency checks; minimal response), no feature code and no acceptance test. The first acceptance test comes from the first real feature via `new-feature`. Litmus's test package (DSL, HTTP/CLI/browser drivers) is installed and wired so that first test is quick to write.
-- **CI (GitHub Actions):** install, typecheck, lint, unit tests, `db:migrate` then acceptance tests against a Postgres service container, on every push and PR.
-- **Migrations (iteration 1):** `pnpm db:generate` and `pnpm db:migrate` (drizzle-kit) against the docker-compose Postgres locally, and against the service container in CI.
+- **CI (GitHub Actions):** install, typecheck, lint, unit tests, acceptance tests against the app's Docker image with Postgres (Docker Compose), on every push and PR.
+- **Migrations (iteration 1):** `pnpm db:generate` and `pnpm db:migrate` (drizzle-kit) against the docker-compose Postgres locally, and against the acceptance-test stack in CI.
 
 ## Iteration 2: reviewer agents
 - `test-reviewer`: reviews tests against `testing.md` and the `test-quality` properties (rates each property; no single score).
@@ -47,6 +47,8 @@ plugins/not-a-factory/
 
 ## Iteration 3: Railway + Neon
 - Railway: prefer Railway's native GitHub integration with PR environments (a temporary environment per PR, removed on merge) and "wait for CI" so Railway deploys only after Actions pass (prior knowledge, medium confidence; verify in current Railway docs). Fallback: deploy from Actions with the Railway CLI (`railway up`); token guidance is inconsistent (project vs account token; a reported auth regression in CLI v5.3.0), so test before relying on it.
+- Deploy the same `Dockerfile` that local Docker Compose and CI already use (Railway Dockerfile builds: prior knowledge, verify).
+- Run the acceptance tests against each PR environment: they already take its address from `ACCEPTANCE_URL`. Open question: how stubs for external services work in a deployed environment.
 - Railway's deploy healthcheck uses `/health` (`healthcheckPath` in railway.json). A DB readiness check is optional and separate; do not fail liveness on a dependency.
 - Neon for Postgres (not Railway Postgres): a Neon branch per Railway PR environment, created with it and deleted when the PR environment is removed. How Railway PR environments hook into Neon is not verified; check the current Railway and Neon docs first.
 - Migrate on deploy (`drizzle-kit migrate`); on merge to main, back up first (Neon branch or restore point).

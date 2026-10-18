@@ -12,5 +12,5 @@ Always:
 - Each layer calls only the one below it: test case → DSL → driver → system.
 - The DSL aliases every name (`this.context.alias(...)`) and gives defaults for what a test does not care about.
 - Only the driver knows how the system is reached. It does the checks and throws a clear `Error` when an outcome is wrong.
-- Tests reach the system only through `system.ts` and its public interfaces. Never through the container or the database.
+- Tests treat the app as a black box: only its address and its public interfaces. They never import or run app code (type imports for the typed client are fine), and never touch its database.
 - No test depends on data from another test.

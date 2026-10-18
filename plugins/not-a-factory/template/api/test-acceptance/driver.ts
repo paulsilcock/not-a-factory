@@ -1,5 +1,6 @@
+import { inject } from "vitest";
+
 import { HttpAppDriver } from "./driver/http.ts";
-import type { RunningSystem } from "./system.ts";
 
 /**
  * What a user can do with the app, in business words.
@@ -7,6 +8,6 @@ import type { RunningSystem } from "./system.ts";
  */
 export interface AppDriver extends AsyncDisposable {}
 
-export function createDriver(system: RunningSystem): AppDriver {
-  return new HttpAppDriver(system.baseUrl);
+export function createDriver(): AppDriver {
+  return new HttpAppDriver(inject("acceptanceUrl"));
 }
