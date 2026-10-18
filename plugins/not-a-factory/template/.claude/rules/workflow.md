@@ -46,8 +46,9 @@ A list of behaviours to test is useful, but it is a guess. It is never the final
 
 - Keep the list short and in business words. Write the list, not the tests.
 - After every cycle, use what you learnt to update it: remove tests that are now redundant or wrong, add behaviours you found, and change the order if needed. Say what changed and why.
+- This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In guided and pair mode, ask first.
 - A change to the list can need another skill. A new word or rule means `model-domain`. A new user-facing capability means `new-capability`.
-- Pick the next test from the list as it is now, not as it was at the start.
+- Pick the next test from the list as it is now, not as it was at the start: the most important thing the system does not do yet. Importance comes first. Between two equally important tests, take the one you are more confident about; the loop will make the other clearer.
 
 ## Think in failures, not features
 
@@ -70,4 +71,4 @@ In GREEN, do not describe what you "need to build". Describe what is missing.
 - **DO NOT plan classes, files, tables or architecture up front.** Plan which behaviours to test. The design comes out of the tests.
 - **DO NOT batch work.** Every RED, GREEN and REFACTOR is a checkpoint.
 - **DO NOT write implementation plans**, even in a planning mode. The plan is: the next acceptance test (one sentence) and the first behaviour inside it (one sentence). Nothing more.
-- **DO NOT leave the code broken between steps.** Typecheck and lint must pass when you stop. In RED, only the new test fails.
+- **DO NOT leave the code broken between steps.** Typecheck and lint must pass when you stop. In RED, only the new test fails at its level. The acceptance test stays red while you build the components it needs; that is expected.

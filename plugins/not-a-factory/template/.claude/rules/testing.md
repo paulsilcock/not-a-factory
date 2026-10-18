@@ -9,7 +9,7 @@
   - Bad: `"checkout handler returns 201"`
   - Good: `"a customer sees their order after checkout"`
   - Good: `"a customer cannot check out an empty basket"`
-- Before you write a test, look for one that already covers the behaviour. If a broader test covers it, do not write the narrow one. Write the broadest useful test first.
+- Before you write a test, look for one that already covers the behaviour. If a broader test covers it, do not write the narrow one. Start with the most important behaviour that you are most confident about, and make it pass with the smallest change.
 - Use `it()`, and put unit tests next to the code: `thing.ts` and `thing.test.ts`.
 
 ## Fakes, not mocks
