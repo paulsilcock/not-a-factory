@@ -5,7 +5,7 @@ description: Build a new feature outside in - new behaviour that a user (or anot
 
 # New feature (outer loop)
 
-> The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
+> The commands and paths below are for a project created by `not-a-factory`. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
 
 Follow `.claude/rules/tdd-workflow.md`: the mode, one test at a time, the working list, and discoveries.
 

@@ -1,4 +1,4 @@
-# not-a-factory
+# `not-a-factory`
 
 A Claude Code plugin that creates a full-stack TypeScript app, and gives Claude rules and skills for building it outside in, one test at a time.
 
@@ -22,7 +22,7 @@ More and more people try to automate all of software development. We think this 
 - **Most software does not need many agents that work in parallel.** They make more busy work and more context switching, not more value.
 - **Speed of output is not speed of learning.** When we release many features quickly, users get too much change at once, and we cannot see which change helped. We learn more slowly, not more quickly.
 
-not-a-factory does the opposite. It helps developers and Claude use good engineering practices: tight feedback loops, small batches, and one test at a time. The aim is to build the right thing, quickly and safely.
+`not-a-factory` does the opposite. It helps developers and Claude use good engineering practices: tight feedback loops, small batches, and one test at a time. The aim is to build the right thing, quickly and safely.
 
 ## Install
 

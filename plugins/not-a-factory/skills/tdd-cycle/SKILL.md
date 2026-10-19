@@ -5,7 +5,7 @@ description: Build or change one component test-first, one test at a time - RED,
 
 # TDD cycle (inner loop)
 
-> The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
+> The commands and paths below are for a project created by `not-a-factory`. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
 
 TDD is a design method, not a testing strategy. Each test asks "what should happen when...?" The answer shapes the interface, and the interface shapes the design. We learn what the code should be one behaviour at a time. **One test at a time. Always.** Keep to the mode agreed with the developer: it decides where you stop, never which steps you do (see `tdd-workflow.md`).
 

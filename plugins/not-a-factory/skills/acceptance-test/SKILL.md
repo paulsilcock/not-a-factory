@@ -5,7 +5,7 @@ description: Write one acceptance test and make it pass with ATDD (Dave Farley) 
 
 # Acceptance test (ATDD)
 
-> The paths below are for a project created by not-a-factory. In any other project, use its own layout. The cycle stays the same.
+> The paths below are for a project created by `not-a-factory`. In any other project, use its own layout. The cycle stays the same.
 
 ## What it is, and why
 

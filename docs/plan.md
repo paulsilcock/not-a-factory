@@ -1,4 +1,4 @@
-# Plan: not-a-factory (scaffold + Claude Code skills)
+# Plan: `not-a-factory` (scaffold + Claude Code skills)
 
 ## Why
 Build apps quickly with Claude Code without becoming a "software factory". Implementation is part of discovery, so work in small batches: one acceptance test per acceptance criterion of a feature, one unit test at a time, refactor every cycle, decide the next step from what was just learned. No big upfront specs or class plans.
