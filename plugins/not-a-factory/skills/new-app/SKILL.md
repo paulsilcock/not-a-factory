@@ -3,6 +3,7 @@ name: new-app
 description: Create a new app with not-a-factory - a pnpm workspace with a TanStack Router + shadcn/ui web app, a Hono + Litmus + Drizzle API, local Postgres, GitHub Actions CI, and the outside-in TDD rules, skills and hooks for Claude Code.
 argument-hint: <app-name>
 disable-model-invocation: true
+allowed-tools: Bash(bash ${CLAUDE_SKILL_DIR}/new-app.sh *)
 ---
 
 # New app
@@ -12,10 +13,10 @@ Create the app named in the arguments: `$ARGUMENTS`.
 The app is a copy of the plugin's `template/` folder, with the TDD skills.
 
 1. If no name was given, ask for one (lower case, letters, digits and `-`). Create it in the current directory unless the developer says otherwise.
-2. Run `new-app.sh`, which is in this skill's base directory. `${CLAUDE_PLUGIN_ROOT}` is the plugin's folder; if it is empty, use the path of this skill's base directory instead.
+2. Run this skill's script:
 
    ```sh
-   bash "${CLAUDE_PLUGIN_ROOT}/skills/new-app/new-app.sh" <name>
+   bash ${CLAUDE_SKILL_DIR}/new-app.sh <name>
    ```
 
    It copies the template and the skills, puts the name in, installs the dependencies and the browser for the acceptance tests, creates the migration journal, installs the shadcn skill, and makes the first commit. If it fails, stop and show the error. Do not work around a failure by hand.

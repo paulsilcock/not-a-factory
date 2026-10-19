@@ -2,3 +2,5 @@
 **/dist
 .env
 .git
+acceptance-tests/*
+!acceptance-tests/package.json
