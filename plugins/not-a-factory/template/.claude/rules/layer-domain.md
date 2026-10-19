@@ -5,7 +5,7 @@ paths:
 
 # Domain layer
 
-- **Discovery before domain code.** If the test needs a new noun, rule or state, use the `model-domain` skill and ask the developer. Do not guess business rules.
+- **Discovery before domain code.** If the test needs a new noun, rule or state, use the `domain-discovery` skill and ask the developer. Do not guess business rules.
 - Use the developer's words for names. If a term is unclear, ask.
 - No I/O and no framework: no database, no HTTP, no tsyringe, no `process.env`. Only Litmus core types and plain TypeScript.
 - A domain with little or no behaviour is naturally anemic. Then plain CRUD is the right design; keep the domain thin.

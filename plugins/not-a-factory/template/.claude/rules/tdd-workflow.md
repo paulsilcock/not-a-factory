@@ -9,7 +9,7 @@ These rules apply to every change to the code, however small, and also when the 
 | New behaviour that a user (or another system) can see or use | `new-feature`. It uses `acceptance-test`, `acceptance-dsl` and `acceptance-driver`. |
 | A change inside the system: a domain rule, a component that a test needs | `tdd-cycle` |
 | A refactor | `tdd-cycle`, REFACTOR only: no new behaviour, and all tests stay green |
-| New or unclear business words or rules | `model-domain`, before any domain code |
+| The request or a test has a business rule, limit, state or new business word (for example "at most 3 per member") | `domain-discovery`, before any domain code |
 | A review of tests | `test-quality` |
 
 Load the skill before you write the first test. If you are not sure which row applies, ask the developer.

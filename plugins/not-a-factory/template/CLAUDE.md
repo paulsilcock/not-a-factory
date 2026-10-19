@@ -9,7 +9,7 @@ The aim is to build the right thing, quickly and safely, with the developer in t
 Which skill when:
 - New behaviour that a user can see or use → `new-feature`. It uses `acceptance-test`, `acceptance-dsl` and `acceptance-driver`.
 - Any other change, or one component that a test needs → `tdd-cycle`.
-- New business words or rules → `model-domain`.
+- Business rules, limits, states or new business words → `domain-discovery`, before domain code.
 - Review tests → `test-quality`.
 
 ## Commands

@@ -38,7 +38,7 @@ Write it down in plain words:
 - The story is one or two sentences about the user's work and why it matters to them, in the user's own words: their description of their problem. It does not mention the program, its screens or its data. Do not use "As a <role>, I want...".
 - Each criterion is one sentence that the least technical person who knows the business would understand. Each one gets its own acceptance test.
 - The list is a working list, like the test list. Start with the most important criterion that you are most confident about.
-- New business words or rules: use `model-domain` first. Its examples often become criteria.
+- If the story or the criteria contain business rules, limits, states or new business words, load `domain-discovery` before you write the first acceptance test. Its examples often become criteria.
 
 ## 4. One criterion at a time
 

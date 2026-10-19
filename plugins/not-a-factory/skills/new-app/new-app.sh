@@ -17,7 +17,7 @@ fi
 
 cp -R "$plugin/template" "$name"
 mkdir -p "$name/.claude/skills"
-for skill in new-feature acceptance-test acceptance-dsl acceptance-driver tdd-cycle model-domain test-quality; do
+for skill in new-feature acceptance-test acceptance-dsl acceptance-driver tdd-cycle domain-discovery test-quality; do
   cp -R "$plugin/skills/$skill" "$name/.claude/skills/"
 done
 

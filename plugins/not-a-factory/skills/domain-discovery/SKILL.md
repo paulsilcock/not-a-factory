@@ -1,9 +1,9 @@
 ---
-name: model-domain
-description: Have a short domain discovery conversation with the developer, then hand over to TDD. Use when a test or a request needs a new business concept, rule, state or term; when a name is unclear; or when a use case starts making business decisions. Produces, in plain English - the agreed words, the rules with examples, open questions, a first guess at where the rules go, and the first test. Each example becomes a test.
+name: domain-discovery
+description: Use before building anything that adds business rules, limits, states or new business words - for example "a member can borrow at most 3 books", "refunds only within 30 days", "an account is locked after 5 failed logins". Also when a name is unclear, or a use case starts making business decisions. A short conversation with the developer that ends, in plain English, with the agreed words, the rules with examples (each becomes a test), open questions, and the first test.
 ---
 
-# Model the domain
+# Domain discovery
 
 Domain code starts with a conversation, not code. Do not guess business rules. Ask.
 

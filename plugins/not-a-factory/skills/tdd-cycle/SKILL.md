@@ -25,7 +25,7 @@ Say it in one sentence: "Building <component> in <layer>, because <consumer> nee
 
 | Missing piece | Component | Where | Its test | Runs against | Read first |
 |---|---|---|---|---|---|
-| A business rule, state or calculation | Domain model or value object | `api/src/domain/` | `<name>.test.ts`, calls the model directly | Plain objects | `layer-domain.md`; `model-domain` skill if the words or rules are new |
+| A business rule, state or calculation | Domain model or value object | `api/src/domain/` | `<name>.test.ts`, calls the model directly | Plain objects | `layer-domain.md`; `domain-discovery` skill if the words or rules are new |
 | One way the system is used: a command (changes it) or a query (reads it) | Use case | `api/src/use-cases/` | `<intent>.test.ts`, calls `handle()` | Real repositories, fakes for other services | `layer-use-cases.md` |
 | Saving and loading an aggregate | Repository | `api/src/infra/repositories/` | `<name>-repository.test.ts` | The database, or a fake of it | `repositories.md`; `db-drizzle.md` for the default stack |
 | Another service (email, a payment gateway, an LLM) | Interface we own, and a thin adapter | `api/src/infra/<service>/` | The interface is designed from use-case tests; the adapter is tested at its edge | Fake or stub of the interface | `layer-infra.md`; "Test doubles" in `writing-tests.md` |
@@ -88,7 +88,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 The list is a guess, never the final list. Use what this cycle taught you:
 - Remove behaviours that are now redundant or wrong. Add the ones you found. Change the order if needed. Say what changed and why.
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
-- New words or rules: use `model-domain`.
+- New words or rules: use `domain-discovery`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`, and ask the developer. Do not build it.
 - Pick the next test from the list as it is now: the most important thing the component does not do yet. Importance comes first. Between two equally important tests, take the one you are more confident about; the loop will make the other clearer.
 

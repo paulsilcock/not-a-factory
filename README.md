@@ -9,7 +9,7 @@ A Claude Code plugin for building the right thing, with Claude as a partner and 
   - `new-feature`: agree a feature's story and acceptance criteria;
   - `acceptance-test`, `acceptance-dsl`, `acceptance-driver`: acceptance tests in Dave Farley's style;
   - `tdd-cycle`: build one component test-first;
-  - `model-domain`: talk through new business words and rules;
+  - `domain-discovery`: talk through new business words and rules;
   - `test-quality`: review tests.
 - **Hooks:** typecheck and lint must pass before Claude stops.
 
