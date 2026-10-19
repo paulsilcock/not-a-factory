@@ -66,7 +66,7 @@ Ask: "what is stopping this test from passing right now?" Name that one thing, f
 - Bad: "To let members borrow books I need a loan table, a repository, a use case and a route."
 - Good: "The test fails because nothing records the loan. The first missing piece is somewhere to keep it."
 
-If the answer is one line of code, write that line. Do the simplest thing that works, even if it looks too simple: the next test will show what is missing.
+If the answer is one line of code, write that line. Do the simplest correct thing, even if it looks too simple: the next test will show what is missing. Simplest never means a shortcut: never hard-code a value that the system should store or compute (for example returning a fixed status instead of saving and reading it), never drop data on save, and never leave a stub in place.
 
 If the missing thing is a new collaborator (another object, with its own clear responsibility, that this component works with, such as a domain model or a repository), stop and start a new `tdd-cycle` for it, with its own tests. Never create it inside this GREEN. Its consumer is the component you are building now. Its behaviour must help that consumer fulfil its own responsibility; design it from that need. Then come back.
 
@@ -81,6 +81,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 **Check before the list review:**
 - All tests still pass, and typecheck and lint pass.
 - You changed no behaviour. A failure mode that no test covers goes on the test list; it is not fixed here.
+- No unused code is left: no method, export, parameter or file that no test or caller uses. Remove it (a finder that no use case calls is unused).
 - If nothing needed to change, you said so.
 
 ## 5. After every cycle, review the list
