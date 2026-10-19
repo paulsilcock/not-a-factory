@@ -4,7 +4,7 @@
     "name": "Paul Silcock"
   },
   "metadata": {
-    "description": "Scaffold apps and build them outside in, one test at a time."
+    "description": "Build the right thing with Claude: tight feedback loops, small batches, a developer in the loop."
   },
   "plugins": [
     {

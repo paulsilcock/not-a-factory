@@ -1,6 +1,6 @@
 # `not-a-factory`
 
-A Claude Code plugin that creates a full-stack TypeScript app, and gives Claude rules and skills for building it outside in, one test at a time.
+A Claude Code plugin for building the right thing, with Claude as a partner and not a factory. It sets up a full-stack TypeScript app with the rules and skills for tight feedback loops and small batches.
 
 **What a new app gets:**
 - **A working app:** a web app with TanStack Router, TanStack Query and shadcn/ui; an API with Hono, Litmus and Drizzle; Postgres in Docker; and GitHub Actions CI.
