@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  plugin:
+    name: Plugin manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate the marketplace
+        run: claude plugin validate .
+      - name: Validate the plugin
+        run: claude plugin validate plugins/not-a-factory
+
+  app:
+    name: Generated app
+    needs: plugin
+    runs-on: ubuntu-latest
+    env:
+      APP: ${{ github.workspace }}/../demo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Configure git
+        run: |
+          git config --global user.name "CI"
+          git config --global user.email "ci@example.com"
+
+      # The commands come from the new-app skill itself, so CI runs exactly what Claude runs.
+      - name: Create an app with the new-app commands
+        working-directory: ${{ github.workspace }}/..
+        run: |
+          awk '/^   ```sh$/{f=1;next} f&&/^   ```$/{exit} f' "$GITHUB_WORKSPACE/plugins/not-a-factory/skills/new-app/SKILL.md" \
+            | sed -e "s#PLUGIN/#$GITHUB_WORKSPACE/plugins/not-a-factory/#g" -e 's#<name>#demo#g' > new-app.sh
+          cat new-app.sh
+          bash -euo pipefail new-app.sh
+
+      - name: "Check: no placeholders left"
+        working-directory: ${{ env.APP }}
+        run: "! grep -rl --exclude-dir=node_modules '{{APP_NAME}}' ."
+      - name: "Check: TanStack and shadcn skills are available"
+        working-directory: ${{ env.APP }}
+        run: |
+          pnpm exec intent list | tee intent.txt
+          grep -q '@tanstack/router' intent.txt
+          rm intent.txt
+          test -f .claude/skills/shadcn/SKILL.md
+      - name: "Check: every file and skill that the rules and skills name exists"
+        working-directory: ${{ env.APP }}
+        run: |
+          status=0
+          # Our rules and skills only; the shadcn skill is third-party.
+          docs=".claude CLAUDE.md"
+          for f in $(grep -rohE --exclude-dir=shadcn '`[A-Za-z0-9_./-]+\.md`' $docs | tr -d '`' | sort -u); do
+            [ -n "$(find . -name "$(basename "$f")" -not -path './node_modules/*' | head -1)" ] || { echo "Missing file: $f"; status=1; }
+          done
+          for s in $(grep -rohE --exclude-dir=shadcn '`[a-z][a-z-]+` skill|skill `[a-z][a-z-]+`|use `[a-z][a-z-]+`' $docs | grep -oE '`[a-z-]+`' | tr -d '`' | sort -u); do
+            [ -f ".claude/skills/$s/SKILL.md" ] || { echo "Missing skill: $s"; status=1; }
+          done
+          exit $status
+      - name: "Check: every path that a rule loads for exists"
+        working-directory: ${{ env.APP }}
+        run: |
+          status=0
+          for p in $(sed -n '/^paths:/,/^---/p' .claude/rules/*.md | sed -n 's/^  - "\(.*\)"$/\1/p' | sort -u); do
+            dir="${p%%/\**}"
+            [ -e "$dir" ] || { echo "No match for rule path: $p"; status=1; }
+          done
+          exit $status
+
+      - name: Typecheck
+        working-directory: ${{ env.APP }}
+        run: pnpm typecheck
+      - name: Lint
+        working-directory: ${{ env.APP }}
+        run: pnpm lint
+      - name: Unit tests
+        working-directory: ${{ env.APP }}
+        run: pnpm test:unit
+
+      - name: "Stop hook: a type error blocks"
+        working-directory: ${{ env.APP }}
+        run: |
+          hook=$(jq -r '.hooks.Stop[0].hooks[0].command' .claude/settings.json)
+          echo 'export const broken: number = "text";' > api/src/broken.ts
+          set +e
+          echo '{"stop_hook_active": false}' | CLAUDE_PROJECT_DIR="$PWD" bash -c "$hook"
+          blocked=$?
+          echo '{"stop_hook_active": true}' | CLAUDE_PROJECT_DIR="$PWD" bash -c "$hook"
+          guarded=$?
+          rm api/src/broken.ts
+          echo '{"stop_hook_active": false}' | CLAUDE_PROJECT_DIR="$PWD" bash -c "$hook"
+          clean=$?
+          set -e
+          echo "blocked=$blocked guarded=$guarded clean=$clean"
+          [ "$blocked" -eq 2 ] && [ "$guarded" -eq 0 ] && [ "$clean" -eq 0 ]
+
+      # The template has no acceptance tests yet, so add a smoke test that reaches the app as a black box.
+      - name: Acceptance tests (Docker Compose stack)
+        working-directory: ${{ env.APP }}
+        run: |
+          cat > acceptance-tests/smoke.test.ts <<'EOF'
+          import { expect, inject, it } from "vitest";
+
+          it("the app is up and serves the web page", async () => {
+            const base = inject("acceptanceUrl");
+            expect((await fetch(`${base}/health`)).ok).toBe(true);
+            expect(await (await fetch(base)).text()).toContain(`id="app"`);
+          });
+          EOF
+          pnpm test:acceptance
+      - name: Acceptance tests again (the stack is reused)
+        working-directory: ${{ env.APP }}
+        run: pnpm test:acceptance
+      - name: Stop the acceptance stack
+        if: always()
+        working-directory: ${{ env.APP }}
+        run: pnpm test:acceptance:down || true
+      - name: Build
+        working-directory: ${{ env.APP }}
+        run: pnpm build
