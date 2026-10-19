@@ -19,5 +19,5 @@ Keep UI tests light. The acceptance tests (browser driver) exercise the UI. Befo
 - **Complex stateful logic in the client,** such as a React reducer, is built test-first, like any other component.
 - **Component tests (TDD) only for complex, critical behaviour that other tests are unlikely to cover fully,** for example a virtualised data table with sorting and swappable columns. Often an off-the-shelf library is the better choice than building one.
 - **Page-level tests** can check combinations that would be too slow as acceptance tests: render the page with the network stubbed (MSW), and check what the user sees. Write one only where the acceptance tests do not already cover it well. TDD is possible here, but often too much.
-- **Test what the user sees and does,** by role and label (Testing Library). Never test implementation details such as state or props. Never mock `fetch` or the API client; stub the network.
+- **Test what the user sees and does,** by role and label, with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) (`@testing-library/react`, already installed). Never test implementation details such as state or props. Never mock `fetch` or the API client; stub the network.
 - **Snapshot tests** can catch obvious visual changes, but they fail on intentional changes too. Use them rarely.
