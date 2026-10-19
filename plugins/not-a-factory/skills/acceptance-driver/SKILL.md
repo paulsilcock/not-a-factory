@@ -37,7 +37,7 @@ export interface AppDriver extends AsyncDisposable {
 
 export async function createDriver(): Promise<AppDriver> {
   const driver = new BrowserAppDriver({ baseUrl: inject("acceptanceUrl") });
-  await driver.init(); // Litmus does not call init() for you
+  await driver.init(); // Litmus base drivers need init(); acceptance() does not call it
   return driver;
 }
 ```
@@ -46,7 +46,7 @@ In the test file: `acceptance(async () => new AppDsl(await createDriver()))`.
 
 ## Writing any driver
 
-- **Extend the Litmus base driver for the channel** (`BrowserDriver`, `HonoDriver`, the CLI driver). It handles the lifecycle.
+- **Use a Litmus base driver when it fits.** `BrowserDriver`, `HonoDriver` and the CLI driver cover the common channels and handle the lifecycle, such as starting and closing a browser. A system with other needs (phone calls, messages, a mobile app) gets a driver written for it: any class that implements `AppDriver` and cleans up in `[Symbol.asyncDispose]()`.
 - **Encode the real interaction.** This is where the interface is designed, from the outside in.
 - **Hold protocol state** that a `confirm...` method needs. Business state stays in the system.
 - **Fail clearly:** a `confirm...` method throws an `Error` that says what was expected and what was found.

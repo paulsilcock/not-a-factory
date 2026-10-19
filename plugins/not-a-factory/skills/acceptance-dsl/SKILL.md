@@ -54,7 +54,9 @@ export class BooksDsl {
 
 ## Where words live
 
-- One area per concept: `api/test-acceptance/dsl/books.ts`, `dsl/members.ts`, `dsl/loans.ts`.
+- **An area is a big concept in the user's world,** something a person at the desk would name: books, members, loans. It is not a class, a page, an endpoint or an action. A small app may need only two or three areas.
+- **Start with few areas.** Put a new word in the area it is most about. Split an area only when it has grown large and holds words about clearly different things. Never create an area for a single word.
+- Areas live in `api/test-acceptance/dsl/`, for example `dsl/books.ts`, `dsl/members.ts`, `dsl/loans.ts`.
 - Register each area in `dsl.ts`:
 
   ```ts
