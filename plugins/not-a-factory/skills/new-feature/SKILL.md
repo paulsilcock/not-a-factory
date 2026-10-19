@@ -41,6 +41,7 @@ Write it down in plain words:
 - If the story or the criteria contain business rules, limits, states or new business words, load `domain-discovery` before you write the first acceptance test. Its examples often become criteria.
 
 **Where it lives in the app.** If the feature has a UI, the developer decides where it goes and how it is reached. Ask:
+- **The look, if shadcn is not set up yet** (there is no `web/components.json`): ask for the component library (Base UI by default, or Radix), the style (Nova by default; also Vega, Maia, Lyra, Mira), the base colour, and the font (for example Geist or Inter). Then run, in `web/`: `pnpm dlx shadcn@latest init --template vite --base <base> --preset <style> -y`. Change the font and colours afterwards in `web/src/styles.css` if the developer asked for others. Run typecheck and lint (`pnpm lint:fix` formats the generated files).
 - **A new app with no app shell yet** (no navigation, only the starter page): what shell do they want, for example a sidebar, a top navbar, or a single page? Build it once, with shadcn blocks (use the `shadcn` skill), before the first feature's page. Every later feature fits into it.
 - **Every feature:** a new route with an entry in the navigation (with what label), or part of an existing page?
 - **Who builds it:** offer to let the developer build the shell or the layout themselves, with the `shadcn` skill, while you build the behaviour. In pair work, they often will.
