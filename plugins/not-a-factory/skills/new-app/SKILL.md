@@ -9,27 +9,19 @@ disable-model-invocation: true
 
 Create the app named in the arguments: `$ARGUMENTS`.
 
-The app is a copy of the plugin's `template/` folder. `PLUGIN` below is `${CLAUDE_PLUGIN_ROOT}`. If that is empty, it is two directories above this skill's base directory.
+The app is a copy of the plugin's `template/` folder, with the TDD skills.
 
-1. If no name was given, ask for one (lower case, letters, digits and `-`). The directory `<name>` must not exist. Create it in the current directory unless the developer says otherwise.
-2. Run these commands. Stop and show the error if one fails. Do not work around a failure by hand.
+1. If no name was given, ask for one (lower case, letters, digits and `-`). Create it in the current directory unless the developer says otherwise.
+2. Run `new-app.sh`, which is in this skill's base directory. `${CLAUDE_PLUGIN_ROOT}` is the plugin's folder; if it is empty, use the path of this skill's base directory instead.
 
    ```sh
-   cp -R "PLUGIN/template" <name>
-   mkdir -p <name>/.claude/skills
-   cp -R "PLUGIN/skills/new-feature" "PLUGIN/skills/acceptance-test" "PLUGIN/skills/acceptance-dsl" "PLUGIN/skills/acceptance-driver" "PLUGIN/skills/tdd-cycle" "PLUGIN/skills/model-domain" "PLUGIN/skills/test-quality" <name>/.claude/skills/
-   cd <name>
-   grep -rl '{{APP_NAME}}' . | xargs sed -i.bak 's/{{APP_NAME}}/<name>/g'
-   find . -name '*.bak' -delete
-   cp .env.example .env
-   pnpm install
-   pnpm --filter acceptance-tests exec playwright install chromium
-   pnpm db:generate
-   pnpm dlx skills add shadcn/ui --skill shadcn --agent claude-code --yes
-   git init -q -b main && git add -A && git commit -q -m "Create <name> with not-a-factory"
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/new-app/new-app.sh" <name>
    ```
 
-   `pnpm install` fails if Node is older than 24.14.1 (`engine-strict`). `playwright install` downloads the browser for the acceptance tests; on Linux, if the browser later fails to start, run it again with `--with-deps`. `pnpm db:generate` lets drizzle-kit create its migration journal.
+   It copies the template and the skills, puts the name in, installs the dependencies and the browser for the acceptance tests, creates the migration journal, installs the shadcn skill, and makes the first commit. If it fails, stop and show the error. Do not work around a failure by hand.
+   - `pnpm install` fails if Node is older than 24.14.1.
+   - The first commit needs git's `user.name` and `user.email`.
+   - On Linux, if the browser later fails to start, run `pnpm --filter acceptance-tests exec playwright install --with-deps chromium`.
 3. Tell the developer the next steps:
 
    ```sh

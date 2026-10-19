@@ -19,6 +19,7 @@
 - **Only mock what you own. Never mock a library directly.** Where nothing can be faked (LLM calls, HTTP calls to other systems), our code depends on an interface we own, and its tests use a stub or mock of that interface, with canned responses for each case.
 - **Design that interface from the consumer's needs,** in our domain's words, not the vendor's. Vendor types and errors stay behind it.
 - **Keep the adapter behind it thin,** and test it at its edge: against a local stub of the other service for HTTP, or with evals for LLM calls. Do not unit-test vendor glue by mocking the library.
+- **When the interaction is the behaviour,** assert on it. If the outcome is that something is sent to another system (a confirmation email, a payment request), use a fake of the interface that records what it receives, and check that. Do not assert on calls otherwise.
 
 ## Acceptance tests
 

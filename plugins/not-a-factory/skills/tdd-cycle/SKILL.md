@@ -46,7 +46,7 @@ List **behaviours**, not classes or methods. Write the list, not the tests. Keep
    - Bad: "To let members borrow books I need a loan table, a repository, a use case and a route."
    - Good: "The test fails because nothing records the loan. The first missing piece is somewhere to keep it."
 
-   If the missing thing is a collaborator (another object, with its own clear responsibility, that this component works with), start a new `tdd-cycle` for it. Its consumer is the component you are building now. Then come back. If the answer is one line of code, write that line. Do the simplest thing that works.
+   If the missing thing is a collaborator (another object, with its own clear responsibility, that this component works with), start a new `tdd-cycle` for it. Its behaviour must help the consumer fulfil its own responsibility; design it from that need. Its consumer is the component you are building now. Then come back. If the answer is one line of code, write that line. Do the simplest thing that works.
 3. **REFACTOR.** Improve the design without changing behaviour: names, separation of concerns, cohesion, duplication. This is where the design thinking happens; it is not optional cleanup. Read the change as a reviewer would: missing error handling, leaked internals, things that do not match the rest of the code, failure modes no test covers. If nothing needs to change, say so.
 
 Run only the test file you are working on, for fast feedback, for example `pnpm --filter api exec vitest run src/domain/loan.test.ts`. That runs Vitest inside `api/`, so the path starts there. Other commands are in `CLAUDE.md`.
