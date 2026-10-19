@@ -17,10 +17,11 @@ The skills also work in other repositories when the plugin is installed.
 
 ## This is not a software factory
 
-More and more people try to automate all of software development. We think this is a mistake:
-- **Building is part of discovery.** When we write the code, we learn what the problem really is. If we hand that work to a machine and do not look, we lose what we would have learnt.
+More and more people try to automate all of software development. This is a mistake:
+- **Building is part of discovery.** Writing the code shows what the problem really is. Hand that work to a machine without looking, and that learning is lost.
 - **Most software does not need many agents that work in parallel.** They make more busy work and more context switching, not more value.
-- **Speed of output is not speed of learning.** When we release many features quickly, users get too much change at once, and we cannot see which change helped. We learn more slowly, not more quickly.
+- **Speed of output is not speed of learning.** Many features released quickly give users too much change at once, and nobody can see which change helped. Learning gets slower, not faster.
+- **Fast output costs quality.** In the last 30 releases of Claude Code (2.1.271 to 2.1.303), 1,202 of the 2,428 [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) entries are fixes (counted on 19 October 2026).
 
 `not-a-factory` does the opposite. It helps developers and Claude use good engineering practices: tight feedback loops, small batches, and one test at a time. The aim is to build the right thing, quickly and safely.
 
