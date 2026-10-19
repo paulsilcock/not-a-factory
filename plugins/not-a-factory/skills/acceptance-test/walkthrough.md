@@ -2,59 +2,75 @@
 
 One way the cycle can go, to show the rhythm. It is not a template: follow the failures, and the order will differ.
 
-Criterion: **"A member can borrow a book that is on the shelf."** Earlier features already let the library add books and members, so those DSL words exist.
+Criterion: **"A member who has three books out cannot borrow a fourth."** The app has a browser UI, so the tests use the browser driver. Earlier features let the library add books and members, so those DSL words exist.
 
 ## 1. The acceptance test
 
 ```ts
-it("a member can borrow a book that is on the shelf", async ({ dsl }) => {
-  await dsl.books.isOnShelf({ title: "Dune" });
+it("a member who has three books out cannot borrow a fourth", async ({ dsl }) => {
   await dsl.members.hasJoined({ name: "Ada" });
+  await dsl.loans.hasBorrowed({ member: "Ada", books: ["Dune", "Emma", "Ulysses"] });
+  await dsl.books.isOnShelf({ title: "Beloved" });
 
-  await dsl.loans.borrow({ member: "Ada", book: "Dune" });
+  await dsl.loans.borrow({ member: "Ada", book: "Beloved" });
 
-  await dsl.loans.confirmBorrowed({ member: "Ada", book: "Dune" });
+  await dsl.loans.confirmRefused({ reason: "too many books" });
 });
 ```
 
-To make it compile: the new DSL words `borrow` and `confirmBorrowed`, the matching driver methods, and stubs in the app for the two routes the driver calls. Each stub is a route plus a use case whose `handle()` only throws.
+To make it compile, add the new DSL words. `hasBorrowed` is a setup word built on `borrow`. Then add the driver methods as stubs that throw, because there is no page to drive yet. Run it. It fails in the driver: the borrowing UI is missing.
 
-Run it. It fails with `Borrowing failed: 500`. The behaviour is missing, which is the right reason. **The first missing piece is the `BorrowBook` use case.**
+## 2. Just enough UI, and the driver
 
-## 2. Drop into the use case
-
-With `tdd-cycle`: the component is `BorrowBook` (a command), and its consumer is the route. Its test list starts with one behaviour.
+The first missing piece is a way for the user to borrow. Build only what the driver needs: a page with "Member" and "Book" fields and a "Borrow" button. It shows a refusal in an alert, and posts to an API route that is a stub (the route, and a use case whose `handle()` only throws). Then implement the driver against the page, with stable locators:
 
 ```ts
-describe("borrowing a book", () => {
-  setupTestDb({ schema });
+async borrow({ member, book }: { member: string; book: string }) {
+  await this.page.goto("/loans/new");
+  await this.page.getByLabel("Member").fill(member);
+  await this.page.getByLabel("Book").fill(book);
+  await this.page.getByRole("button", { name: "Borrow" }).click();
+}
+```
 
-  it("records a loan for the member", async () => {
-    await container.resolve(BorrowBook).handle({ member: "Ada", book: "Dune" });
+Run it. It now fails further in: the API answers with an error, because nothing handles the borrowing.
 
-    const loans = await container.resolve(LoanRepository).forMember("Ada");
-    expect(loans.map((loan) => loan.book)).toEqual(["Dune"]);
-  });
+## 3. The missing use case
+
+From the user's side, borrowing a book is one way the system is used: a member and a book go in, and the loan is recorded or refused. That is a use case, `BorrowBook`, and it is the next missing piece. With `tdd-cycle`, its consumer is the route, and its first test is the behaviour the acceptance test needs:
+
+```ts
+it("refuses a member who already has three books", async () => {
+  // Ada has three books out
+  await expect(borrowBook.handle({ member: "Ada", book: "Beloved" })).rejects.toThrow(TooManyBooks);
 });
 ```
 
-To compile, `LoanRepository` gets a stub. RED: `handle()` throws.
+RED: `handle()` throws a plain error.
 
-## 3. Missing collaborators
+## 4. Its collaborators, domain first
 
-GREEN: what stops it passing? `BorrowBook` has nowhere to record a loan. That collaborator is missing, so drop down again:
+GREEN: what stops it passing? `BorrowBook` must **decide** whether Ada may borrow. That decision is a business rule, so it belongs in the domain, not in the use case. Drop down:
 
-- **`LoanRepository`,** with its own `tdd-cycle`, tested against PGlite: "a saved loan can be found by member". Its consumer is `BorrowBook`, so it gets only `add` and `forMember`.
-- That test needs something to save: a **`Loan`** domain model. This criterion has no rule yet, so the model is thin. The rules arrive with later criteria, through `model-domain`.
+- **`Member`** (domain model), with its own `tdd-cycle`. The examples from `model-domain` become its tests: "a member with two books can borrow a third", "a member with three books is refused". `member.borrow(book)` keeps the rule, and throws `TooManyBooks`.
+- **`MemberRepository`**, because the use case must load Ada's loans and save the change. Tested against PGlite, with only what `BorrowBook` needs.
 
-When the repository passes, go back up. `BorrowBook.handle()` creates a `Loan` and adds it. Its test passes. Refactor.
+Back up. `BorrowBook` is now a dumb orchestrator:
 
-## 4. Back to the acceptance test
+```ts
+async handle({ member, book }: BorrowBookCommand) {
+  const borrower = await this.members.findByName(member);
+  borrower.borrow(book);
+  await this.members.update(borrower);
+}
+```
 
-Run it again. It now gets further, and fails in `confirmBorrowed`: the driver cannot list Ada's loans. **The next missing piece is the `ListMemberLoans` use case:** a query, with no side effects, that reuses `LoanRepository.forMember`.
+Its tests pass. Refactor.
 
-Build it with the same cycle, and continue until the acceptance test passes.
+## 5. Back to the acceptance test
 
-## 5. When it passes
+Run it again. Map `TooManyBooks` to an HTTP status in `main.ts`, so that the page can show the refusal. Continue the same way, one missing piece at a time, until the acceptance test passes.
 
-Refactor, including the DSL and the driver. Then back to `new-feature`. The next criterion, "a member cannot borrow a book when every copy is out", brings the first real rule, so it starts with `model-domain`.
+## 6. When it passes
+
+Refactor, including the DSL, the driver and the page. Then go back to `new-feature` for the next criterion.

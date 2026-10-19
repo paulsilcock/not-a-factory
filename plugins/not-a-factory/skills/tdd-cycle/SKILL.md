@@ -1,13 +1,13 @@
 ---
 name: tdd-cycle
-description: Build or change one component test-first, one test at a time. Use when an acceptance test points at a missing piece, when the developer names a component to build (for example "the repository this use case needs"), or for a bug fix or refactor that starts at one component. Names the component, its consumer, its test and the rules that apply, then runs RED → GREEN → REFACTOR until the consumer's need is met.
+description: Build or change one component test-first, one test at a time - RED, GREEN, REFACTOR. Use when an acceptance test points at a missing piece, when the developer names a component to build (for example "the repository this use case needs"), or for a bug fix or refactor that starts at one component. Names the component and its consumer, clarifies the behaviours, and runs the cycle until the consumer's need is met.
 ---
 
 # TDD cycle (inner loop)
 
 > The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
 
-The cycle itself (RED, GREEN, REFACTOR, stubs, the DO NOT list, the modes) is in `.claude/rules/workflow.md`. This skill decides **what** the cycle builds.
+TDD is a design method, not a testing strategy. Each test asks "what should happen when...?" The answer shapes the interface, and the interface shapes the design. We learn what the code should be one behaviour at a time. **One test at a time. Always.** Keep to the mode agreed with the developer (guided, pair or autonomous; see `workflow.md`).
 
 ## 1. Find where we are
 
@@ -17,35 +17,49 @@ The cycle itself (RED, GREEN, REFACTOR, stubs, the DO NOT list, the modes) is in
 
 ## 2. Name the component and its consumer
 
-Say it in one sentence: "Building <component> in <layer>, because <consumer> needs <behaviour>." The consumer is the code or test that will call it: the acceptance test, a route, a use case.
+Say it in one sentence: "Building <component> in <layer>, because <consumer> needs <behaviour>." The consumer is the code or test that will use it: the acceptance test, a route, a use case.
 
 | Missing piece | Component | Where | Its test | Runs against | Read first |
 |---|---|---|---|---|---|
-| A business rule, state or calculation | Aggregate or value object | `api/src/domain/` | `<name>.test.ts`, calls the model directly | Plain objects | `layer-domain.md`; `model-domain` skill if the words or rules are new |
+| A business rule, state or calculation | Domain model or value object | `api/src/domain/` | `<name>.test.ts`, calls the model directly | Plain objects | `layer-domain.md`; `model-domain` skill if the words or rules are new |
 | One way the system is used: a command (changes it) or a query (reads it) | Use case | `api/src/use-cases/` | `<intent>.test.ts`, calls `handle()` | Real repositories on PGlite, fakes for other services | `layer-use-cases.md` |
 | Saving and loading | Repository and table | `api/src/infra/repositories/`, `infra/db/schema.ts` | `<name>-repository.test.ts` | PGlite (`setupTestDb`) | `layer-infra.md`; then `pnpm db:generate` |
-| Another service (email, payments) | Interface, adapter and fake | `api/src/infra/<service>/` | Use cases use the fake; the adapter is tested against a local stub of the service | Fake or stub | `layer-infra.md` |
+| Another service (email, payments, an LLM) | Interface we own, and a thin adapter | `api/src/infra/<service>/` | The interface is designed from use-case tests; the adapter is tested at its edge | Fake or stub of the interface | `layer-infra.md`; "Test doubles" in `testing.md` |
 | An HTTP route, status or input check | Route | `api/src/entrypoints/http/` | Usually the acceptance test covers it; write a route test only for HTTP behaviour | The Hono app | `layer-entrypoints.md` |
-| What a page shows or does | Route or component | `web/src/routes/`, `web/src/components/` | `<name>.test.tsx`, by role and label | jsdom | `layer-web.md`; `shadcn` skill; TanStack Intent skills |
+| Complex stateful logic in the client, such as a reducer | Client logic | `web/src/` | `<name>.test.ts`, plain unit test | Plain objects | `layer-web.md` (other UI tests follow its "Testing the UI") |
 
 If the piece does not fit a row, or fits two, ask the developer.
 
-## 3. Start a short test list
+## 3. Clarify the behaviour, then start a short test list
 
-List the behaviours the consumer needs from this component, in business words. Only what the consumer needs, not everything the component could do. Write the list, not the tests.
+Before the first test, be clear about what the consumer needs:
+- What outcome does it expect?
+- What are the inputs, and the effects someone can see?
+- Which edge cases and failure modes do we already know about?
 
-## 4. Cycle, one test at a time
+List **behaviours**, not classes or methods. Write the list, not the tests. Keep it short: only what the consumer needs, not everything the component could do. The list is a guess, and it will change (step 5).
 
-Pick one behaviour from the list and run RED → GREEN → REFACTOR (see the workflow rule).
+## 4. RED → GREEN → REFACTOR
 
-Run one test file while you work:
+1. **RED.** Write one failing test for the most important behaviour on the list. Test the public interface: inputs, outputs, effects someone can see. If an idea is easy to say in the test, it will be easy to use in the code. The test must compile, so add stubs if needed. Run it and check that it fails **for the right reason**: the behaviour is missing, not a typo or a missing import.
+2. **GREEN.** Ask: "what is stopping this test from passing right now?" Name that one thing, fix it, and ask again. Describe what is missing, not what you "need to build":
+   - Bad: "To let members borrow books I need a loan table, a repository, a use case and a route."
+   - Good: "The test fails because nothing records the loan. The first missing piece is somewhere to keep it."
 
-- API: `pnpm --filter api exec vitest run src/domain/loan.test.ts`
-- Web: `pnpm --filter web exec vitest run src/routes/index.test.tsx`
+   If the missing thing is a collaborator (another object, with its own clear responsibility, that this component works with), start a new `tdd-cycle` for it. Its consumer is the component you are building now. Then come back. If the answer is one line of code, write that line. Do the simplest thing that works.
+3. **REFACTOR.** Improve the design without changing behaviour: names, separation of concerns, cohesion, duplication. This is where the design thinking happens; it is not optional cleanup. Read the change as a reviewer would: missing error handling, leaked internals, things that do not match the rest of the code, failure modes no test covers. If nothing needs to change, say so.
 
-Paths are relative to the package. Other commands are in `CLAUDE.md`.
+Run only the test file you are working on, for fast feedback, for example `pnpm --filter api exec vitest run src/domain/loan.test.ts`. That runs Vitest inside `api/`, so the path starts there. Other commands are in `CLAUDE.md`.
 
-In GREEN, if the missing thing is another component (a collaborator), start a new `tdd-cycle` for it. Its consumer is the component you are building now. Then come back.
+**Stubs** only satisfy the compiler: they throw or return nothing. A stub must not make the test pass. No "stub" or "not implemented yet" comments.
+
+## What makes a good test
+
+- It says **what** the component does for its consumer, not how. It fails when behaviour changes, and keeps passing when only the structure changes. If a refactor makes you change tests, they are coupled to the implementation.
+- **Its name is a specification:** in business words for domain models and use cases; in terms of what the consumer can rely on for technical components ("a saved loan can be found by its member"). Never a class, function or framework name.
+- **Look for an existing test first.** If a broader test already covers the behaviour, do not write the narrow one.
+- Aim for Farley's properties: understandable, maintainable, repeatable, atomic, necessary, granular, fast, and written first. The `test-quality` skill reviews tests against them.
+- Real objects and fakes by default; stubs or mocks only of interfaces we own. See "Test doubles" in `testing.md`.
 
 ## 5. After every cycle, review the list
 

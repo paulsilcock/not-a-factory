@@ -4,7 +4,7 @@
 
 - A test says **what the system does**, not how it does it.
 - A test fails when behaviour changes and keeps passing when only the structure changes. If a refactor makes you change tests, the tests are coupled to the implementation.
-- Test names read as a specification of behaviour that someone can see. Never put a class, function, option, table or framework name in the title.
+- Test names read as a specification of behaviour: what the code does for whoever uses it. For domain models, use cases and acceptance tests, that is in business words. For a technical component, such as a repository or an adapter, it is what its consumer can rely on ("a saved loan can be found by its member"). Never put a class, function, option, table or framework name in the title.
   - Bad: `"OrderRepository.save sets status to PLACED"`
   - Bad: `"checkout handler returns 201"`
   - Good: `"a customer sees their order after checkout"`

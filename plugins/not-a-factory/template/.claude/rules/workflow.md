@@ -33,12 +33,12 @@ Not a feature: a new endpoint for behaviour that already exists, an internal cha
 
 ## Inner loop: RED → GREEN → REFACTOR
 
-Use the `tdd-cycle` skill. It names the component, its test and the rules that apply.
+Use the `tdd-cycle` skill: it names the component, and has the detail of each step. In short:
 
-1. **RED.** Write one failing test for one behaviour. Test the public interface: inputs, outputs, effects someone can see. If an idea is easy to say in the test, it will be easy to use in the code. The test must compile, so add stubs if needed. Run it and check that it fails **for the right reason**: the behaviour is missing, not a typo or a missing import.
-2. **GREEN.** Ask: "what is stopping this test from passing right now?" Name that one thing. Fix it. Ask again. If the answer is a collaborator that does not exist, drop down and build it with its own RED → GREEN → REFACTOR loop. If the answer is one line of code, write that line. Do the simplest thing that works.
-3. **REFACTOR.** Improve the design without changing behaviour. This is where the design thinking happens: names, separation of concerns, cohesion, duplication. It is not optional cleanup. Read the change as a reviewer would: missing error handling, leaked internals, things that do not match the rest of the code, failure modes no test covers. If nothing needs to change, say so.
-4. **Review the test list** (below). Then write the next test.
+1. **RED:** one failing test for one behaviour. It must fail for the right reason: the behaviour is missing.
+2. **GREEN:** fix the one thing that stops it passing. The simplest thing that works.
+3. **REFACTOR:** improve the design without changing behaviour. Not optional.
+4. **Review the test list,** then the next test.
 
 When a test needs a new domain idea (a new noun, a new rule, a new state), stop and use the `model-domain` skill before you write domain code.
 
@@ -55,19 +55,6 @@ A list of behaviours to test is useful, but it is a guess. It is never the final
 ## Discoveries
 
 When the code shows something new about the problem (a case nobody thought of, two rules that conflict, a technical limit that changes what users get), stop and tell the developer at once, in plain words, with the options you see. Do not decide a business question alone, even in autonomous mode. Put the answer in the test list.
-
-## Think in failures, not features
-
-In GREEN, do not describe what you "need to build". Describe what is missing.
-
-- Bad: "To let members borrow books I need a loan table, a repository, a use case and a route."
-- Good: "The test fails because nothing answers the borrow request. The first missing piece is the route."
-
-## Stubs
-
-- A stub only satisfies the compiler. It throws or returns nothing.
-- **A stub must not make the test pass.** If a stub has real logic, the test goes green before anything is built.
-- No "stub" or "not implemented yet" comments.
 
 ## DO NOT
 
