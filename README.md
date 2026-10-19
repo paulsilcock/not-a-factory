@@ -21,7 +21,7 @@ More and more people try to automate all of software development. This is a mist
 - **Building is part of discovery.** Writing the code shows what the problem really is. Hand that work to a machine without looking, and that learning is lost.
 - **Most software does not need many agents that work in parallel.** They make more busy work and more context switching, not more value.
 - **Speed of output is not speed of learning.** Many features released quickly give users too much change at once, and nobody can see which change helped. Learning gets slower, not faster.
-- **Fast output costs quality.** In the last 30 releases of Claude Code (2.1.271 to 2.1.303), 1,202 of the 2,428 [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) entries are fixes (counted on 19 October 2026).
+- **Fast output costs quality.** Tools that release almost every day show it: in one week of October 2026, more than half of the [changelog entries](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) of a widely used AI coding tool were fixes.
 
 `not-a-factory` does the opposite. It helps developers and Claude use good engineering practices: tight feedback loops, small batches, and one test at a time. The aim is to build the right thing, quickly and safely.
 
