@@ -48,10 +48,13 @@ it("refuses a member who already has three books", async () => {
 
 RED: `handle()` throws a plain error.
 
+This test needs one use case, but many acceptance tests need more than one. Each step that the user takes can be a different way of using the system. For example, in a bookshop, "a customer can buy a book they found" can need three use cases: `SearchBooks` (a query), `AddToBasket` and `CheckOut` (commands). Build them one at a time, in the order that the failures show them. The setup words also use the system: here, `hasBorrowed` goes through `BorrowBook` too.
+
 ## 4. Its collaborators, domain first
 
 GREEN: what stops it passing? `BorrowBook` must **decide** whether Ada may borrow. That decision is a business rule, so it belongs in the domain, not in the use case. Drop down:
 
+- **Understand the domain first, if needed.** The `model-domain` skill helps the developer explore the rule: who keeps it, which words the business uses, and which examples show it. It is not a required step. Use it when the words or the rule are new or not clear.
 - **`Member`** (domain model), with its own `tdd-cycle`. The examples from `model-domain` become its tests: "a member with two books can borrow a third", "a member with three books is refused". `member.borrow(book)` keeps the rule, and throws `TooManyBooks`.
 - **`MemberRepository`**, because the use case must load Ada's loans and save the change. Tested against PGlite, with only what `BorrowBook` needs.
 
