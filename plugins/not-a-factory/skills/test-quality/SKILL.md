@@ -43,4 +43,6 @@ Quick checks:
 2. The three changes that would help most, each with file and test name.
 3. Ask the developer which ones to make. Do not change tests without approval.
 
-Source: the eight properties are from Dave Farley's work on test quality, as used in citypaul's test-design-reviewer skill.
+Sources:
+- The eight properties: Dave Farley's work on test quality, as used in citypaul's [test-design-reviewer](https://smithery.ai/skills/citypaul/test-design-reviewer) skill.
+- Acceptance tests: Dave Farley, [Acceptance Testing for Continuous Delivery](https://edinburgh.bcs.org/events/2015/acceptance_testing_for_continuous_delivery.pdf) (slides) and [ATDD how-to guide](https://continuous-delivery.co.uk/downloads/ATDD%20Guide%2026-03-21.pdf).
