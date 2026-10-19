@@ -5,7 +5,7 @@ paths:
 
 # Acceptance tests
 
-Use the `acceptance-test` skill. It explains the four layers, the DSL, drivers, stubs and isolation.
+Use the `acceptance-test` skill for the ATDD cycle, `acceptance-dsl` for DSL words and `acceptance-driver` for drivers.
 
 Always:
 - Test cases are in the user's words: no `expect`, URLs, JSON, status codes or selectors.

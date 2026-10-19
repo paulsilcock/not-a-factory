@@ -21,6 +21,8 @@
 
 ## Acceptance tests
 
+How to write one with ATDD: the `acceptance-test` skill (DSL words: `acceptance-dsl`; drivers: `acceptance-driver`).
+
 - Real objects and fakes only. No mocks.
 - **No `expect` in acceptance test cases.** The case calls DSL methods. A DSL method such as `confirmOrderPlaced()` asks the driver, and the driver does the assertion.
 - **No test-only behaviour in the app.** No test endpoints, no reset commands, no flags that only tests use. Drivers use the same public interfaces as real users.

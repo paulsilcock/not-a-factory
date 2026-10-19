@@ -57,5 +57,5 @@ In GREEN, if the missing thing is another component (a collaborator), start a ne
 ## 6. Done when the consumer's need is met
 
 - Run all the package's unit tests: `pnpm --filter api test:unit` or `pnpm --filter web test`.
-- If this component is part of a feature, go back to its acceptance test (`new-feature`, step 4).
+- If this component is part of a feature, go back to its acceptance test (the `acceptance-test` skill, step 4 of the ATDD cycle).
 - If it is a bug fix or a refactor, run `pnpm test` and stop.
