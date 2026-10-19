@@ -22,7 +22,7 @@ Acceptance tests reach the system through its public interfaces, so there is one
 
 These are examples, not a closed list. A system may need a phone driver to make calls, a WhatsApp driver to send messages, or an iOS driver for a mobile app. If an HTTP API exists only to serve the app's own UI, it is not a public interface: test through the UI.
 
-**Several interfaces, one test suite.** A system with a web client and a mobile app has two drivers that implement the same driver interface. The test cases and the DSL do not change. `createDriver` picks the driver, for example from a `DRIVER` environment variable, and CI can run the suite once per driver in a matrix. Every test must pass through every driver.
+**Several entrypoints, one test suite.** When a system has more than one entrypoint (adapter, in hexagonal terms), each gets its own driver, and all of them implement the same driver interface. The test cases and the DSL do not change. For example, a web client and a mobile app can share one suite; or, when a store front is replaced, the same tests check the new one before it goes live. `createDriver` picks the driver, for example from a `DRIVER` environment variable, and CI can run the suite once per driver in a matrix. Every test must pass through every driver.
 
 ## The driver interface
 
