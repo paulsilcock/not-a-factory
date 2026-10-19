@@ -18,6 +18,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test:unit
+      - run: pnpm --filter acceptance-tests exec playwright install --with-deps chromium
       # Starts the app and Postgres with Docker Compose (see acceptance-tests/global-setup.ts)
       - run: pnpm test:acceptance
       - run: pnpm build

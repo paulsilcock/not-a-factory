@@ -1,6 +1,6 @@
 import { inject } from "vitest";
 
-import { HttpAppDriver } from "./driver/http.ts";
+import { BrowserAppDriver } from "./driver/browser.ts";
 
 /**
  * What a user can do with the app, in business words.
@@ -8,6 +8,8 @@ import { HttpAppDriver } from "./driver/http.ts";
  */
 export interface AppDriver extends AsyncDisposable {}
 
-export function createDriver(): AppDriver {
-  return new HttpAppDriver(inject("acceptanceUrl"));
+export async function createDriver(): Promise<AppDriver> {
+  const driver = new BrowserAppDriver({ baseUrl: inject("acceptanceUrl") });
+  await driver.init(); // Litmus base drivers need init(); acceptance() does not call it
+  return driver;
 }

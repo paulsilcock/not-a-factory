@@ -6,7 +6,7 @@ Use the typed Hono client (`this.client`). The driver imports only the app's rou
 import { HonoDriver } from "@litmus-ts/http/testing";
 import { z } from "zod";
 
-import type { AppType } from "#api/app.ts";
+import type { AppType } from "api/app";
 
 // Litmus answers a refused action (a DomainError) with { code, message }.
 const Refusal = z.object({ code: z.string(), message: z.string() });
@@ -31,5 +31,6 @@ export class HttpAppDriver extends HonoDriver<AppType> implements AppDriver {
 ```
 
 - An action that the system refuses is an outcome, not an error: keep the refusal for the `confirm...` method. Throw only for unexpected failures (5xx).
+- Setup: add `@litmus-ts/http`, `hono`, `zod` and `"api": "workspace:*"` to the acceptance tests' dev dependencies. `api` exports `./app` for its route types.
 - The typed client compiles only against routes that exist. In RED, add the route as a stub (see "When the system does not have it yet" in `SKILL.md`).
 - The client knows the validation-error body, but not Litmus's `{ code, message }` body for refusals, so parse that with zod.

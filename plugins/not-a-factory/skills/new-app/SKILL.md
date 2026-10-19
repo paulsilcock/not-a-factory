@@ -23,12 +23,13 @@ The app is a copy of the plugin's `template/` folder. `PLUGIN` below is `${CLAUD
    find . -name '*.bak' -delete
    cp .env.example .env
    pnpm install
+   pnpm --filter acceptance-tests exec playwright install chromium
    pnpm db:generate
    pnpm dlx skills add shadcn/ui --skill shadcn --agent claude-code --yes
    git init -q -b main && git add -A && git commit -q -m "Create <name> with not-a-factory"
    ```
 
-   `pnpm install` fails if Node is older than 24.14.1 (`engine-strict`). `pnpm db:generate` lets drizzle-kit create its migration journal.
+   `pnpm install` fails if Node is older than 24.14.1 (`engine-strict`). `playwright install` downloads the browser for the acceptance tests; on Linux, if the browser later fails to start, run it again with `--with-deps`. `pnpm db:generate` lets drizzle-kit create its migration journal.
 3. Tell the developer the next steps:
 
    ```sh

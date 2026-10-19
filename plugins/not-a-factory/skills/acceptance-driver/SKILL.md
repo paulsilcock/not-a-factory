@@ -15,7 +15,7 @@ Acceptance tests reach the system through its public interfaces, so there is one
 
 | The system's public interface | Driver | Read |
 |---|---|---|
-| A browser UI (most full-stack apps) | Browser driver | `browser.md` |
+| A browser UI (most full-stack apps; the template's default) | Browser driver | `browser.md` |
 | A public HTTP API, used by other systems | HTTP driver | `http.md` |
 | A UI that is still being built | HTTP driver for now; add the browser driver when the UI exists | `http.md` |
 | A CLI app, or a CLI added for exploratory testing (handy for chat apps) | CLI driver | |

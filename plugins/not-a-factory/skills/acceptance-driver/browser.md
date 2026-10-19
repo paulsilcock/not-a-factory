@@ -45,4 +45,4 @@ Stable selectors come from accessible markup: real buttons, labels and headings,
 
 - Each test gets its own browser context; `BrowserDriver` does this.
 - Group methods by page or area once the driver grows.
-- Playwright is a peer dependency of `@litmus-ts/test`. Add `playwright` to `api`'s dev dependencies, and install the browser with `pnpm --filter api exec playwright install chromium`.
+- A project created by not-a-factory already has Playwright and Chromium, and a `BrowserAppDriver` in `acceptance-tests/driver/browser.ts`. In other projects: Playwright is a peer dependency of `@litmus-ts/test`; add `playwright` to the acceptance tests' dev dependencies, and install the browser with `playwright install chromium`.

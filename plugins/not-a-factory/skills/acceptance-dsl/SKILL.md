@@ -54,13 +54,13 @@ export class BooksDsl {
 
 ## Where words live
 
-- **Start with one:** put new words directly on `AppDsl` in `dsl.ts`. Areas emerge as the DSL grows.
+- **One root DSL,** named after the problem domain: Farley's examples use `BookShoppingDsl`. The template's root is `AppDsl` in `acceptance-tests/dsl.ts`; rename it when the domain is clear. Put new words on it directly.
 - **An area is a big concept in the user's world,** something a person at the desk would name: books, members, loans. It is not a class, a page, an endpoint or an action.
-- **Split off an area** when a group of words clearly belongs together around one concept and the DSL has grown hard to read. A good area tells part of the system's story, holds a cohesive set of concepts, and can be understood on its own. Never create an area for a single word.
-- Areas live in `acceptance-tests/dsl/`, for example `dsl/loans.ts`, and are registered in `dsl.ts`. After the DSL has grown, it might look like this:
+- **Split off an area** when a group of words clearly belongs together around one concept and the root DSL has grown hard to read. A good area tells part of the system's story, holds a cohesive set of concepts, and can be understood on its own. Never create an area for a single word.
+- Areas live in `acceptance-tests/dsl/`, for example `dsl/loans.ts`, and the root DSL holds them. After the DSL has grown, it might look like this:
 
   ```ts
-  export class AppDsl extends Dsl<AppDriver> {
+  export class LibraryDsl extends Dsl<AppDriver> {
     readonly books = new BooksDsl(this.driver, this.context);
     readonly loans = new LoansDsl(this.driver, this.context);
   }

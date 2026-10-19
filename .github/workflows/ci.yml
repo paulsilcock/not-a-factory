@@ -109,17 +109,25 @@ jobs:
           echo "blocked=$blocked guarded=$guarded clean=$clean"
           [ "$blocked" -eq 2 ] && [ "$guarded" -eq 0 ] && [ "$clean" -eq 0 ]
 
-      # The template has no acceptance tests yet, so add a smoke test that reaches the app as a black box.
+      - name: Install the browser's system libraries
+        working-directory: ${{ env.APP }}
+        run: pnpm --filter acceptance-tests exec playwright install --with-deps chromium
+      # The template has no acceptance tests yet, so add a smoke test that reaches the app as a black box,
+      # through the template's own browser driver.
       - name: Acceptance tests (Docker Compose stack)
         working-directory: ${{ env.APP }}
         run: |
           cat > acceptance-tests/smoke.test.ts <<'EOF'
           import { expect, inject, it } from "vitest";
 
-          it("the app is up and serves the web page", async () => {
+          import { createDriver } from "#acceptance/driver.ts";
+
+          it("the app is up, and the browser driver starts", async () => {
             const base = inject("acceptanceUrl");
             expect((await fetch(`${base}/health`)).ok).toBe(true);
             expect(await (await fetch(base)).text()).toContain(`id="app"`);
+            const driver = await createDriver();
+            await driver[Symbol.asyncDispose]();
           });
           EOF
           pnpm test:acceptance
