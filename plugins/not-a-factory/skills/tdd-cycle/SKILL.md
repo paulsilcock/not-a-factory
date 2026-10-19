@@ -7,7 +7,7 @@ description: Build or change one component test-first, one test at a time - RED,
 
 > The commands and paths below are for a project created by `not-a-factory`. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
 
-TDD is a design method, not a testing strategy. Each test asks "what should happen when...?" The answer shapes the interface, and the interface shapes the design. We learn what the code should be one behaviour at a time. **One test at a time. Always.** Keep to the mode agreed with the developer: it decides where you stop, never which steps you do (see `tdd-workflow.md`).
+This skill finds the component, its consumer and its tests. The cycle itself (RED, GREEN, REFACTOR, review the list) is in `.claude/rules/tdd-workflow.md`. **One test at a time. Always.** Keep to the mode agreed with the developer: it decides where you stop, never which steps you do (see `tdd-workflow.md`).
 
 ## 1. Find where we are
 
@@ -41,25 +41,12 @@ List **behaviours**, not classes or methods. Write the list, not the tests. Keep
 
 ## 4. RED → GREEN → REFACTOR
 
-1. **RED.** Write one failing test for the most important behaviour on the list. Test the public interface: inputs, outputs, effects someone can see. If an idea is easy to say in the test, it will be easy to use in the code. The test must compile, so add stubs if needed. Run it and check that it fails **for the right reason**: the behaviour is missing, not a typo or a missing import.
-2. **GREEN.** Ask: "what is stopping this test from passing right now?" Name that one thing, fix it, and ask again. Describe what is missing, not what you "need to build":
-   - Bad: "To let members borrow books I need a loan table, a repository, a use case and a route."
-   - Good: "The test fails because nothing records the loan. The first missing piece is somewhere to keep it."
+Follow "Inner loop" in `.claude/rules/tdd-workflow.md`, one cycle at a time, and stop where the mode says. Before the first test, read `.claude/rules/writing-tests.md`.
 
-   If the missing thing is a collaborator (another object, with its own clear responsibility, that this component works with), start a new `tdd-cycle` for it. Its behaviour must help the consumer fulfil its own responsibility; design it from that need. Its consumer is the component you are building now. Then come back. If the answer is one line of code, write that line. Do the simplest thing that works.
-3. **REFACTOR.** Improve the design without changing behaviour: names, separation of concerns, cohesion, duplication. This is where the design thinking happens; it is not optional cleanup. Read the change as a reviewer would: missing error handling, leaked internals, things that do not match the rest of the code, failure modes no test covers. If nothing needs to change, say so.
-
-Run only the test file you are working on, for fast feedback, for example `pnpm --filter api exec vitest run src/domain/loan.test.ts`. That runs Vitest inside `api/`, so the path starts there. Other commands are in `CLAUDE.md`.
-
-**Stubs** only satisfy the compiler: they throw or return nothing. A stub must not make the test pass. No "stub" or "not implemented yet" comments.
-
-## What makes a good test
-
-- It says **what** the component does for its consumer, not how. It fails when behaviour changes, and keeps passing when only the structure changes. If a refactor makes you change tests, they are coupled to the implementation.
-- **Its name is a specification:** in business words for domain models and use cases; in terms of what the consumer can rely on for technical components ("a saved loan can be found by its member"). Never a class, function or framework name.
-- **Look for an existing test first.** If a broader test already covers the behaviour, do not write the narrow one.
-- Aim for Farley's properties: understandable, maintainable, repeatable, atomic, necessary, granular, fast, and written first. The `test-quality` skill reviews tests against them.
-- Real objects and fakes by default; stubs or mocks only of interfaces we own. See "Test doubles" in `writing-tests.md`.
+For this component:
+- If GREEN needs a collaborator, start a new `tdd-cycle` for it. Its consumer is the component you are building now. Then come back.
+- Run only the test file you are working on, for fast feedback, for example `pnpm --filter api exec vitest run src/domain/loan.test.ts`. That runs Vitest inside `api/`, so the path starts there. Other commands are in `CLAUDE.md`.
+- Good tests: see `writing-tests.md`. The `test-quality` skill reviews tests against Farley's properties.
 
 ## 5. After every cycle, review the list
 

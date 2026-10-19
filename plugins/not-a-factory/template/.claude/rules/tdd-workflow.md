@@ -4,6 +4,14 @@ TDD is a design method, not a testing strategy. Each test asks "what should happ
 
 **One test at a time. Always.**
 
+## Before you change any code
+
+Every change to what the code does goes through a test-first loop, even when the developer only says "build X" or "add Y":
+- New behaviour that a user (or another system) can see or use: the `new-feature` skill (outer loop, below).
+- Anything else (a component, a bug fix, a refactor): the `tdd-cycle` skill (inner loop, below).
+
+No production code before a failing test asks for it.
+
 ## Modes
 
 At the start of a task, ask the developer which mode to use. Show the modes as a list of options (the `AskUserQuestion` tool), with step mode first, as the default. Keep to the mode until the developer changes it.
@@ -38,12 +46,18 @@ Not a feature: a new endpoint for behaviour that already exists, an internal cha
 
 ## Inner loop: RED → GREEN → REFACTOR
 
-Use the `tdd-cycle` skill: it names the component, and has the detail of each step. In short:
+The `tdd-cycle` skill names the component and its consumer, and finds the right test. Every cycle then has these steps, in this order:
 
-1. **RED:** one failing test for one behaviour. It must fail for the right reason: the behaviour is missing.
-2. **GREEN:** fix the one thing that stops it passing. The simplest thing that works.
-3. **REFACTOR:** improve the design without changing behaviour. Not optional.
-4. **Review the test list,** then the next test.
+1. **RED.** Write one failing test for the most important behaviour on the list. Test the public interface: inputs, outputs, effects someone can see. If an idea is easy to say in the test, it will be easy to use in the code. The test must compile, so add stubs if needed. Run it and check that it fails **for the right reason**: the behaviour is missing, not a typo or a missing import.
+2. **GREEN.** Ask: "what is stopping this test from passing right now?" Name that one thing, fix it, and ask again. Describe what is missing, not what you "need to build":
+   - Bad: "To let members borrow books I need a loan table, a repository, a use case and a route."
+   - Good: "The test fails because nothing records the loan. The first missing piece is somewhere to keep it."
+
+   If the missing thing is a collaborator (another object, with its own clear responsibility), build it with its own cycle first; its behaviour must help the consumer fulfil its responsibility. If the answer is one line of code, write that line. Do the simplest thing that works.
+3. **REFACTOR.** Improve the design without changing behaviour: names, separation of concerns, cohesion, duplication. This is where the design thinking happens; it is not optional cleanup. Read the change as a reviewer would: missing error handling, leaked internals, things that do not match the rest of the code, failure modes no test covers. If nothing needs to change, say so.
+4. **Review the test list** (below), then the next test.
+
+**Stubs** only satisfy the compiler: they throw or return nothing. A stub must not make the test pass. No "stub" or "not implemented yet" comments.
 
 When a test needs a new domain idea (a new noun, a new rule, a new state), stop and use the `model-domain` skill before you write domain code.
 
@@ -66,7 +80,7 @@ When the code shows something new about the problem (a case nobody thought of, t
 - **DO NOT write more than one test before the first one passes.** Not even as placeholders or `it.todo`. The next test comes from what this one teaches you.
 - **DO NOT treat the first test list as final.** Review it after every cycle.
 - **DO NOT write code before a failing test asks for it.**
-- **DO NOT plan classes, files, tables or architecture up front.** Plan which behaviours to test. The design comes out of the tests.
+- **DO NOT describe what you "need to build" in GREEN.** Describe what is missing.
+- **DO NOT plan classes, files, tables or architecture up front, or write implementation plans,** even in a planning mode. The plan is: the next acceptance test (one sentence) and the first behaviour inside it (one sentence). The design comes out of the tests.
 - **DO NOT batch work.** Every RED, GREEN and REFACTOR is a checkpoint, in every mode: the code compiles, and you can say what changed.
-- **DO NOT write implementation plans**, even in a planning mode. The plan is: the next acceptance test (one sentence) and the first behaviour inside it (one sentence). Nothing more.
 - **DO NOT leave the code broken between steps.** Typecheck and lint must pass when you stop. In RED, only the new test fails at its level. The acceptance test stays red while you build the components it needs; that is expected.

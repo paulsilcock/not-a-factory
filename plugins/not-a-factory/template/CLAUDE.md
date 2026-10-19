@@ -4,9 +4,13 @@
 
 ## How we work
 
-Outside in, in small steps. One acceptance test for each acceptance criterion of a feature, one unit test at a time, refactor every cycle. Decide the next step from what you just learned. No big specs or implementation plans up front. See `.claude/rules/tdd-workflow.md`.
+The aim is to build the right thing, quickly and safely, with the developer in the loop. Building is discovery: each small, tested step shows what to build next. So work in tight feedback loops and small batches, one test at a time, and decide the next step from what you just learned. No big specs or implementation plans up front. The rules are in `.claude/rules/tdd-workflow.md`.
 
-Skills: `new-feature` (a new feature, outside in), `acceptance-test` (one acceptance test, ATDD), `acceptance-dsl` and `acceptance-driver` (its DSL and drivers), `tdd-cycle` (one component, test-first), `model-domain` (new business words or rules), `test-quality` (review tests).
+Which skill when:
+- New behaviour that a user can see or use → `new-feature`. It uses `acceptance-test`, `acceptance-dsl` and `acceptance-driver`.
+- Any other change, or one component that a test needs → `tdd-cycle`.
+- New business words or rules → `model-domain`.
+- Review tests → `test-quality`.
 
 ## Commands
 
