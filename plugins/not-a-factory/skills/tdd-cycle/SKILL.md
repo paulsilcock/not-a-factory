@@ -41,7 +41,7 @@ Before the first test, be clear about what the consumer needs:
 - What are the inputs, and the effects someone can see?
 - Which edge cases and failure modes do we already know about?
 
-List **behaviours**, not classes or methods. Write the list, not the tests. Keep it short: only what the consumer needs, not everything the component could do. The list is a guess, and it will change (step 5).
+Write the list in your message as a checklist, so the developer can see it and change it. List **behaviours**, not classes or methods. Write the list, not the tests. Keep it short: only what the consumer needs, not everything the component could do. The list is a guess, and it will change (step 5).
 
 ## 4. RED → GREEN → REFACTOR
 
@@ -86,7 +86,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 ## 5. After every cycle, review the list
 
 The list is a guess, never the final list. Use what this cycle taught you:
-- Remove behaviours that are now redundant or wrong. Add the ones you found. Change the order if needed. Say what changed and why.
+- Remove behaviours that are now redundant or wrong. Add the ones you found. Change the order if needed. Show the list again, with what changed and why (for example "added: an empty order is refused"; "done: a saved order can be found").
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - New words or rules: use `domain-discovery`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`, and ask the developer. Do not build it.

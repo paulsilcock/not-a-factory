@@ -17,10 +17,9 @@ Acceptance tests reach the system through its public interfaces, so there is one
 |---|---|---|
 | A browser UI (most full-stack apps; the template's default) | Browser driver | `browser.md` |
 | A public HTTP API, used by other systems | HTTP driver | `http.md` |
-| A UI that is still being built | HTTP driver for now; add the browser driver when the UI exists | `http.md` |
 | A CLI app, or a CLI added for exploratory testing (handy for chat apps) | CLI driver | |
 
-These are examples, not a closed list. A system may need a phone driver to make calls, a WhatsApp driver to send messages, or an iOS driver for a mobile app. If an HTTP API exists only to serve the app's own UI, it is not a public interface: test through the UI.
+These are examples, not a closed list. A system may need a phone driver to make calls, a WhatsApp driver to send messages, or an iOS driver for a mobile app. If an HTTP API exists only to serve the app's own UI, it is not a public interface: test through the UI. Do not build the API first and the UI later: the first acceptance test goes through the UI, and you build just enough page for it (see `walkthrough.md` in the `acceptance-test` skill).
 
 **Several entrypoints, one test suite.** When a system has more than one entrypoint (adapter, in hexagonal terms), each gets its own driver, and all of them implement the same driver interface. The test cases and the DSL do not change. For example, a web client and a mobile app can share one suite; or, when a store front is replaced, the same tests check the new one before it goes live. `createDriver` picks the driver, for example from a `DRIVER` environment variable, and CI can run the suite once per driver in a matrix. Every test must pass through every driver.
 

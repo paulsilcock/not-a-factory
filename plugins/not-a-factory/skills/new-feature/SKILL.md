@@ -43,7 +43,7 @@ Write it down in plain words:
 ## 4. One criterion at a time
 
 1. Make the criterion pass with the `acceptance-test` skill.
-2. Suggest the `test-quality` skill for the tests written for this criterion.
+2. Run the `test-quality` skill on the tests written for this criterion. Report the results, and ask before you change any test.
 3. Review the criteria list: remove, add or reorder. Then take the next criterion.
 
 The feature is done when every criterion has a passing acceptance test.

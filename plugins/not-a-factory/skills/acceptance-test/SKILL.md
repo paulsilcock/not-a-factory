@@ -20,6 +20,8 @@ A good acceptance test says **what, not how**, in the **language of the problem 
 
 One test per acceptance criterion. A test may have several `confirm...` steps when together they check that one criterion.
 
+**Would the test pass if the system did nothing?** A confirmation message alone often proves nothing. Confirm the outcome the user relies on, through the public interface ("the order appears in my orders"). If no interface shows it yet, say so, and add the missing view to the criteria list for the developer to decide.
+
 ## The four layers
 
 ```
