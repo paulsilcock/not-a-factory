@@ -17,7 +17,7 @@ Follow `.claude/rules/tdd-workflow.md`: the mode, one test at a time, the workin
 
 ## 2. Is it a feature?
 
-A feature lets a user do or see something new through the public interface. If the request is only a new endpoint for something users can already do, an internal change, a refactor or performance work, say so and use `tdd-cycle` instead.
+A feature lets a user do or see something new through the public interface. If the request is only a new endpoint for something users can already do, an internal change, a refactor or performance work, say so and use `tdd-cycle` instead. A bug fix gets an acceptance test only when the bug shows an acceptance criterion that no test covers; then use this skill for that criterion only.
 
 ## 3. Agree the feature and its acceptance criteria
 
