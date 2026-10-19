@@ -1,6 +1,6 @@
 {
   "name": "not-a-factory",
-  "description": "Create a TanStack Router + shadcn/ui + Hono + Litmus app with TDD rules and skills.",
+  "description": "Build the right thing with Claude: tight feedback loops, small batches, a developer in the loop.",
   "author": {
     "name": "Paul Silcock"
   },

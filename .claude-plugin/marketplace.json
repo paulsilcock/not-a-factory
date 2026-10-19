@@ -9,8 +9,7 @@
   "plugins": [
     {
       "name": "not-a-factory",
-      "source": "./plugins/not-a-factory",
-      "description": "Create a TanStack Router + shadcn/ui + Hono + Litmus app with TDD rules and skills."
+      "source": "./plugins/not-a-factory"
     }
   ]
 }
