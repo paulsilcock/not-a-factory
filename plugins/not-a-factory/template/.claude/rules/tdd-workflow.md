@@ -47,6 +47,7 @@ Stubs only satisfy the compiler. They throw or return nothing, and never make a 
 - Build only what the current failing test asks for.
 - Before you write production code, check that a test fails because that code is missing. If none does, stop and write the test first.
 - Anything more needs the developer first: a new behaviour, a new criterion, another component, or a refactor outside this step. Put it on the test list, and ask.
+- Where a feature lives in the app (its route and navigation) and how it looks are the developer's decisions. Ask; do not decide them yourself.
 - A discovery or a business question (a case nobody thought of, two rules that conflict, a limit that changes what users get) stops you in every mode. Tell the developer at once, in plain words, with the options you see. Never decide a business question yourself.
 
 ## Never

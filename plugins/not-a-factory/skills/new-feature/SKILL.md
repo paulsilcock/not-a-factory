@@ -40,10 +40,16 @@ Write it down in plain words:
 - The list is a working list, like the test list. Start with the most important criterion that you are most confident about.
 - If the story or the criteria contain business rules, limits, states or new business words, load `domain-discovery` before you write the first acceptance test. Its examples often become criteria.
 
+**Where it lives in the app.** If the feature has a UI, the developer decides where it goes and how it is reached. Ask:
+- **A new app with no app shell yet** (no navigation, only the starter page): what shell do they want, for example a sidebar, a top navbar, or a single page? Build it once, with shadcn blocks (use the `shadcn` skill), before the first feature's page. Every later feature fits into it.
+- **Every feature:** a new route with an entry in the navigation (with what label), or part of an existing page?
+- **Who builds it:** offer to let the developer build the shell or the layout themselves, with the `shadcn` skill, while you build the behaviour. In pair work, they often will.
+
 ## 4. One criterion at a time
 
 1. Make the criterion pass with the `acceptance-test` skill.
-2. Run the `test-quality` skill on the tests written for this criterion. Report the results, and ask before you change any test.
-3. Review the criteria list: remove, add or reorder. Then take the next criterion.
+2. **Shape the UI** (if the criterion has a UI). The acceptance test passes with just enough page; now make it fit the app. Take a screenshot of the page and show it to the developer. Propose a layout with shadcn components or blocks. The developer decides, or does it themselves. Make the agreed change, and keep the acceptance tests green: they find elements by role and label, so a new layout does not break them. This is not REFACTOR: users can see the change.
+3. Run the `test-quality` skill on the tests written for this criterion. Report the results, and ask before you change any test.
+4. Review the criteria list: remove, add or reorder. Then take the next criterion.
 
 The feature is done when every criterion has a passing acceptance test.

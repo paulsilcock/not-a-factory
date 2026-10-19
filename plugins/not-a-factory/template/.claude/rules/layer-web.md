@@ -10,6 +10,7 @@ paths:
 - Server state uses TanStack Query (`useQuery`, `useMutation`). Keep local UI state in components.
 - Components come from shadcn/ui (`pnpm dlx shadcn@latest add <name>` in `web/`). Use the `shadcn` skill. Do not hand-write a component that shadcn has.
 - No business rules in the client. If the client needs a decision, the API makes it.
+- **The app shell, the routes, the navigation and the look are the developer's decisions.** Ask before you add a route, a navigation entry or a layout. Build the shell and layouts with shadcn blocks, not by hand.
 - Before you change TanStack code, load the matching Intent skill (see `AGENTS.md`).
 
 ## Testing the UI
