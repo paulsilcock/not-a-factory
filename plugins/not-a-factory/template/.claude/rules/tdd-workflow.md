@@ -35,7 +35,7 @@ Before the first test of a component, write its test list in your message: a sho
 
 1. **RED:** write one failing test for one behaviour. Run it. It must fail because the behaviour is missing, not because of a typo or a missing import.
 2. **GREEN:** fix only the one thing that stops the test passing, with the simplest correct code. Simplest never means a shortcut: no hard-coded value that the system should store or compute, no data dropped on save, no stub left behind. If that is a new collaborator (a domain model, a repository, a service), stop: give it its own test and cycles first, then come back.
-3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no test or caller uses. If nothing needs to change, say so.
+3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no test or caller uses. Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
 4. **Review the test list:** remove, add or reorder, and show the list with what changed.
 
 Name each step in your message as you do it: **RED**, **GREEN**, **REFACTOR**, **LIST**, with one line on what you did. In every mode, never start the next test before you have written REFACTOR and LIST, so that the developer can see that no step was skipped.

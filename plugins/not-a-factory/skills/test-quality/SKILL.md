@@ -26,6 +26,7 @@ Mark **Fast** "Not assessed" if you did not run the tests. Mark **First** "Not a
 
 Quick checks:
 - Would the test still pass if you deleted the production code? Then it tests nothing.
+- Would the test still pass if the code returned a fixed value? Then it cannot tell real behaviour from a fake. Add an example with a different value.
 - Does the test name a class, function, table or framework? Rename it as behaviour.
 - Does a refactor make you change it? It is coupled to the implementation.
 

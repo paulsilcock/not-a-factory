@@ -73,10 +73,11 @@ If the missing thing is a new collaborator (another object, with its own clear r
 **Check before REFACTOR:**
 - The new test passes, and all the other tests in this file still pass.
 - You wrote no code that no test asks for. If you did, remove it, or put the behaviour on the test list.
+- Would the test still pass if the code returned a fixed value? Then triangulate: put a second example with a different value on the test list (for example a task in another state), and make it the next test.
 
 ### REFACTOR
 
-Improve the design without changing behaviour: names, separation of concerns, cohesion, duplication. This is where the design thinking happens; it is not optional cleanup. Read the change as a reviewer would: missing error handling, leaked internals, things that do not match the rest of the code, failure modes no test covers.
+Improve the design without changing behaviour: names, separation of concerns, cohesion, duplication. This includes duplication between the test and the code: a fixed value in the code that only repeats what the test expects must become real code. This is where the design thinking happens; it is not optional cleanup. Read the change as a reviewer would: missing error handling, leaked internals, things that do not match the rest of the code, failure modes no test covers.
 
 **Check before the list review:**
 - All tests still pass, and typecheck and lint pass.
