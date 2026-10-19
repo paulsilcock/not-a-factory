@@ -3,8 +3,7 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#api/*": "./src/*",
-    "#acceptance/*": "./test-acceptance/*"
+    "#api/*": "./src/*"
   },
   "exports": {
     "./app": "./src/app.ts"
@@ -14,9 +13,8 @@
     "start": "tsx src/main.ts",
     "typecheck": "tsc",
     "test": "vitest run",
-    "test:unit": "vitest run --project unit",
-    "test:acceptance": "vitest run --project acceptance",
-    "test:changed": "vitest run --project unit --changed",
+    "test:unit": "vitest run",
+    "test:changed": "vitest run --changed",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },

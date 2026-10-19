@@ -18,6 +18,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test:unit
-      # Starts the app and Postgres with Docker Compose (see api/test-acceptance/global-setup.ts)
+      # Starts the app and Postgres with Docker Compose (see acceptance-tests/global-setup.ts)
       - run: pnpm test:acceptance
       - run: pnpm build

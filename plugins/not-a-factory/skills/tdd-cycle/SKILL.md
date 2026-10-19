@@ -7,7 +7,7 @@ description: Build or change one component test-first, one test at a time - RED,
 
 > The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
 
-TDD is a design method, not a testing strategy. Each test asks "what should happen when...?" The answer shapes the interface, and the interface shapes the design. We learn what the code should be one behaviour at a time. **One test at a time. Always.** Keep to the mode agreed with the developer (guided, pair or autonomous; see `workflow.md`).
+TDD is a design method, not a testing strategy. Each test asks "what should happen when...?" The answer shapes the interface, and the interface shapes the design. We learn what the code should be one behaviour at a time. **One test at a time. Always.** Keep to the mode agreed with the developer: it decides where you stop, never which steps you do (see `tdd-workflow.md`).
 
 ## 1. Find where we are
 
@@ -22,10 +22,10 @@ Say it in one sentence: "Building <component> in <layer>, because <consumer> nee
 | Missing piece | Component | Where | Its test | Runs against | Read first |
 |---|---|---|---|---|---|
 | A business rule, state or calculation | Domain model or value object | `api/src/domain/` | `<name>.test.ts`, calls the model directly | Plain objects | `layer-domain.md`; `model-domain` skill if the words or rules are new |
-| One way the system is used: a command (changes it) or a query (reads it) | Use case | `api/src/use-cases/` | `<intent>.test.ts`, calls `handle()` | Real repositories on PGlite, fakes for other services | `layer-use-cases.md` |
-| Saving and loading | Repository and table | `api/src/infra/repositories/`, `infra/db/schema.ts` | `<name>-repository.test.ts` | PGlite (`setupTestDb`) | `layer-infra.md`; then `pnpm db:generate` |
-| Another service (email, payments, an LLM) | Interface we own, and a thin adapter | `api/src/infra/<service>/` | The interface is designed from use-case tests; the adapter is tested at its edge | Fake or stub of the interface | `layer-infra.md`; "Test doubles" in `testing.md` |
-| An HTTP route, status or input check | Route | `api/src/entrypoints/http/` | Usually the acceptance test covers it; write a route test only for HTTP behaviour | The Hono app | `layer-entrypoints.md` |
+| One way the system is used: a command (changes it) or a query (reads it) | Use case | `api/src/use-cases/` | `<intent>.test.ts`, calls `handle()` | Real repositories, fakes for other services | `layer-use-cases.md` |
+| Saving and loading an aggregate | Repository | `api/src/infra/repositories/` | `<name>-repository.test.ts` | The database, or a fake of it | `repositories.md`; `db-drizzle.md` for the default stack |
+| Another service (email, a payment gateway, an LLM) | Interface we own, and a thin adapter | `api/src/infra/<service>/` | The interface is designed from use-case tests; the adapter is tested at its edge | Fake or stub of the interface | `layer-infra.md`; "Test doubles" in `writing-tests.md` |
+| A new way in: an HTTP route, CLI command, queue consumer, scheduled job | Entrypoint | `api/src/entrypoints/<kind>/` | Usually the acceptance test covers it; write an entrypoint test only for behaviour of that channel | The entrypoint | `layer-entrypoints.md` |
 | Complex stateful logic in the client, such as a reducer | Client logic | `web/src/` | `<name>.test.ts`, plain unit test | Plain objects | `layer-web.md` (other UI tests follow its "Testing the UI") |
 
 If the piece does not fit a row, or fits two, ask the developer.
@@ -59,14 +59,13 @@ Run only the test file you are working on, for fast feedback, for example `pnpm 
 - **Its name is a specification:** in business words for domain models and use cases; in terms of what the consumer can rely on for technical components ("a saved loan can be found by its member"). Never a class, function or framework name.
 - **Look for an existing test first.** If a broader test already covers the behaviour, do not write the narrow one.
 - Aim for Farley's properties: understandable, maintainable, repeatable, atomic, necessary, granular, fast, and written first. The `test-quality` skill reviews tests against them.
-- Real objects and fakes by default; stubs or mocks only of interfaces we own. See "Test doubles" in `testing.md`.
+- Real objects and fakes by default; stubs or mocks only of interfaces we own. See "Test doubles" in `writing-tests.md`.
 
 ## 5. After every cycle, review the list
 
 - Remove behaviours that are now redundant or wrong. Add the ones you found. Change the order if needed. Say what changed.
 - New words or rules: use `model-domain`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`.
-- In pair mode, ask the developer whether to continue, or whether they want to take the next step.
 
 ## 6. Done when the consumer's need is met
 

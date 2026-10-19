@@ -1,15 +1,21 @@
 ---
 paths:
   - "api/src/infra/**"
-  - "api/drizzle/**"
-  - "api/drizzle.config.ts"
 ---
 
 # Infrastructure
 
-- Tables are in `infra/db/schema.ts` (Drizzle). Export each table and add it to the `schema` object. Each aggregate table has `id`, `version`, `created_at`, `updated_at`.
-- After you change the schema, run `pnpm db:generate` to make a migration, then `pnpm db:migrate`. Commit the generated SQL in `api/drizzle/`. Never edit a migration that is already committed.
-- A repository extends `DrizzlePostgresRepository<Aggregate, typeof table>` from `@litmus-ts/db/drizzle/postgres`, implements `toPersistence`, and adds finders that the use cases need. Its constructor is `@inject(DrizzleDbContext) ctx: DrizzleDbContext`.
-- Test a repository against PGlite with `setupTestDb({ schema })` from `@litmus-ts/db/drizzle/postgres/test`: save, load, and check that the loaded aggregate behaves the same.
-- An adapter to another service implements an interface that this project owns, designed from what the use cases need. Keep it thin, and test it at its edge (see "Test doubles" in `testing.md`). Use cases get a fake or stub of the interface.
-- Read config (`process.env`) only in `main.ts` and pass values in.
+Infrastructure is the way out of the system: driven adapters, in hexagonal terms. The app uses it to reach the outside world, for example:
+- a database (through repositories and query code);
+- a payment gateway, an email service, an LLM, another team's API;
+- files, queues and clocks.
+
+## Every adapter
+
+- **It implements an interface that the application core owns** (a port), designed from what the use cases need, in our domain's words. Vendor types and errors stay behind it.
+- **Keep it thin,** and test it at its edge: against a local stub of the other service for HTTP, or with evals for LLM calls. Do not unit-test vendor glue by mocking the library (see "Test doubles" in `writing-tests.md`).
+- **Use cases get a fake or stub of the interface** in their tests.
+- **Read config (`process.env`) only in `main.ts`,** and pass the values in.
+- **Wire the real adapter in `main.ts` only.**
+
+For repositories, read `repositories.md`. For the default database stack (Postgres and Drizzle), read `db-drizzle.md`.

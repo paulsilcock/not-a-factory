@@ -1,4 +1,4 @@
-# Testing
+# Writing tests
 
 ## Good tests
 

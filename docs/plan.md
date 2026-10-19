@@ -41,7 +41,7 @@ plugins/not-a-factory/
 - **Migrations (iteration 1):** `pnpm db:generate` and `pnpm db:migrate` (drizzle-kit) against the docker-compose Postgres locally, and against the acceptance-test stack in CI.
 
 ## Iteration 2: reviewer agents
-- `test-reviewer`: reviews tests against `testing.md` and the `test-quality` properties (rates each property; no single score).
+- `test-reviewer`: reviews tests against `writing-tests.md` and the `test-quality` properties (rates each property; no single score).
 - `design-reviewer`: reviews code against `architecture.md` and the layer rules (dependency direction, thin entrypoints, rules in the domain).
 - Both report findings and ask before changing code. Exact scope comes from iteration 1 feedback.
 
@@ -73,8 +73,8 @@ Principles:
 - Distil, don't clone. create-agent-app is the model for the shape and most of the ideas, but it is bloated and partly out of date. Litmus `tdd-workflow.md` (68 lines) has the best TDD wording; its acceptance-test section is thin (treats ATDD as optional "for features where multiple classes must collaborate"; Litmus #118 says the trigger should be a user-facing capability), so the outer ATDD loop needs writing properly.
 
 **Always-on rules (`.claude/rules/`, no `paths:`), each short:**
-- `workflow.md`: outside-in. Every feature's acceptance criteria each get one failing acceptance test (business language, via DSL and driver); inside it, one unit test at a time; RED for the right reason; GREEN by fixing the one thing stopping the test; REFACTOR every cycle; no upfront implementation plans or batch work; guided, pair or autonomous agreed at the start; the test list is a working list, reviewed after every cycle. Names the skills: `new-feature`, `acceptance-test`, `tdd-cycle`, `model-domain`.
-- `testing.md`: the few non-negotiables (fakes over mocks, only mock what you own, behaviour-named tests, no test-only behaviour in the app, no `expect` in acceptance test cases).
+- `tdd-workflow.md`: outside-in. Every feature's acceptance criteria each get one failing acceptance test (business language, via DSL and driver); inside it, one unit test at a time; RED for the right reason; GREEN by fixing the one thing stopping the test; REFACTOR every cycle; no upfront implementation plans or batch work; a mode agreed at the start (step by default, cycle, component or criterion: it decides only where the agent stops); the test list is a working list, reviewed after every cycle. Names the skills: `new-feature`, `acceptance-test`, `tdd-cycle`, `model-domain`.
+- `writing-tests.md`: the few non-negotiables (fakes over mocks, only mock what you own, behaviour-named tests, no test-only behaviour in the app, no `expect` in acceptance test cases).
 - `architecture.md`: the layout and dependency direction (Litmus-inspired) in a few lines, plus "use `add-*` skills / layer rules for detail".
 
 **Path-scoped rules (`paths:`), short, one per layer:** domain, use cases, entrypoints, infra/repositories, acceptance tests, web client. Only the rules that matter when touching those files.

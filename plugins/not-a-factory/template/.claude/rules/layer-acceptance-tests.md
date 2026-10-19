@@ -1,6 +1,6 @@
 ---
 paths:
-  - "api/test-acceptance/**"
+  - "acceptance-tests/**"
 ---
 
 # Acceptance tests

@@ -1,4 +1,4 @@
-# Workflow: outside in, one test at a time
+# TDD workflow: outside in, one test at a time
 
 TDD is a design method, not a testing strategy. Each test asks "what should happen when...?" The answer shapes the interface, and the interface shapes the design. Building is discovery: we learn what the code should be one behaviour at a time.
 
@@ -6,11 +6,16 @@ TDD is a design method, not a testing strategy. Each test asks "what should happ
 
 ## Modes
 
-At the start of a task, ask the developer which mode to use. Keep to it until the developer changes it.
+At the start of a task, ask the developer which mode to use. Show the modes as a list of options (the `AskUserQuestion` tool), with step mode first, as the default. Keep to the mode until the developer changes it.
 
-- **Guided:** propose each test and each change, and wait for approval.
-- **Pair:** the developer drives. They may write a use case, a test or any code themselves. Suggest the next test, review their changes, or build one component when they ask.
-- **Autonomous:** agree the behaviours, then work without stopping.
+The mode decides only where you stop. In every mode, each cycle is RED → GREEN → REFACTOR → review the test list, in that order, with the same checks. In every mode, a discovery or a business question stops you at once (see "Discoveries").
+
+1. **Step (default):** stop after each RED, GREEN, REFACTOR and list review. Show what you did, and wait for approval.
+2. **Cycle:** complete one full cycle, then stop.
+3. **Component:** continue the cycles until the component's test list is done, then stop. Stop earlier if you are stuck.
+4. **Criterion:** do all the work for one acceptance test, outside in, until it passes. Then stop.
+
+The developer may write code themselves at any time, in any mode: a test, a use case, anything. When they do, find where we are (see "Handovers"), review their changes, and continue from there.
 
 ## Handovers
 
@@ -48,13 +53,13 @@ A list of behaviours to test is useful, but it is a guess. It is never the final
 
 - Keep the list short and in business words. Write the list, not the tests.
 - After every cycle, use what you learnt to update it: remove tests that are now redundant or wrong, add behaviours you found, and change the order if needed. Say what changed and why.
-- This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In guided and pair mode, ask first.
+- This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - A change to the list can need another skill. A new word or rule means `model-domain`. A new user-facing feature means `new-feature`.
 - Pick the next test from the list as it is now, not as it was at the start: the most important thing the system does not do yet. Importance comes first. Between two equally important tests, take the one you are more confident about; the loop will make the other clearer.
 
 ## Discoveries
 
-When the code shows something new about the problem (a case nobody thought of, two rules that conflict, a technical limit that changes what users get), stop and tell the developer at once, in plain words, with the options you see. Do not decide a business question alone, even in autonomous mode. Put the answer in the test list.
+When the code shows something new about the problem (a case nobody thought of, two rules that conflict, a technical limit that changes what users get), stop and tell the developer at once, in plain words, with the options you see. Do not decide a business question alone, in any mode. Put the answer in the test list.
 
 ## DO NOT
 
@@ -62,6 +67,6 @@ When the code shows something new about the problem (a case nobody thought of, t
 - **DO NOT treat the first test list as final.** Review it after every cycle.
 - **DO NOT write code before a failing test asks for it.**
 - **DO NOT plan classes, files, tables or architecture up front.** Plan which behaviours to test. The design comes out of the tests.
-- **DO NOT batch work.** Every RED, GREEN and REFACTOR is a checkpoint.
+- **DO NOT batch work.** Every RED, GREEN and REFACTOR is a checkpoint, in every mode: the code compiles, and you can say what changed.
 - **DO NOT write implementation plans**, even in a planning mode. The plan is: the next acceptance test (one sentence) and the first behaviour inside it (one sentence). Nothing more.
 - **DO NOT leave the code broken between steps.** Typecheck and lint must pass when you stop. In RED, only the new test fails at its level. The acceptance test stays red while you build the components it needs; that is expected.

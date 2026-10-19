@@ -7,11 +7,11 @@ description: Build a new feature outside in - new behaviour that a user (or anot
 
 > The commands and paths below are for a project created by not-a-factory. In any other project, use that project's own commands, layout and test setup (see its `CLAUDE.md` and `package.json`). The steps stay the same.
 
-Follow `.claude/rules/workflow.md`: the mode (guided, pair or autonomous), one test at a time, the working list, and discoveries.
+Follow `.claude/rules/tdd-workflow.md`: the mode, one test at a time, the working list, and discoveries.
 
 ## 1. Find where we are
 
-- Are there acceptance tests for this feature already, and do they fail? Run `pnpm test:acceptance` (needs Docker).
+- Are there acceptance tests for this feature already, and do they fail? Run `pnpm test:acceptance`.
 - What changed? `git status` and `git diff`. The developer may have written some of it.
 - If a test for this feature already fails, go to step 4.
 
@@ -35,25 +35,15 @@ Write it down in plain words:
 3. A member with three books out cannot borrow another.
 ```
 
-- The story is one or two sentences about the user's work and why it matters to them. It does not mention the program, its screens or its data.
+- The story is one or two sentences about the user's work and why it matters to them, in the user's own words: their description of their problem. It does not mention the program, its screens or its data. Do not use "As a <role>, I want...".
 - Each criterion is one sentence that the least technical person who knows the business would understand. Each one gets its own acceptance test.
 - The list is a working list, like the test list. Start with the most important criterion that you are most confident about.
 - New business words or rules: use `model-domain` first. Its examples often become criteria.
 
 ## 4. One criterion at a time
 
-1. Write its acceptance test with the `acceptance-test` skill. Run it; it must fail because the behaviour is missing.
-2. Say in one sentence why it fails, and name the missing piece and the component that should hold it (see the component table in `tdd-cycle`).
-3. Build that component:
-   - In guided or autonomous mode, use `tdd-cycle`.
-   - In pair mode, ask whether the developer wants to build it. If they write the consumer (for example a use case) and name its parts, build each part with `tdd-cycle`, driven by what the consumer needs.
-4. Run `pnpm test:acceptance` again. Repeat from step 2 until it passes.
-5. Refactor, including the DSL and the drivers.
-6. Review the criteria list: remove, add or reorder. Then take the next criterion.
+1. Make the criterion pass with the `acceptance-test` skill.
+2. Suggest the `test-quality` skill for the tests written for this criterion.
+3. Review the criteria list: remove, add or reorder. Then take the next criterion.
 
-Follow the failure, not a fixed order. It is often route → use case → domain → repository, but not always.
-
-## 5. Done when every criterion has a passing acceptance test
-
-- If there is a UI, check it in the browser (`pnpm dev`).
-- Suggest the `test-quality` skill for the feature's tests.
+The feature is done when every criterion has a passing acceptance test.

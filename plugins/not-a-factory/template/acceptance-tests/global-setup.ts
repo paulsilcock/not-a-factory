@@ -6,13 +6,18 @@ import type { TestProject } from "vitest/node";
 // With ACCEPTANCE_URL set (for example a deployed environment), they use it.
 // Otherwise they start the app and its database with Docker Compose, as a
 // separate project so that the development database is not touched.
+// The stack stays up between runs, so later runs are fast; `up --build`
+// rebuilds the app only when the code changed. The tests do not need a clean
+// database: the DSL aliases keep each test's data separate.
+// Stop it with `pnpm test:acceptance:down`.
 const composeProject = "acceptance";
 const dbPort = "55432";
 const appPort = "53001";
+const root = "..";
 
 const compose = (args: string) =>
   execSync(`docker compose -p ${composeProject} --profile app ${args}`, {
-    cwd: "..",
+    cwd: root,
     stdio: "inherit",
     env: { ...process.env, DB_PORT: dbPort, APP_PORT: appPort },
   });
@@ -27,6 +32,7 @@ export default function setup(project: TestProject) {
   try {
     compose("up -d --build --wait db");
     execSync("pnpm db:migrate", {
+      cwd: root,
       stdio: "inherit",
       env: {
         ...process.env,
@@ -39,8 +45,6 @@ export default function setup(project: TestProject) {
     compose("down -v");
     throw error;
   }
-
-  return () => compose("down -v");
 }
 
 declare module "vitest" {

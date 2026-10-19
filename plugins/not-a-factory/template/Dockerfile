@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY api/package.json api/
 COPY web/package.json web/
+COPY acceptance-tests/package.json acceptance-tests/
 RUN pnpm install --frozen-lockfile
 
 COPY . .

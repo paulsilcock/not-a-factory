@@ -1,5 +1,5 @@
 # Local development uses only `db`. Acceptance tests start `db` and `app`
-# as a separate project (see api/test-acceptance/global-setup.ts).
+# as a separate project (see acceptance-tests/global-setup.ts).
 services:
   db:
     image: postgres:17

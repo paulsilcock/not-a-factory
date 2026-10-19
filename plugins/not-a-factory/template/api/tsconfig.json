@@ -13,5 +13,5 @@
     "experimentalDecorators": true,
     "types": ["node"]
   },
-  "include": ["src", "test-acceptance", "*.config.ts"]
+  "include": ["src", "*.config.ts"]
 }

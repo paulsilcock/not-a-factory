@@ -14,8 +14,9 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "test": "pnpm test:unit && pnpm test:acceptance",
-    "test:unit": "pnpm --filter api test:unit && pnpm --filter web test",
-    "test:acceptance": "pnpm --filter api test:acceptance",
+    "test:unit": "pnpm --filter api --filter web test",
+    "test:acceptance": "pnpm --filter acceptance-tests test",
+    "test:acceptance:down": "docker compose -p acceptance --profile app down -v",
     "test:changed": "pnpm -r test:changed",
     "db:up": "docker compose up -d --wait db",
     "db:down": "docker compose down",
@@ -23,7 +24,8 @@
     "db:migrate": "pnpm --filter api db:migrate"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15"
+    "@biomejs/biome": "^2.5.15",
+    "@tanstack/intent": "^0.5.6"
   },
   "intent": {
     "skills": [

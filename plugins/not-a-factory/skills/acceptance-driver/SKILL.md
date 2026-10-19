@@ -26,7 +26,7 @@ These are examples, not a closed list. A system may need a phone driver to make 
 
 ## The driver interface
 
-`api/test-acceptance/driver.ts` declares what a user can do, in business words. It mirrors the DSL: `dsl.loans.borrow` calls `driver.borrow`.
+`acceptance-tests/driver.ts` declares what a user can do, in business words. It mirrors the DSL: `dsl.loans.borrow` calls `driver.borrow`.
 
 ```ts
 export interface AppDriver extends AsyncDisposable {
@@ -46,7 +46,7 @@ In the test file: `acceptance(async () => new AppDsl(await createDriver()))`.
 
 ## Writing any driver
 
-- **Use a Litmus base driver when it fits.** `BrowserDriver`, `HonoDriver` and the CLI driver cover the common channels and handle the lifecycle, such as starting and closing a browser. A system with other needs (phone calls, messages, a mobile app) gets a driver written for it: any class that implements `AppDriver` and cleans up in `[Symbol.asyncDispose]()`.
+- **Use a Litmus base driver when it fits.** `BrowserDriver` (`@litmus-ts/test`) and `HonoDriver` (`@litmus-ts/http/testing`) handle the lifecycle, such as starting and closing a browser. Any other channel (a CLI, phone calls, messages, a mobile app) gets a driver written for it: any class that implements `AppDriver` and cleans up in `[Symbol.asyncDispose]()`.
 - **Encode the real interaction.** This is where the interface is designed, from the outside in.
 - **Hold protocol state** that a `confirm...` method needs. Business state stays in the system.
 - **Fail clearly:** a `confirm...` method throws an `Error` that says what was expected and what was found.
