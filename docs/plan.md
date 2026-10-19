@@ -8,7 +8,7 @@ For personal use first; easy to make reusable later. Keep iteration 1 small: any
 ## Iterations
 1. **Local + CI.** `new-app`, the rules and skills, local Postgres, local migrations, GitHub Actions. No deploy.
 2. **Reviewer agents.** `test-reviewer` and `design-reviewer`, written against the rules as tightened by iteration 1 feedback. Plugin agents, also copied into new projects. No accounts needed; test on the iteration 1 demo project.
-3. **Railway + Neon.** Deploy, PR environments, a Neon branch per PR environment (deleted with it), migrate on deploy with a backup first. The README lists the one-off account setup so the developer can test deploys on their own accounts.
+3. **Railway + Neon.** Deploy, logging and traces, PR environments, a Neon branch per PR environment (deleted with it), migrate on deploy with a backup first. The README lists the one-off account setup so the developer can test deploys on their own accounts.
 4. **Everything else.** Migration safety checks (with `migration-reviewer`), `adopt`, `add-*` skills and the rest of the deferred list.
 5. **Auth** (optional, final).
 
@@ -52,6 +52,7 @@ plugins/not-a-factory/
 - Railway's deploy healthcheck uses `/health` (`healthcheckPath` in railway.json). A DB readiness check is optional and separate; do not fail liveness on a dependency.
 - Neon for Postgres (not Railway Postgres): a Neon branch per Railway PR environment, created with it and deleted when the PR environment is removed. How Railway PR environments hook into Neon is not verified; check the current Railway and Neon docs first.
 - Migrate on deploy (`drizzle-kit migrate`); on merge to main, back up first (Neon branch or restore point).
+- **Logging, traces and metrics.** Verified in Litmus rc.3: `@litmus-ts/log` wraps pino; core, http (`@hono/otel`) and test depend on the OpenTelemetry API and trace SDK; no package ships an exporter. To do: an observability rule (use the Litmus logger, never `console.log`, which the template's `main.ts` still uses; structured fields; no personal data); set up the OpenTelemetry SDK and an exporter in `main.ts` from environment variables; check what Litmus records automatically (probably HTTP spans; not verified).
 - `railway.json` in the repo; README lists the one-off setup for both accounts (Railway project, Neon project and API key, connect the GitHub repo, enable PR environments).
 - **Claude files:** short `CLAUDE.md` (philosophy, commands, layout), `.claude/rules/` (workflow, testing, domain, architecture; path-scoped with `paths:` where useful), `.claude/skills/` (below), `.claude/settings.json` with the Stop hook (see below) and the `typescript-lsp` plugin enabled.
 - **Layout (api):** follow Litmus conventions (domain, use cases, adapters/entrypoints, composition root). Point docs at Litmus's bookshop (`packages/test-acceptance`) as the worked outside-in example.
