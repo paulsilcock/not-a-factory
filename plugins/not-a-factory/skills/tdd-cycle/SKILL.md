@@ -1,6 +1,6 @@
 ---
 name: tdd-cycle
-description: Build or change one component test-first, one test at a time - RED, GREEN, REFACTOR. Use when an acceptance test points at a missing piece, when the developer names a component to build (for example "the repository this use case needs"), or for a bug fix or refactor that starts at one component. Names the component and its consumer, clarifies the behaviours, and runs the cycle until the consumer's need is met.
+description: Build or change one component test-first, one test at a time - RED, GREEN, REFACTOR. Use when an acceptance test points at a missing piece, when the developer names a component to build (for example "the repository this use case needs"), or for a refactor that starts at one component. Names the component and its consumer, clarifies the behaviours, and runs the cycle until the consumer's need is met.
 ---
 
 # TDD cycle (inner loop)
@@ -96,4 +96,4 @@ The list is a guess, never the final list. Use what this cycle taught you:
 
 - Run all the package's unit tests: `pnpm --filter api test:unit` or `pnpm --filter web test`.
 - If this component is part of a feature, go back to its acceptance test (the `acceptance-test` skill, step 4 of the ATDD cycle).
-- If it is a bug fix or a refactor, run `pnpm test` and stop.
+- If it is a refactor, run `pnpm test` and stop.
