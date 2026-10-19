@@ -28,13 +28,14 @@ Think about it from the user's side. Ask the developer, a few questions at a tim
 Write it down in plain words:
 
 ```
-**Feature:** a member can borrow a book.
+**Story:** Members borrow books to read at home. Each member can have three books out at a time, so that there are books on the shelves for everyone.
 **Acceptance criteria**
 1. A member can borrow a book that is on the shelf.
 2. A member cannot borrow a book when every copy is out.
 3. A member with three books out cannot borrow another.
 ```
 
+- The story is one or two sentences about the user's work and why it matters to them. It does not mention the program, its screens or its data.
 - Each criterion is one sentence that the least technical person who knows the business would understand. Each one gets its own acceptance test.
 - The list is a working list, like the test list. Start with the most important criterion that you are most confident about.
 - New business words or rules: use `model-domain` first. Its examples often become criteria.

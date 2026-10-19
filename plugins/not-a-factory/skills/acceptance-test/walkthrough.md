@@ -56,7 +56,7 @@ GREEN: what stops it passing? `BorrowBook` must **decide** whether Ada may borro
 
 - **Understand the domain first, if needed.** The `model-domain` skill helps the developer explore the rule: who keeps it, which words the business uses, and which examples show it. It is not a required step. Use it when the words or the rule are new or not clear.
 - **`Member`** (domain model), with its own `tdd-cycle`. The examples from `model-domain` become its tests: "a member with two books can borrow a third", "a member with three books is refused". `member.borrow(book)` keeps the rule, and throws `TooManyBooks`.
-- **`MemberRepository`**, because the use case must load Ada's loans and save the change. Tested against PGlite, with only what `BorrowBook` needs.
+- **`MemberRepository`**, because the use case must load Ada's loans and save the change. It offers only what `BorrowBook` needs.
 
 Back up. `BorrowBook` is now a dumb orchestrator:
 
