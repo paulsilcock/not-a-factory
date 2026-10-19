@@ -68,7 +68,7 @@ Ask: "what is stopping this test from passing right now?" Name that one thing, f
 
 If the answer is one line of code, write that line. Do the simplest thing that works, even if it looks too simple: the next test will show what is missing.
 
-If the missing thing is a collaborator (another object, with its own clear responsibility, that this component works with), start a new `tdd-cycle` for it. Its consumer is the component you are building now. Its behaviour must help that consumer fulfil its own responsibility; design it from that need. Then come back.
+If the missing thing is a new collaborator (another object, with its own clear responsibility, that this component works with, such as a domain model or a repository), stop and start a new `tdd-cycle` for it, with its own tests. Never create it inside this GREEN. Its consumer is the component you are building now. Its behaviour must help that consumer fulfil its own responsibility; design it from that need. Then come back.
 
 **Check before REFACTOR:**
 - The new test passes, and all the other tests in this file still pass.
