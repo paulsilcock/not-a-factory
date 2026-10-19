@@ -40,6 +40,8 @@ Each layer calls only the layer below it.
 5. **Refactor,** including the DSL and the driver.
 6. **Go back to `new-feature`** for the next criterion.
 
+To see the whole rhythm once, from the acceptance test down through use cases and their collaborators and back up, read `walkthrough.md` in this skill's folder.
+
 ## Writing the test case
 
 Check it two ways:

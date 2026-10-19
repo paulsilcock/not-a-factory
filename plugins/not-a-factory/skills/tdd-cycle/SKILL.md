@@ -22,7 +22,7 @@ Say it in one sentence: "Building <component> in <layer>, because <consumer> nee
 | Missing piece | Component | Where | Its test | Runs against | Read first |
 |---|---|---|---|---|---|
 | A business rule, state or calculation | Aggregate or value object | `api/src/domain/` | `<name>.test.ts`, calls the model directly | Plain objects | `layer-domain.md`; `model-domain` skill if the words or rules are new |
-| Something a user intends to do | Use case | `api/src/use-cases/` | `<intent>.test.ts`, calls `handle()` | Real repositories on PGlite, fakes for other services | `layer-use-cases.md` |
+| One way the system is used: a command (changes it) or a query (reads it) | Use case | `api/src/use-cases/` | `<intent>.test.ts`, calls `handle()` | Real repositories on PGlite, fakes for other services | `layer-use-cases.md` |
 | Saving and loading | Repository and table | `api/src/infra/repositories/`, `infra/db/schema.ts` | `<name>-repository.test.ts` | PGlite (`setupTestDb`) | `layer-infra.md`; then `pnpm db:generate` |
 | Another service (email, payments) | Interface, adapter and fake | `api/src/infra/<service>/` | Use cases use the fake; the adapter is tested against a local stub of the service | Fake or stub | `layer-infra.md` |
 | An HTTP route, status or input check | Route | `api/src/entrypoints/http/` | Usually the acceptance test covers it; write a route test only for HTTP behaviour | The Hono app | `layer-entrypoints.md` |
