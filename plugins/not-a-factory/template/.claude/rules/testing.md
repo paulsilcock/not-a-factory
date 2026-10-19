@@ -12,12 +12,13 @@
 - Before you write a test, look for one that already covers the behaviour. If a broader test covers it, do not write the narrow one. Start with the most important behaviour that you are most confident about, and make it pass with the smallest change.
 - Use `it()`, and put unit tests next to the code: `thing.ts` and `thing.test.ts`.
 
-## Fakes, not mocks
+## Test doubles
 
 - **Default: classicist.** Use real objects and assert on outcomes.
-- **Fakes** (simple, working in-memory versions, such as PGlite for Postgres) when real infrastructure is too slow or not practical. A fake has real logic, not expectations.
-- **Mocks** (objects that record calls) only at real boundaries, when the interaction is the behaviour.
-- **Only mock what you own.** Wrap third-party services in an interface that this project owns, and fake that interface. Never mock a library.
+- **Fakes** (working in-memory versions, such as PGlite for Postgres) when the real thing is too slow or impractical.
+- **Only mock what you own. Never mock a library directly.** Where nothing can be faked (LLM calls, HTTP calls to other systems), our code depends on an interface we own, and its tests use a stub or mock of that interface, with canned responses for each case.
+- **Design that interface from the consumer's needs,** in our domain's words, not the vendor's. Vendor types and errors stay behind it.
+- **Keep the adapter behind it thin,** and test it at its edge: against a local stub of the other service for HTTP, or with evals for LLM calls. Do not unit-test vendor glue by mocking the library.
 
 ## Acceptance tests
 
