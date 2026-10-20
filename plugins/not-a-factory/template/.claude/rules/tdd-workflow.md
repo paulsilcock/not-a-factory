@@ -38,7 +38,16 @@ Before the first test of a component, write its test list in your message: a sho
 3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no test or caller uses. Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
 4. **Review the test list:** remove, add or reorder, and show the list with what changed.
 
-Name each step in your message as you do it: **RED**, **GREEN**, **REFACTOR**, **LIST**, with one line on what you did. In every mode, never start the next test before you have written REFACTOR and LIST, so that the developer can see that no step was skipped.
+Write one line for each step as you do it. The line starts with the step name in bold, then what you did:
+
+```
+**RED:** a claim over £500 stays waiting after one approval. Fails: the status is "approved".
+**GREEN:** the claim counts its approvals.
+**REFACTOR:** nothing to change.
+**LIST:** removed "two approvals by one manager" (the test above covers it). Next: a second manager approves.
+```
+
+Write all four lines for every cycle, in every mode, also when a step changed nothing. The modes only change where you stop, not what you write. Never start the next test before you have written the REFACTOR and LIST lines, so that the developer can see that no step was skipped.
 
 Stubs only satisfy the compiler. They throw or return nothing, and never make a test pass.
 
