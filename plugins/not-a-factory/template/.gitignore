@@ -4,3 +4,4 @@ dist
 *.local
 .tanstack
 .DS_Store
+.claude/pending-tests.md

@@ -34,14 +34,36 @@ Say it in one sentence: "Building <component> in <layer>, because <consumer> nee
 
 If the piece does not fit a row, or fits two, ask the developer.
 
-## 3. Clarify the behaviour, then start a short test list
+## 3. Clarify the behaviour, then write the pending tests
 
 Before the first test, be clear about what the consumer needs:
 - What outcome does it expect?
 - What are the inputs, and the effects someone can see?
 - Which edge cases and failure modes do we already know about?
 
-Write the list in your message as a checklist, so the developer can see it and change it. List **behaviours**, not classes or methods. Write the list, not the tests. Keep it short: only what the consumer needs, not everything the component could do. The list is a guess, and it will change (step 5).
+Write them in `.claude/pending-tests.md`, so the developer can see them and change them, and show them in your message:
+
+```
+# Pending tests
+
+**Component:** the claim (domain model). **Consumer:** the submit-claim use case.
+
+**Sure** (most important first)
+- a claim over £500 stays waiting after one approval
+- a claim over £500 is approved by a second, different manager
+
+**Not sure yet**
+- a manager cannot approve their own claim (question 1)
+
+**Questions**
+1. Can a manager approve their own claim?
+```
+
+- Only tests that are not written yet. When you write a test, remove it: the test suite is the record of what is done, so the file cannot drift from it.
+- **Sure** and **Not sure yet** make it clear what is certain. A test that depends on an open question stays in **Not sure yet** and names the question.
+- List **behaviours**, not classes or methods. Keep it short: only what the consumer needs, not everything the component could do.
+- When you drop down to a collaborator, add its section at the top, with its own component and consumer. Remove a section when it is empty and its component is done.
+- The file is a guess, and it changes after every cycle (step 5). It is not committed.
 
 ## 4. RED → GREEN → REFACTOR
 
@@ -88,7 +110,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 ## 5. After every cycle, review the list
 
 The list is a guess, never the final list. Use what this cycle taught you:
-- Remove behaviours that are now redundant or wrong. Add the ones you found. Change the order if needed. Show the list again, with what changed and why (for example "added: an empty order is refused"; "done: a saved order can be found").
+- Update `.claude/pending-tests.md`: remove the test you just wrote, and tests that are now redundant or wrong. Add the ones you found. Move a test from **Not sure yet** to **Sure** when its question is answered. Change the order if needed. Show what changed and why (for example "added: an empty order is refused"; "answered question 1: moved 'own claim' to Sure").
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - New words or rules: use `domain-discovery`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`, and ask the developer. Do not build it.

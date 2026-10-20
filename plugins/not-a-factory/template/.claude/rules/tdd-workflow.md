@@ -25,18 +25,18 @@ The mode changes only where you stop. It never changes the steps.
 
 1. **Step (default):** stop after each RED, GREEN, REFACTOR and list review.
 2. **Cycle:** stop after each full cycle.
-3. **Component:** stop when the component's test list is done, or when you are stuck.
+3. **Component:** stop when the component has no pending tests left, or when you are stuck.
 4. **Criterion:** stop when the acceptance test for one criterion passes.
 
 ## 4. Every cycle, in this order
 
-Before the first test of a component, write its test list in your message: a short checklist of behaviours, most important first. The list is a guess; it changes after every cycle.
+Before the first test of a component, write its pending tests in `.claude/pending-tests.md` (the format is in the `tdd-cycle` skill): the component under test, the tests you are sure of, the tests you are not sure of yet, and the open questions. It holds only tests that are not written yet; the test suite holds the rest. It changes after every cycle.
 
 
 1. **RED:** write one failing test for one behaviour. Run it. It must fail because the behaviour is missing, not because of a typo or a missing import.
 2. **GREEN:** fix only the one thing that stops the test passing, with the simplest correct code. Simplest never means a shortcut: no hard-coded value that the system should store or compute, no data dropped on save, no stub left behind. If that is a new collaborator (a domain model, a repository, a service), stop: give it its own test and cycles first, then come back.
 3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no test or caller uses. Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
-4. **Review the test list:** remove, add or reorder, and show the list with what changed.
+4. **Review the pending tests:** in `.claude/pending-tests.md`, remove the test you just wrote, then add, remove or reorder. Show what changed.
 
 Write one line for each step as you do it. The line starts with the step name in bold, then what you did:
 
@@ -44,7 +44,7 @@ Write one line for each step as you do it. The line starts with the step name in
 **RED:** a claim over £500 stays waiting after one approval. Fails: the status is "approved".
 **GREEN:** the claim counts its approvals.
 **REFACTOR:** nothing to change.
-**LIST:** removed "two approvals by one manager" (the test above covers it). Next: a second manager approves.
+**LIST:** removed "two approvals by one manager" (the test above covers it). Next: a second manager approves. Still a question: can a manager approve their own claim?
 ```
 
 Write all four lines for every cycle, in every mode, also when a step changed nothing. The modes only change where you stop, not what you write. Never start the next test before you have written the REFACTOR and LIST lines, so that the developer can see that no step was skipped.
@@ -55,7 +55,7 @@ Stubs only satisfy the compiler. They throw or return nothing, and never make a 
 
 - Build only what the current failing test asks for.
 - Before you write production code, check that a test fails because that code is missing. If none does, stop and write the test first.
-- Anything more needs the developer first: a new behaviour, a new criterion, another component, or a refactor outside this step. Put it on the test list, and ask.
+- Anything more needs the developer first: a new behaviour, a new criterion, another component, or a refactor outside this step. Put it in the pending tests, and ask.
 - Where a feature lives in the app (its route and navigation) and how it looks are the developer's decisions. Ask; do not decide them yourself.
 - A discovery or a business question (a case nobody thought of, two rules that conflict, a limit that changes what users get) stops you in every mode. Tell the developer at once, in plain words, with the options you see. Never decide a business question yourself.
 
