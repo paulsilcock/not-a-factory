@@ -41,7 +41,7 @@ Before the first test, be clear about what the consumer needs:
 - What are the inputs, and the effects someone can see?
 - Which edge cases and failure modes do we already know about?
 
-Write them in `.claude/pending-tests.md`, so the developer can see them and change them, and show them in your message:
+Write them in `pending-tests.md` in the project root (not in `.claude/`, which Claude Code protects), so the developer can see them and change them, and show them in your message:
 
 ```
 # Pending tests
@@ -110,7 +110,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 ## 5. After every cycle, review the list
 
 The list is a guess, never the final list. Use what this cycle taught you:
-- Update `.claude/pending-tests.md`: remove the test you just wrote, and tests that are now redundant or wrong. Add the ones you found. Move a test from **Not sure yet** to **Sure** when its question is answered. Change the order if needed. Show what changed and why (for example "added: an empty order is refused"; "answered question 1: moved 'own claim' to Sure").
+- Update `pending-tests.md`: remove the test you just wrote, and tests that are now redundant or wrong. Add the ones you found. Move a test from **Not sure yet** to **Sure** when its question is answered. Change the order if needed. Show what changed and why (for example "added: an empty order is refused"; "answered question 1: moved 'own claim' to Sure").
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - New words or rules: use `domain-discovery`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`, and ask the developer. Do not build it.

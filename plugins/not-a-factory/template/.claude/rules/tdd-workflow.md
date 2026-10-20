@@ -30,13 +30,13 @@ The mode changes only where you stop. It never changes the steps.
 
 ## 4. Every cycle, in this order
 
-Before the first test of a component, write its pending tests in `.claude/pending-tests.md` (the format is in the `tdd-cycle` skill): the component under test, the tests you are sure of, the tests you are not sure of yet, and the open questions. It holds only tests that are not written yet; the test suite holds the rest. It changes after every cycle.
+Before the first test of a component, write its pending tests in `pending-tests.md` in the project root (the format is in the `tdd-cycle` skill): the component under test, the tests you are sure of, the tests you are not sure of yet, and the open questions. It holds only tests that are not written yet; the test suite holds the rest. It changes after every cycle.
 
 
 1. **RED:** write one failing test for one behaviour. Run it. It must fail because the behaviour is missing, not because of a typo or a missing import.
 2. **GREEN:** fix only the one thing that stops the test passing, with the simplest correct code. Simplest never means a shortcut: no hard-coded value that the system should store or compute, no data dropped on save, no stub left behind. If that is a new collaborator (a domain model, a repository, a service), stop: give it its own test and cycles first, then come back.
 3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no test or caller uses. Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
-4. **Review the pending tests:** in `.claude/pending-tests.md`, remove the test you just wrote, then add, remove or reorder. Show what changed.
+4. **Review the pending tests:** in `pending-tests.md`, remove the test you just wrote, then add, remove or reorder. Show what changed.
 
 Write one line for each step as you do it. The line starts with the step name in bold, then what you did:
 
