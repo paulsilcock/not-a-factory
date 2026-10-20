@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  plugin:
+    name: Plugin manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate the marketplace
+        run: claude plugin validate .
+      - name: Validate the plugin
+        run: claude plugin validate plugins/not-a-factory
+
+  app:
+    name: Generated app
+    needs: plugin
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/../demo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Configure git
+        working-directory: .
+        run: |
+          git config --global user.name "CI"
+          git config --global user.email "ci@example.com"
+
+      # The same script that the new-app skill runs.
+      - name: Create an app
+        working-directory: ${{ github.workspace }}/..
+        run: bash "$GITHUB_WORKSPACE/plugins/not-a-factory/skills/new-app/new-app.sh" demo
+
+      - name: Check the app
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/check-app.sh"
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Unit tests
+        run: pnpm test:unit
+      - name: Stop hook
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/check-stop-hook.sh"
+
+      - name: Install the browser's system libraries
+        run: pnpm --filter acceptance-tests exec playwright install --with-deps chromium
+      - name: Acceptance tests (Docker Compose stack)
+        run: |
+          cp "$GITHUB_WORKSPACE/.github/scripts/smoke.test.ts" acceptance-tests/
+          pnpm test:acceptance
+      - name: Acceptance tests again (the stack is reused)
+        run: pnpm test:acceptance
+      - name: Stop the acceptance stack
+        if: always()
+        run: pnpm test:acceptance:down || true
+      - name: Build
+        run: pnpm build

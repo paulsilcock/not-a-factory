@@ -1,0 +1,9 @@
+{
+  "name": "not-a-factory",
+  "description": "Build the right thing with Claude: tight feedback loops, small batches, a developer in the loop.",
+  "author": {
+    "name": "Paul Silcock"
+  },
+  "repository": "https://github.com/paulsilcock/not-a-factory",
+  "license": "MIT"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "not-a-factory",
+  "owner": {
+    "name": "Paul Silcock"
+  },
+  "metadata": {
+    "description": "Build the right thing with Claude: tight feedback loops, small batches, a developer in the loop."
+  },
+  "plugins": [
+    {
+      "name": "not-a-factory",
+      "source": "./plugins/not-a-factory"
+    }
+  ]
+}

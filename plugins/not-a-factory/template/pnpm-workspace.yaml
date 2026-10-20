@@ -1,0 +1,8 @@
+packages:
+  - api
+  - web
+  - acceptance-tests
+
+onlyBuiltDependencies:
+  - esbuild
+  - lightningcss
