@@ -41,10 +41,10 @@ Before the first test of a component, write its pending tests in `pending-tests.
 Write one line for each step as you do it. The line starts with the step name in bold, then what you did:
 
 ```
-**RED:** a claim over £500 stays waiting after one approval. Fails: the status is "approved".
-**GREEN:** the claim counts its approvals.
+**RED:** a loan extended twice cannot be extended again. Fails: the third extension is accepted.
+**GREEN:** the loan counts its extensions.
 **REFACTOR:** nothing to change.
-**LIST:** removed "two approvals by one manager" (the test above covers it). Next: a second manager approves. Still a question: can a manager approve their own claim?
+**LIST:** removed "a loan can be extended twice" (the test above covers it). Next: an overdue loan cannot be extended. Still a question: can a member extend a loan when someone is waiting for the book?
 ```
 
 Write all four lines for every cycle, in every mode, also when a step changed nothing. The modes only change where you stop, not what you write. Never start the next test before you have written the REFACTOR and LIST lines, so that the developer can see that no step was skipped.
@@ -68,7 +68,7 @@ Small batches limit the damage when something goes wrong, and get code to users 
   - All tests pass. An acceptance test in progress is marked `it.fails`, and fails for the expected reason.
   - No entrypoint (a route, a page, a navigation entry, a CLI command, an event subscription) reaches behaviour whose acceptance test does not pass yet. The domain, use cases and infrastructure can merge before it.
   - It works with the version already deployed: a migration only adds.
-- **Say what users will see** after the merge, in plain words, for example "staff can submit claims, but nobody can approve them yet".
+- **Say what users will see** after the merge, in plain words, for example "members can borrow books, but cannot extend loans yet".
 
 ## Never
 

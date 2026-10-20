@@ -46,17 +46,17 @@ Write them in `pending-tests.md` in the project root (not in `.claude/`, which C
 ```
 # Pending tests
 
-**Component:** the claim (domain model). **Consumer:** the submit-claim use case.
+**Component:** the loan (domain model). **Consumer:** the borrow-book use case.
 
 **Sure** (most important first)
-- a claim over £500 stays waiting after one approval
-- a claim over £500 is approved by a second, different manager
+- a new loan is due back in two weeks
+- a loan can be extended by one week, at most twice
 
 **Not sure yet**
-- a manager cannot approve their own claim (question 1)
+- a loan cannot be extended when someone is waiting for the book (question 1)
 
 **Questions**
-1. Can a manager approve their own claim?
+1. Can a member extend a loan when someone else is waiting for the book?
 ```
 
 - Only tests that are not written yet. When you write a test, remove it: the test suite is the record of what is done, so the file cannot drift from it.
@@ -110,7 +110,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 ## 5. After every cycle, review the list
 
 The list is a guess, never the final list. Use what this cycle taught you:
-- Update `pending-tests.md`: remove the test you just wrote, and tests that are now redundant or wrong. Add the ones you found. Move a test from **Not sure yet** to **Sure** when its question is answered. Change the order if needed. Show what changed and why (for example "added: an empty order is refused"; "answered question 1: moved 'own claim' to Sure").
+- Update `pending-tests.md`: remove the test you just wrote, and tests that are now redundant or wrong. Add the ones you found. Move a test from **Not sure yet** to **Sure** when its question is answered. Change the order if needed. Show what changed and why (for example "added: an empty order is refused"; "answered question 1: moved 'someone waiting' to Sure").
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - New words or rules: use `domain-discovery`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`, and ask the developer. Do not build it.
