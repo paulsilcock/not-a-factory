@@ -52,6 +52,7 @@ A short summary in your reply, in plain English that the developer could read to
 **First test:** a new loan is due back in two weeks.
 ```
 
+- Always write all five headings. If a heading has nothing in it, write "none".
 - Every rule has at least one concrete example, with real dates, amounts or names. Each example is a test.
 - Say the rules out loud. If a sentence sounds awkward, the words or the model are wrong.
 - Do not write a test that depends on an open question.
@@ -60,7 +61,7 @@ A short summary in your reply, in plain English that the developer could read to
 
 ## Into TDD
 
-1. Agree the summary with the developer. Use its words in the code and in the test names.
+1. **Stop and agree the summary, in every mode.** Write the whole summary, with every heading, then stop and ask the developer to agree or correct it. Do not write a test, an acceptance test included, until they agree. The mode does not change this: the summary holds business decisions, and those are the developer's. Use its words in the code and in the test names.
 2. Use `tdd-cycle`. The component is the one from "Where the rules go"; the test list is the examples.
 3. While you build, follow the `layer-domain` rule: it covers how to shape models, aggregates, domain events and value objects.
 4. After each cycle, review the test list. If a test shows a new word or rule, a rule in the wrong place, or an open question, come back here and update the summary.
