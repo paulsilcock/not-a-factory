@@ -59,23 +59,16 @@ Stubs only satisfy the compiler. They throw or return nothing, and never make a 
 - Where a feature lives in the app (its route and navigation) and how it looks are the developer's decisions. Ask; do not decide them yourself.
 - A discovery or a business question (a case nobody thought of, two rules that conflict, a limit that changes what users get) stops you in every mode. Tell the developer at once, in plain words, with the options you see. Never decide a business question yourself.
 
-## 6. Small batches: commit and merge
+## 6. Small batches
 
-Small batches limit the damage when something goes wrong, cause fewer conflicts with other work, and get code in front of users sooner. Code that is not merged is an untested risk.
+Small batches limit the damage when something goes wrong, and get code to users sooner.
 
-**Commit after the REFACTOR and LIST lines,** when the related unit tests, typecheck and lint pass: one commit for each cycle. A hook blocks a commit after a GREEN line until both lines are written. Commit on a branch for the feature, never on `main`: only the developer merges to `main`. The commit message says the behaviour in business words, for example "a claim over £500 stays waiting after one approval". A refactor outside a cycle gets its own commit. Never commit at RED. If the developer asks you not to commit, stop committing.
-
-**Never revert automatically.** If a test fails for a reason you did not expect, tell the developer, and offer to go back to the last commit.
-
-**Recommend a merge** when the work is safe to merge. The developer decides; they may have their own way to release features. It is safe to merge when:
-- All tests pass, the acceptance tests included.
-- **Users cannot reach unfinished behaviour.** No entrypoint (an HTTP route, a page, a navigation entry, a CLI command, an event subscription) reaches behaviour whose acceptance test does not pass yet. The domain, use cases and infrastructure can merge before the entrypoint: without it, nothing calls them. The entrypoint goes in the commit that makes the acceptance test pass.
-- **An acceptance test in progress is marked `it.fails`.** It still runs, and it fails the build when it starts to pass. Then remove the mark. Before you recommend the merge, read its failure and check that it fails for the expected reason, not because of a crash or a broken driver.
-- **It works with the version that is already deployed.** A migration only adds: a new table, or a column that can be empty or has a default. Renaming or dropping something is a separate, later change.
-
-Good merge points: a refactor; a finished component, such as a domain model or a repository with its migration; a criterion whose acceptance test passes.
-
-**Say what users will see.** If a merge changes what users can do, say it in plain words, for example "after this merge, staff can submit claims, but nobody can approve them yet". The same applies to a change to existing behaviour. The developer decides.
+- **Commit** on a branch for the feature at green points, at least once per cycle. The message says the behaviour in business words. Never commit at RED. Never revert by yourself: if a test fails for a reason you did not expect, tell the developer and offer to go back to the last commit.
+- **Recommend a merge** to `main` when it is safe. Only the developer merges. It is safe when:
+  - All tests pass. An acceptance test in progress is marked `it.fails`, and fails for the expected reason.
+  - No entrypoint (a route, a page, a navigation entry, a CLI command, an event subscription) reaches behaviour whose acceptance test does not pass yet. The domain, use cases and infrastructure can merge before it.
+  - It works with the version already deployed: a migration only adds.
+- **Say what users will see** after the merge, in plain words, for example "staff can submit claims, but nobody can approve them yet".
 
 ## Never
 

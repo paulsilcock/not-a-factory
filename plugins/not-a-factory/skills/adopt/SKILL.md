@@ -1,6 +1,6 @@
 ---
 name: adopt
-description: Add the not-a-factory way of working to an existing project - the TDD workflow rule (modes, one test at a time, step names, small batches), the writing-tests rule, and a hook that blocks a commit until the cycle's REFACTOR and LIST lines are written. Never overwrites the project's own files.
+description: Add the not-a-factory way of working to an existing project - the TDD workflow rule (modes, one test at a time, step names, small batches) and the writing-tests rule. Never overwrites the project's own files.
 disable-model-invocation: true
 allowed-tools: Bash(bash ${CLAUDE_SKILL_DIR}/adopt.sh)
 ---
@@ -10,7 +10,6 @@ allowed-tools: Bash(bash ${CLAUDE_SKILL_DIR}/adopt.sh)
 1. Tell the developer what this adds to `.claude/` in the current project, and ask before you run it:
    - `rules/tdd-workflow.md`: which skill to use, the modes, one test at a time, step names, small batches.
    - `rules/writing-tests.md`: what makes a good test, and test doubles.
-   - `hooks/refactor-before-commit.mjs`, and a `PreToolUse` entry for it in `settings.json`. It needs Node.js.
 
    It does not add the rules for the generated app's stack (architecture, layers, Litmus). They do not fit other projects.
 2. Run this skill's script from the project root:

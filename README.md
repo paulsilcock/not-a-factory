@@ -13,7 +13,7 @@ A Claude Code plugin for building the right thing, with Claude as a partner and 
   - `test-quality`: review tests.
 - **Hooks:** typecheck and lint must pass before Claude stops.
 
-The skills also work in other repositories when the plugin is installed. To add the TDD workflow rule, the writing-tests rule and the commit hook to an existing project, run `/not-a-factory:adopt` in it.
+The skills also work in other repositories when the plugin is installed. To add the TDD workflow and writing-tests rules to an existing project, run `/not-a-factory:adopt` in it.
 
 ## This is not a software factory
 
