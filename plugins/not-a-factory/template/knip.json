@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "include": ["files", "exports", "classMembers"],
+  "ignore": [
+    ".claude/**",
+    "web/src/components/ui/**",
+    "web/src/hooks/use-mobile.ts",
+    "web/src/lib/utils.ts",
+    "web/src/routeTree.gen.ts"
+  ],
+  "workspaces": {
+    "api": {
+      "entry": ["src/main.ts!"],
+      "project": ["src/**/*.ts!"],
+      "ignoreMembers": ["handle", "toPersistence", "properties"]
+    },
+    "web": {
+      "entry": ["src/main.tsx!", "src/routes/**/*.tsx!"],
+      "project": ["src/**/*.{ts,tsx}!"]
+    }
+  },
+  "ignoreWorkspaces": ["acceptance-tests"]
+}

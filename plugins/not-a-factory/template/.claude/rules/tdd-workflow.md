@@ -35,8 +35,8 @@ Before the first test of a component, write its pending tests in `pending-tests.
 
 1. **RED:** write one failing test for one behaviour. Run it. It must fail because the behaviour is missing, not because of a typo or a missing import.
 2. **GREEN:** fix only the one thing that stops the test passing, with the simplest correct code. Simplest never means a shortcut: no hard-coded value that the system should store or compute, no data dropped on save, no stub left behind. If that is a new collaborator (a domain model, a repository, a service), stop: give it its own test and cycles first, then come back.
-3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no test or caller uses. Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
-4. **Review the pending tests:** in `pending-tests.md`, remove the test you just wrote, then add, remove or reorder. Show what changed.
+3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no production code uses (a method that only its own test calls is unused). If the project has a `knip` script, run it (`pnpm knip`). Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
+4. **Review the pending tests:** in `pending-tests.md`, remove the test you just wrote (a written test is not pending, even while it fails), then add, remove or reorder. Say what changed in the LIST line.
 
 Write one line for each step as you do it. The line starts with the step name in bold, then what you did:
 
@@ -63,7 +63,7 @@ Stubs only satisfy the compiler. They throw or return nothing, and never make a 
 
 Small batches limit the damage when something goes wrong, and get code to users sooner.
 
-- **Commit** on a branch for the feature at green points, at least once per cycle. The message says the behaviour in business words. Never commit at RED. Never revert by yourself: if a test fails for a reason you did not expect, tell the developer and offer to go back to the last commit.
+- **Commit** on a branch for the feature at green points, at least once per cycle, after the LIST line. The message says the behaviour in business words. Never commit at RED. Never revert by yourself: if a test fails for a reason you did not expect, tell the developer and offer to go back to the last commit.
 - **Recommend a merge** to `main` when it is safe. Only the developer merges. It is safe when:
   - All tests pass. An acceptance test in progress is marked `it.fails`, and fails for the expected reason.
   - No entrypoint (a route, a page, a navigation entry, a CLI command, an event subscription) reaches behaviour whose acceptance test does not pass yet. The domain, use cases and infrastructure can merge before it.

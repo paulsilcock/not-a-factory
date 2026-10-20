@@ -33,7 +33,7 @@ Quick checks:
 ## The code the tests drive
 
 REFACTOR is easy to skip. Check the production code that these tests drove, and give file, line and name for each finding:
-- **Unused code:** a method, export, parameter, type or file that no production code calls. A method that only its own test calls is unused, for example a repository finder that no use case calls yet. Search for each new name (`grep -rn`, or the language server's references) and ignore the test files.
+- **Unused code:** a method, export, parameter, type or file that no production code calls. A method that only its own test calls is unused, for example a repository finder that no use case calls yet. If the project has a `knip` script, run it (`pnpm knip`) first. Otherwise, search for each new name (`grep -rn`, or the language server's references) and ignore the test files.
 - **Fixed values:** a value in production code that only repeats what a test expects, where the system should store or compute it.
 - **Duplication** in production code that one name would remove.
 - **Names** that are not the business's words, or that no longer say what the code does.

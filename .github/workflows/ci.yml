@@ -55,6 +55,8 @@ jobs:
         run: pnpm typecheck
       - name: Lint
         run: pnpm lint
+      - name: Unused code
+        run: pnpm knip
       - name: Unit tests
         run: pnpm test:unit
       - name: Stop hook

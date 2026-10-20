@@ -62,7 +62,8 @@ Write them in `pending-tests.md` in the project root (not in `.claude/`, which C
 - Only tests that are not written yet. When you write a test, remove it: the test suite is the record of what is done, so the file cannot drift from it.
 - **Sure** and **Not sure yet** make it clear what is certain. A test that depends on an open question stays in **Not sure yet** and names the question.
 - List **behaviours**, not classes or methods. Keep it short: only what the consumer needs, not everything the component could do.
-- When you drop down to a collaborator, add its section at the top, with its own component and consumer. Remove a section when it is empty and its component is done.
+- In a feature, the story and its pending acceptance criteria stay at the top of the file (the `new-feature` skill writes them). Component sections go below them.
+- When you drop down to a collaborator, add its section above the other component sections, with its own component and consumer. Remove a section when it is empty and its component is done.
 - The file is a guess, and it changes after every cycle (step 5). It is not committed.
 
 ## 4. RED → GREEN → REFACTOR
