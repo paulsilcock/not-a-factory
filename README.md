@@ -13,7 +13,7 @@ A Claude Code plugin for building the right thing, with Claude as a partner and 
   - `test-quality`: review tests.
 - **Hooks:** typecheck and lint must pass before Claude stops.
 
-The skills also work in other repositories when the plugin is installed.
+The skills also work in other repositories when the plugin is installed. To add the TDD workflow rule, the writing-tests rule and the commit hook to an existing project, run `/not-a-factory:adopt` in it.
 
 ## This is not a software factory
 
@@ -52,6 +52,7 @@ Needs Node.js 24.14.1 or later, pnpm, git and Docker. Then open Claude Code in `
 .claude-plugin/marketplace.json
 plugins/not-a-factory/
   skills/new-app/   the /not-a-factory:new-app command and its script (new-app.sh)
+  skills/adopt/     the /not-a-factory:adopt command and its script (adopt.sh)
   skills/<others>/  TDD skills: plugin skills, also copied into new projects
   template/         the new project, with {{APP_NAME}} placeholders
 docs/decisions.md   decisions that the code does not explain (the work is in GitHub issues)
