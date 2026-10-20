@@ -62,9 +62,9 @@ A short summary in your reply, in plain English that the developer could read to
 ## Into TDD
 
 1. **Stop and agree the summary, in every mode.** Write the whole summary, with every heading, then stop and ask the developer to agree or correct it. Do not write a test, an acceptance test included, until they agree. The mode does not change this: the summary holds business decisions, and those are the developer's. Use its words in the code and in the test names.
-2. Use `tdd-cycle`. The component is the one from "Where the rules go"; the test list is the examples.
+2. Use `tdd-cycle`. The component is the one from "Where the rules go"; its pending tests are the examples, and the open questions go under **Questions**.
 3. While you build, follow the `layer-domain` rule: it covers how to shape models, aggregates, domain events and value objects.
-4. After each cycle, review the test list. If a test shows a new word or rule, a rule in the wrong place, or an open question, come back here and update the summary.
+4. After each cycle, review the pending tests. If a test shows a new word or rule, a rule in the wrong place, or an open question, come back here and update the summary.
 
 ## Further reading
 

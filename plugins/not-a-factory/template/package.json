@@ -21,11 +21,13 @@
     "db:up": "docker compose up -d --wait db",
     "db:down": "docker compose down",
     "db:generate": "pnpm --filter api db:generate",
-    "db:migrate": "pnpm --filter api db:migrate"
+    "db:migrate": "pnpm --filter api db:migrate",
+    "knip": "knip --production"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
-    "@tanstack/intent": "^0.5.6"
+    "@tanstack/intent": "^0.5.6",
+    "knip": "^5.88.1"
   },
   "intent": {
     "skills": [

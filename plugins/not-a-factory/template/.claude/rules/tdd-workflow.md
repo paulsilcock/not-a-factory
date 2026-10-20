@@ -25,26 +25,26 @@ The mode changes only where you stop. It never changes the steps.
 
 1. **Step (default):** stop after each RED, GREEN, REFACTOR and list review.
 2. **Cycle:** stop after each full cycle.
-3. **Component:** stop when the component's test list is done, or when you are stuck.
+3. **Component:** stop when the component has no pending tests left, or when you are stuck.
 4. **Criterion:** stop when the acceptance test for one criterion passes.
 
 ## 4. Every cycle, in this order
 
-Before the first test of a component, write its test list in your message: a short checklist of behaviours, most important first. The list is a guess; it changes after every cycle.
+Before the first test of a component, write its pending tests in `pending-tests.md` in the project root (the format is in the `tdd-cycle` skill): the component under test, the tests you are sure of, the tests you are not sure of yet, and the open questions. It holds only tests that are not written yet; the test suite holds the rest. It changes after every cycle.
 
 
 1. **RED:** write one failing test for one behaviour. Run it. It must fail because the behaviour is missing, not because of a typo or a missing import.
 2. **GREEN:** fix only the one thing that stops the test passing, with the simplest correct code. Simplest never means a shortcut: no hard-coded value that the system should store or compute, no data dropped on save, no stub left behind. If that is a new collaborator (a domain model, a repository, a service), stop: give it its own test and cycles first, then come back.
-3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no test or caller uses. Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
-4. **Review the test list:** remove, add or reorder, and show the list with what changed.
+3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no production code uses (a method that only its own test calls is unused). If the project has a `knip` script, run it (`pnpm knip`). Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
+4. **Review the pending tests:** in `pending-tests.md`, remove the test you just wrote (a written test is not pending, even while it fails), then add, remove or reorder. Say what changed in the LIST line.
 
 Write one line for each step as you do it. The line starts with the step name in bold, then what you did:
 
 ```
-**RED:** a claim over £500 stays waiting after one approval. Fails: the status is "approved".
-**GREEN:** the claim counts its approvals.
+**RED:** a loan extended twice cannot be extended again. Fails: the third extension is accepted.
+**GREEN:** the loan counts its extensions.
 **REFACTOR:** nothing to change.
-**LIST:** removed "two approvals by one manager" (the test above covers it). Next: a second manager approves.
+**LIST:** removed "a loan can be extended twice" (the test above covers it). Next: an overdue loan cannot be extended. Still a question: can a member extend a loan when someone is waiting for the book?
 ```
 
 Write all four lines for every cycle, in every mode, also when a step changed nothing. The modes only change where you stop, not what you write. Never start the next test before you have written the REFACTOR and LIST lines, so that the developer can see that no step was skipped.
@@ -55,9 +55,20 @@ Stubs only satisfy the compiler. They throw or return nothing, and never make a 
 
 - Build only what the current failing test asks for.
 - Before you write production code, check that a test fails because that code is missing. If none does, stop and write the test first.
-- Anything more needs the developer first: a new behaviour, a new criterion, another component, or a refactor outside this step. Put it on the test list, and ask.
+- Anything more needs the developer first: a new behaviour, a new criterion, another component, or a refactor outside this step. Put it in the pending tests, and ask.
 - Where a feature lives in the app (its route and navigation) and how it looks are the developer's decisions. Ask; do not decide them yourself.
 - A discovery or a business question (a case nobody thought of, two rules that conflict, a limit that changes what users get) stops you in every mode. Tell the developer at once, in plain words, with the options you see. Never decide a business question yourself.
+
+## 6. Small batches
+
+Small batches limit the damage when something goes wrong, and get code to users sooner.
+
+- **Commit** on a branch for the feature at green points, at least once per cycle, after the LIST line. The message says the behaviour in business words. Never commit at RED. Never revert by yourself: if a test fails for a reason you did not expect, tell the developer and offer to go back to the last commit.
+- **Recommend a merge** to `main` when it is safe. Only the developer merges. It is safe when:
+  - All tests pass. An acceptance test in progress is marked `it.fails`, and fails for the expected reason.
+  - No entrypoint (a route, a page, a navigation entry, a CLI command, an event subscription) reaches behaviour whose acceptance test does not pass yet. The domain, use cases and infrastructure can merge before it.
+  - It works with the version already deployed: a migration only adds.
+- **Say what users will see** after the merge, in plain words, for example "members can borrow books, but cannot extend loans yet".
 
 ## Never
 

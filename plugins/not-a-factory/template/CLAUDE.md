@@ -24,6 +24,7 @@ Which skill when:
 | Stop the acceptance-test stack | `pnpm test:acceptance:down` |
 | Tests for changed files | `pnpm test:changed` |
 | Typecheck / lint | `pnpm typecheck` / `pnpm lint:fix` |
+| Unused code | `pnpm knip` |
 | New migration / apply | `pnpm db:generate` / `pnpm db:migrate` |
 
 ## Layout
