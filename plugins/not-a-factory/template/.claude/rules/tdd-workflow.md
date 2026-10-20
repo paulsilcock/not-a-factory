@@ -63,7 +63,7 @@ Stubs only satisfy the compiler. They throw or return nothing, and never make a 
 
 Small batches limit the damage when something goes wrong, cause fewer conflicts with other work, and get code in front of users sooner. Code that is not merged is an untested risk.
 
-**Commit after every REFACTOR,** when the related unit tests, typecheck and lint pass: one commit for each cycle. The commit message says the behaviour in business words, for example "a claim over £500 stays waiting after one approval". A refactor outside a cycle gets its own commit. Never commit at RED. If the developer asks you not to commit, stop committing.
+**Commit after the REFACTOR and LIST lines,** when the related unit tests, typecheck and lint pass: one commit for each cycle. A hook blocks a commit after a GREEN line until both lines are written. Commit on a branch for the feature, never on `main`: only the developer merges to `main`. The commit message says the behaviour in business words, for example "a claim over £500 stays waiting after one approval". A refactor outside a cycle gets its own commit. Never commit at RED. If the developer asks you not to commit, stop committing.
 
 **Never revert automatically.** If a test fails for a reason you did not expect, tell the developer, and offer to go back to the last commit.
 
