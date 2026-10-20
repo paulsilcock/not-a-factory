@@ -40,7 +40,7 @@ Each layer calls only the layer below it.
 3. **Run it and read the failure.** `pnpm test:acceptance`. It must fail **because the behaviour is missing**, not because of a type error, a broken setup or a typo. Say in one sentence why it fails, and what the first missing piece is.
 4. **Make it pass from the inside,** one missing piece at a time, with `tdd-cycle`. Run the acceptance test again after each piece. Do not change the test to make it pass; if the criterion turns out to be wrong, ask the developer.
 5. **Refactor,** including the DSL and the driver.
-6. **Go back to `new-feature`** for the next criterion.
+6. **Go back to `new-feature`** for the next acceptance test.
 
 To see the whole rhythm once, from the acceptance test down through use cases and their collaborators and back up, read `walkthrough.md` in this skill's folder.
 

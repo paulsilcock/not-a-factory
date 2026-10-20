@@ -46,11 +46,11 @@ Write it down in plain words, at the top of `pending-tests.md` in the project ro
 - **Every feature:** a new route with an entry in the navigation (with what label), or part of an existing page?
 - **Who builds it:** offer to let the developer build the shell or the layout themselves, with the `shadcn` skill, while you build the behaviour. In pair work, they often will.
 
-## 4. One criterion at a time
+## 4. One acceptance test at a time
 
-1. Make the criterion pass with the `acceptance-test` skill.
-2. **Shape the UI** (if the criterion has a UI). The acceptance test passes with just enough page; now make it fit the app. Take a screenshot of the page and show it to the developer. Propose a layout with shadcn components or blocks. The developer decides, or does it themselves. Make the agreed change, and keep the acceptance tests green: they find elements by role and label, so a new layout does not break them. This is not REFACTOR: users can see the change.
-3. Run the `test-quality` skill on the tests written for this criterion. Report the results, and ask before you change any test.
-4. Review the criteria list: remove, add or reorder. Then take the next criterion.
+1. Write the next criterion's acceptance test and make it pass with the `acceptance-test` skill. This takes many cycles, each with its own commit.
+2. **Shape the UI** (if it has a UI). The acceptance test passes with just enough page; now make it fit the app. Take a screenshot of the page and show it to the developer. Propose a layout with shadcn components or blocks. The developer decides, or does it themselves. Make the agreed change, and keep the acceptance tests green: they find elements by role and label, so a new layout does not break them. This is not REFACTOR: users can see the change.
+3. Run the `test-quality` skill on the tests written for this acceptance test. Report the results, and ask before you change any test.
+4. Review the criteria list: remove, add or reorder. Then start the next acceptance test.
 
 The feature is done when every criterion has a passing acceptance test.

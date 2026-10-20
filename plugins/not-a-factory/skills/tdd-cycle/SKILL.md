@@ -115,6 +115,7 @@ The list is a guess, never the final list. Use what this cycle taught you:
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - New words or rules: use `domain-discovery`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`, and ask the developer. Do not build it.
+- Commit the cycle: one unit test, one commit (COMMIT in `.claude/rules/tdd-workflow.md`). The acceptance test may still fail.
 - Pick the next test from the list as it is now: the most important thing the component does not do yet. Importance comes first. Between two equally important tests, take the one you are more confident about; the loop will make the other clearer.
 
 ## 6. Done when the consumer's need is met

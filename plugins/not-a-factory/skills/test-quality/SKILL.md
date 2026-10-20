@@ -5,7 +5,7 @@ description: Review the quality of tests against Dave Farley's eight properties 
 
 # Test quality review
 
-Review the tests the developer names, or the tests changed since the last commit (`git diff --name-only HEAD` and untracked `*.test.ts(x)` files). After a criterion, review everything the criterion changed: `git diff --name-only main...HEAD` and uncommitted files.
+Review the tests the developer names, or the tests changed since the last commit (`git diff --name-only HEAD` and untracked `*.test.ts(x)` files). After an acceptance test passes, review everything changed for it: `git diff --name-only main...HEAD` and uncommitted files.
 
 ## The eight properties
 
