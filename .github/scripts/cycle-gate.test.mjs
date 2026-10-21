@@ -99,6 +99,16 @@ test("allows a commit with no unit test in it, such as setup or an acceptance te
   assert.equal(gate(project({ unitTest: false }).dir).permissionDecision, "allow");
 });
 
+test("allows a commit that only changes an existing acceptance test", () => {
+  const { dir, git } = project({ unitTest: false });
+  mkdirSync(join(dir, "acceptance-tests"));
+  writeFileSync(join(dir, "acceptance-tests/claims.test.ts"), "export {}\n");
+  git("add -A");
+  git("commit -q -m acceptance");
+  writeFileSync(join(dir, "acceptance-tests/claims.test.ts"), "export const x = 1;\n");
+  assert.equal(gate(dir).permissionDecision, "allow");
+});
+
 test("ignores commands that do not commit", () => {
   assert.equal(gate(project().dir, "git status").permissionDecision, "allow");
 });

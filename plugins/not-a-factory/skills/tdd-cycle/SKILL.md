@@ -57,9 +57,13 @@ Write them in `pending-tests.md` in the project root (not in `.claude/`, which C
 
 **Questions**
 1. Can a member extend a loan when someone else is waiting for the book?
+
+**Not now** (deferred by the developer; never build these without asking)
+- fines for late returns
 ```
 
 - Only tests that are not written yet. When you write a test, remove it: the test suite is the record of what is done, so the file cannot drift from it.
+- **Not now** keeps what the developer deferred, so the decision survives a long session. It stays until the developer takes it out.
 - **Sure** and **Not sure yet** make it clear what is certain. A test that depends on an open question stays in **Not sure yet** and names the question.
 - List **behaviours**, not classes or methods. Keep it short: only what the consumer needs, not everything the component could do.
 - In a feature, the story and its pending acceptance criteria stay at the top of the file (the `new-feature` skill writes them). Component sections go below them.
@@ -105,7 +109,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 **Check before the list review:**
 - All tests still pass, and typecheck and lint pass.
 - You changed no behaviour. A failure mode that no test covers goes on the test list; it is not fixed here.
-- No unused code is left: no method, export, parameter or file that no test or caller uses. Remove it (a finder that no use case calls is unused).
+- No unused code is left: no method, export, parameter or file that nothing asked for. A finder that a use-case test needs to check its outcome is used; a finder that only its own repository test calls is not. Never add code (such as a route) only to give unused code a caller: delete it, or ask.
 - If nothing needed to change, you said so.
 
 ## 5. After every cycle, review the list
