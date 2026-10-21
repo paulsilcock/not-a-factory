@@ -35,10 +35,10 @@ A cycle is one unit test: RED, GREEN, REFACTOR, LIST, COMMIT. An acceptance test
 Before the first test of a component, write its pending tests in `pending-tests.md` in the project root (the format is in the `tdd-cycle` skill): the component under test, the tests you are sure of, the tests you are not sure of yet, and the open questions. It holds only tests that are not written yet; the test suite holds the rest. It changes after every cycle.
 
 
-1. **RED:** write one failing test for one behaviour. Run it. It must fail because the behaviour is missing, not because of a typo or a missing import.
+1. **RED:** write one failing test for one behaviour. Run it. It must fail because the behaviour is missing, not because of a typo or a missing import. If it passes at once, say so in the RED line, and show that it fails when you take out the code that makes it pass. Then keep it if it protects behaviour that no other test covers, or delete it. GREEN is then "nothing to do".
 2. **GREEN:** fix only the one thing that stops the test passing, with the simplest correct code. Simplest never means a shortcut: no hard-coded value that the system should store or compute, no data dropped on save, no stub left behind. If that is a new collaborator (a domain model, a repository, a service), stop: give it its own test and cycles first, then come back.
 3. **REFACTOR:** always. Improve the design without changing behaviour. Remove unused code: any method, export, parameter or file that no production code uses (a method that only its own test calls is unused). If the project has a `knip` script, run it (`pnpm knip`): it finds unused files and exports. Check methods yourself: knip does not. Replace any fixed value that only repeats what the test expects with real code. If nothing needs to change, say so.
-4. **Review the pending tests:** in `pending-tests.md`, remove the test you just wrote (a written test is not pending, even while it fails), then add, remove or reorder. Say what changed in the LIST line.
+4. **Review the pending tests:** in `pending-tests.md`, remove the test you just wrote (a written test is not pending, even while it fails). Then ask what this cycle taught you: a case nobody thought of, a test that is now redundant, an answered or new question. Add, remove, move or reorder. The LIST line says what changed, `Learnt:` (or "nothing new"), and `Next:` with the reason that test comes next: the most important, or the one you are most sure of.
 5. **COMMIT:** commit this cycle's test and code on the feature branch: one unit test, one commit. The unit tests, typecheck and lint pass; the acceptance test you are working towards may still fail. The message says the behaviour in business words.
 
 Write one line for each step as you do it, in your reply to the developer, so that they can see it. The line starts with the step name in bold, then what you did:
@@ -47,11 +47,13 @@ Write one line for each step as you do it, in your reply to the developer, so th
 **RED:** a loan extended twice cannot be extended again. Fails: the third extension is accepted.
 **GREEN:** the loan counts its extensions.
 **REFACTOR:** nothing to change.
-**LIST:** removed "a loan can be extended twice" (the test above covers it). Next: an overdue loan cannot be extended. Still a question: can a member extend a loan when someone is waiting for the book?
+**LIST:** removed "a loan can be extended twice" (the test above covers it).
+Learnt: an overdue loan was never considered, so I added "an overdue loan cannot be extended" to Sure.
+Next: the overdue loan, because it matters more than the waiting list, and I am sure of the rule.
 **COMMIT:** "a loan cannot be extended a third time".
 ```
 
-A cycle is not done until REFACTOR and LIST are done. A hook blocks the commit of a unit test until, since the last commit, the RED, GREEN, REFACTOR and LIST lines are written, `pnpm knip` has run after GREEN, and `pending-tests.md` has changed.
+A cycle is not done until REFACTOR and LIST are done. A hook blocks the commit of a unit test until, since the last commit, the RED, GREEN, REFACTOR and LIST lines are written, the LIST line has `Learnt:` and `Next:`, and `pnpm knip` has run after GREEN.
 
 Write all five lines for every cycle, in every mode, as you go, also when a step changed nothing. The modes only change where you stop, not what you write or when you commit. Never start the next test before you have written the REFACTOR, LIST and COMMIT lines, so that the developer can see that no step was skipped.
 

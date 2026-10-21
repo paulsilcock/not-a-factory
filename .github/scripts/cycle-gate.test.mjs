@@ -60,7 +60,7 @@ const fullCycle = [
   say("**GREEN:** a loan sets its due date."),
   bash("pnpm knip"),
   say("**REFACTOR:** nothing to change."),
-  say("**LIST:** removed the due-date test. Next: extending a loan."),
+  say("**LIST:** removed the due-date test.\nLearnt: nothing new.\nNext: extending a loan, because it matters most."),
 ];
 
 test("allows the commit of a complete cycle", () => {
@@ -86,10 +86,15 @@ test("blocks the commit when knip did not run after GREEN", () => {
   assert.match(decision.permissionDecisionReason, /knip/);
 });
 
-test("blocks the commit when the pending tests did not change since the last commit", () => {
-  const decision = gate(project({ pendingUpdated: false }), fullCycle);
+test("allows the commit when the pending tests file was not touched", () => {
+  assert.equal(gate(project({ pendingUpdated: false }), fullCycle).permissionDecision, "allow");
+});
+
+test("blocks the commit when the LIST line does not say what was learnt and what is next", () => {
+  const decision = gate(project(), [...fullCycle.slice(0, 4), say("**LIST:** removed the due-date test.")]);
   assert.equal(decision.permissionDecision, "deny");
-  assert.match(decision.permissionDecisionReason, /pending-tests\.md/);
+  assert.match(decision.permissionDecisionReason, /Learnt/);
+  assert.match(decision.permissionDecisionReason, /Next/);
 });
 
 test("only the conversation since the last commit counts", () => {

@@ -1,10 +1,10 @@
 // PreToolUse hook: blocks a `git commit` that includes a unit test until the
 // cycle is complete (see .claude/rules/tdd-workflow.md, section 4). Since the
 // last commit, the conversation must have the RED, GREEN, REFACTOR and LIST
-// lines, `pnpm knip` must have run after GREEN, and pending-tests.md must have
-// changed.
+// lines, the LIST line must say what was learnt and what is next, and
+// `pnpm knip` must have run after GREEN.
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const input = JSON.parse(readFileSync(0, "utf8"));
@@ -85,6 +85,19 @@ if (steps.length)
     `write the ${steps.join(", ")} line${steps.length > 1 ? "s" : ""} in your reply to the developer, so they can see each step`,
   );
 
+const list = cycle.findLast(
+  (b) => b.type === "text" && b.text.includes("**LIST:**"),
+);
+if (list) {
+  const after = list.text.slice(list.text.indexOf("**LIST:**"));
+  const parts = ["Learnt:", "Next:"].filter((part) => !after.includes(part));
+  if (parts.length) {
+    missing.push(
+      `in the LIST line, add ${parts.join(" and ")} (what this cycle taught you, or "nothing new"; the next test and why)`,
+    );
+  }
+}
+
 const packageJson = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
 if (packageJson.scripts?.knip) {
   const green = lineAt("GREEN");
@@ -96,14 +109,6 @@ if (packageJson.scripts?.knip) {
   );
   if (!knipRan)
     missing.push("run `pnpm knip` after GREEN, as part of REFACTOR");
-}
-
-const pending = join(dir, "pending-tests.md");
-const lastCommitTime = Number(git("log -1 --format=%ct").trim()) * 1000;
-if (!existsSync(pending) || statSync(pending).mtimeMs <= lastCommitTime) {
-  missing.push(
-    "update pending-tests.md: remove the test you wrote, then add, remove or reorder",
-  );
 }
 
 if (missing.length === 0) process.exit(0);
