@@ -82,7 +82,7 @@ const steps = ["RED", "GREEN", "REFACTOR", "LIST"].filter(
 );
 if (steps.length)
   missing.push(
-    `write the ${steps.join(", ")} line${steps.length > 1 ? "s" : ""} in a message to the developer (not only in your reasoning: the developer cannot see that)`,
+    `write the ${steps.join(", ")} line${steps.length > 1 ? "s" : ""} in your reply to the developer, so they can see each step`,
   );
 
 const packageJson = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));

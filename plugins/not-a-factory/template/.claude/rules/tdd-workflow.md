@@ -41,7 +41,7 @@ Before the first test of a component, write its pending tests in `pending-tests.
 4. **Review the pending tests:** in `pending-tests.md`, remove the test you just wrote (a written test is not pending, even while it fails), then add, remove or reorder. Say what changed in the LIST line.
 5. **COMMIT:** commit this cycle's test and code on the feature branch: one unit test, one commit. The unit tests, typecheck and lint pass; the acceptance test you are working towards may still fail. The message says the behaviour in business words.
 
-Write one line for each step as you do it, in your message to the developer. Your reasoning does not count: the developer cannot see it. The line starts with the step name in bold, then what you did:
+Write one line for each step as you do it, in your reply to the developer, so that they can see it. The line starts with the step name in bold, then what you did:
 
 ```
 **RED:** a loan extended twice cannot be extended again. Fails: the third extension is accepted.
