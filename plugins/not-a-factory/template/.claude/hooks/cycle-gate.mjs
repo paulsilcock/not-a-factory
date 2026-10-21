@@ -12,16 +12,20 @@ const command = input.tool_input?.command ?? "";
 if (!/\bgit\s+(?:-\S+\s+)*commit\b/.test(command)) process.exit(0);
 
 const cwd = input.cwd ?? process.env.CLAUDE_PROJECT_DIR ?? ".";
-const git = (args) =>
+const run = (args) =>
   execSync(`git ${args}`, {
     cwd,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
-  }).trim();
+  });
+const git = (args) => run(args).trim();
 const dir = git("rev-parse --show-toplevel");
 
 // Only commits that include a unit test (not an acceptance test) are gated.
-const unitTest = git("status --porcelain -uall")
+// Porcelain lines start with a two-letter status, which can be a space, so
+// only the end of the output is trimmed.
+const unitTest = run("status --porcelain -uall")
+  .trimEnd()
   .split("\n")
   .map((line) => line.slice(3).trim())
   .some(
