@@ -46,6 +46,8 @@ claude --plugin-dir ./plugins/not-a-factory
 
 Needs Node.js 24.14.1 or later, pnpm, git and Docker. Then open Claude Code in `my-app` and describe a feature: the `new-feature` skill takes it from there.
 
+To add sign-in with Clerk, run `/not-a-factory:add-clerk` in the app. It needs a Clerk development instance used only for tests.
+
 ## Layout
 
 ```
@@ -53,6 +55,7 @@ Needs Node.js 24.14.1 or later, pnpm, git and Docker. Then open Claude Code in `
 plugins/not-a-factory/
   skills/new-app/   the /not-a-factory:new-app command and its script (new-app.sh)
   skills/adopt/     the /not-a-factory:adopt command and its script (adopt.sh)
+  skills/add-clerk/ the /not-a-factory:add-clerk command, its script (add-clerk.mjs) and the files it adds
   skills/<others>/  TDD skills: plugin skills, also copied into new projects
   template/         the new project, with {{APP_NAME}} placeholders
 docs/decisions.md   decisions that the code does not explain (the work is in GitHub issues)
