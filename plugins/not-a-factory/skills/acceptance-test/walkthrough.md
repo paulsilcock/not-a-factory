@@ -1,4 +1,4 @@
-# Walkthrough: one criterion from RED to GREEN
+# Walkthrough: one acceptance test from RED to GREEN
 
 One way the cycle can go, to show the rhythm. It is not a template: follow the failures, and the order will differ.
 
@@ -76,4 +76,4 @@ Run it again. Map `TooManyBooks` to an HTTP status in `main.ts`, so that the pag
 
 ## 6. When it passes
 
-Refactor, including the DSL, the driver and the page. Then go back to `new-feature` for the next criterion.
+Refactor, including the DSL, the driver and the page. Then go back to `new-feature` for the next acceptance test.

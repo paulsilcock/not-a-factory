@@ -5,7 +5,7 @@ description: Review the quality of tests against Dave Farley's eight properties 
 
 # Test quality review
 
-Review the tests the developer names, or the tests changed since the last commit (`git diff --name-only HEAD` and untracked `*.test.ts(x)` files). After a criterion, review everything the criterion changed: `git diff --name-only main...HEAD` and uncommitted files.
+Review the tests the developer names, or the tests changed since the last commit (`git diff --name-only HEAD` and untracked `*.test.ts(x)` files). After an acceptance test passes, review everything changed for it: `git diff --name-only main...HEAD` and uncommitted files.
 
 ## The eight properties
 
@@ -33,7 +33,7 @@ Quick checks:
 ## The code the tests drive
 
 REFACTOR is easy to skip. Check the production code that these tests drove, and give file, line and name for each finding:
-- **Unused code:** a method, export, parameter, type or file that no production code calls. A method that only its own test calls is unused, for example a repository finder that no use case calls yet. If the project has a `knip` script, run it (`pnpm knip`) first. Otherwise, search for each new name (`grep -rn`, or the language server's references) and ignore the test files.
+- **Unused code:** a method, export, parameter, type or file that no production code calls. A method that only its own test calls is unused, for example a repository finder that no use case calls yet. If the project has a `knip` script, run it (`pnpm knip`) first: it finds unused files and exports, but not unused methods. For each new method, and without knip for every new name, search (`grep -rn`, or the language server's references) and ignore the test files.
 - **Fixed values:** a value in production code that only repeats what a test expects, where the system should store or compute it.
 - **Duplication** in production code that one name would remove.
 - **Names** that are not the business's words, or that no longer say what the code does.

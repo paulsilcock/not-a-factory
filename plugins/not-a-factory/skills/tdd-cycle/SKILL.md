@@ -111,10 +111,12 @@ Improve the design without changing behaviour: names, separation of concerns, co
 ## 5. After every cycle, review the list
 
 The list is a guess, never the final list. Use what this cycle taught you:
+- Ask what this cycle taught you, then write it in the LIST line in `tdd-log.md` as `Learnt:` (or "nothing new") and `Next:` with the reason.
 - Update `pending-tests.md`: remove the test you just wrote, and tests that are now redundant or wrong. Add the ones you found. Move a test from **Not sure yet** to **Sure** when its question is answered. Change the order if needed. Show what changed and why (for example "added: an empty order is refused"; "answered question 1: moved 'someone waiting' to Sure").
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - New words or rules: use `domain-discovery`.
 - A behaviour that a user would see on its own may be a new acceptance criterion or feature: note it for `new-feature`, and ask the developer. Do not build it.
+- Commit the cycle: one unit test, one commit (COMMIT in `.claude/rules/tdd-workflow.md`). The acceptance test may still fail.
 - Pick the next test from the list as it is now: the most important thing the component does not do yet. Importance comes first. Between two equally important tests, take the one you are more confident about; the loop will make the other clearer.
 
 ## 6. Done when the consumer's need is met

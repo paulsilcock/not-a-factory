@@ -37,7 +37,7 @@ Write it down in plain words, at the top of `pending-tests.md` in the project ro
 
 - The story is one or two sentences about the user's work and why it matters to them, in the user's own words: their description of their problem. It does not mention the program, its screens or its data. Do not use "As a <role>, I want...".
 - Each criterion is one sentence that the least technical person who knows the business would understand. Each one gets its own acceptance test.
-- The list is a working list, like the pending tests. Start with the most important criterion that you are most confident about. When you write a criterion's acceptance test, remove the criterion from the file; the story stays until the feature is done.
+- The list is a working list, like the pending tests. Ask the developer which criterion to start with, as its own question, for example: "Which of these matters most to you? I suggest 2, because …". Suggest the most important one, or the one we are most confident about. The developer decides. When you write a criterion's acceptance test, remove the criterion from the file; the story stays until the feature is done.
 - If the story or the criteria contain business rules, limits, states or new business words, load `domain-discovery` before you write the first acceptance test. Its examples often become criteria.
 
 **Where it lives in the app.** If the feature has a UI, the developer decides where it goes and how it is reached. Ask:
@@ -46,11 +46,11 @@ Write it down in plain words, at the top of `pending-tests.md` in the project ro
 - **Every feature:** a new route with an entry in the navigation (with what label), or part of an existing page?
 - **Who builds it:** offer to let the developer build the shell or the layout themselves, with the `shadcn` skill, while you build the behaviour. In pair work, they often will.
 
-## 4. One criterion at a time
+## 4. One acceptance test at a time
 
-1. Make the criterion pass with the `acceptance-test` skill.
-2. **Shape the UI** (if the criterion has a UI). The acceptance test passes with just enough page; now make it fit the app. Take a screenshot of the page and show it to the developer. Propose a layout with shadcn components or blocks. The developer decides, or does it themselves. Make the agreed change, and keep the acceptance tests green: they find elements by role and label, so a new layout does not break them. This is not REFACTOR: users can see the change.
-3. Run the `test-quality` skill on the tests written for this criterion. Report the results, and ask before you change any test.
-4. Review the criteria list: remove, add or reorder. Then take the next criterion.
+1. Write the next criterion's acceptance test and make it pass with the `acceptance-test` skill. This takes many cycles, each with its own commit.
+2. **Shape the UI** (if it has a UI). The acceptance test passes with just enough page; now make it fit the app. Take a screenshot of the page and show it to the developer. Propose a layout with shadcn components or blocks. The developer decides, or does it themselves. Make the agreed change, and keep the acceptance tests green: they find elements by role and label, so a new layout does not break them. This is not REFACTOR: users can see the change.
+3. Run the `test-quality` skill on the tests written for this acceptance test. Report the results, and ask before you change any test.
+4. Review the criteria list: remove, add or reorder. Then start the next acceptance test.
 
 The feature is done when every criterion has a passing acceptance test.

@@ -5,3 +5,4 @@ dist
 .tanstack
 .DS_Store
 pending-tests.md
+tdd-log.md
