@@ -1,11 +1,11 @@
 ---
 name: add-clerk
-description: Add sign-in with Clerk to a not-a-factory app. The API reads the signed-in person through a port (tsyringe), the web app uses Clerk's components, and acceptance tests can start signed in. Use when the developer asks for sign-in, sign-up, users or roles, and has chosen Clerk.
+description: Add sign-in with Clerk to a not-a-factory app. The API reads the signed-in person as an Actor (Clerk only in infra/auth/), the web app uses Clerk's components, and acceptance tests can start signed in. Use when the developer asks for sign-in, sign-up, users or roles, and has chosen Clerk.
 ---
 
 # Add Clerk
 
-Clerk is part of the system: the web app uses Clerk's components and hooks directly. The API does not know Clerk: it reads the signed-in person as an `Actor`, through the `AUTHENTICATION` middleware that `main.ts` registers with tsyringe.
+Clerk is part of the system: the web app uses Clerk's components and hooks directly. The API knows Clerk only in `infra/auth/clerk-authentication.ts`, a tsyringe `@singleton()` that tsyringe resolves by itself. Routes and use cases see only the `Actor`.
 
 ## 1. Ask first
 
@@ -14,7 +14,7 @@ Show the developer this list, and wait for a yes:
 ```
 I'll add sign-in with Clerk:
 1. Install @clerk/hono (api), @clerk/react (web), @clerk/testing and @clerk/backend (acceptance tests).
-2. API: an AUTHENTICATION port, Clerk's adapter in infra/auth/, registered in main.ts; every /api route needs a signed-in person.
+2. API: ClerkAuthentication in infra/auth/ (a tsyringe singleton, no registration); every /api route needs a signed-in person.
 3. Web: ClerkProvider, and /sign-in and /sign-up pages (move or restyle them as you like).
 4. Acceptance tests: dsl.isSignedIn(name), and tests of sign-up and sign-in through our pages.
 5. Docker, CI and .env.example get the Clerk keys.
