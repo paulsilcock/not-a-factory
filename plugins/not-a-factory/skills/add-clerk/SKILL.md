@@ -1,5 +1,6 @@
 ---
 name: add-clerk
+allowed-tools: Bash(node ${CLAUDE_SKILL_DIR}/add-clerk.mjs)
 description: Add sign-in with Clerk to a not-a-factory app. The API reads the signed-in person as an Actor (Clerk only in infra/auth/), the web app uses Clerk's components, and acceptance tests can start signed in. Use when the developer asks for sign-in, sign-up, users or roles, and has chosen Clerk.
 ---
 
@@ -29,7 +30,7 @@ Also suggest Clerk's own skills for Clerk itself (`/plugin marketplace add clerk
 Commit or stash first, so that `git diff` shows only this change. Then, from the project root:
 
 ```sh
-node "${CLAUDE_PLUGIN_ROOT}/skills/add-clerk/add-clerk.mjs"
+node ${CLAUDE_SKILL_DIR}/add-clerk.mjs
 ```
 
 It adds the new files (never over existing ones), makes the edits, installs the packages and runs `pnpm lint:fix`. If it lists edits it could not make, make them by hand: the script's source shows each one.
