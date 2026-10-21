@@ -51,7 +51,7 @@ REFACTOR: nothing to change; knip clean.
 LIST: removed "a loan can be extended twice" (the test above covers it). Learnt: an overdue loan was never considered, so I added "an overdue loan cannot be extended" to Sure. Next: the overdue loan, because it matters more than the waiting list, and I am sure of the rule.
 ```
 
-Then COMMIT, with the heading as the message. A cycle is not done until REFACTOR and LIST are done. A hook blocks the commit of a unit test until the newest entry in `tdd-log.md` is new since the last commit, has the RED, GREEN, REFACTOR and LIST lines, and its LIST line has `Learnt:` and `Next:`. The modes only change where you stop, not what you write or when you commit.
+Then COMMIT, with the heading as the message. Write the log entry in its own step, before the commit command: the hook reads the log before the command runs. A cycle is not done until REFACTOR and LIST are done. A hook blocks the commit of a unit test until the newest entry in `tdd-log.md` is new since the last commit, has the RED, GREEN, REFACTOR and LIST lines, and its LIST line has `Learnt:` and `Next:`. The modes only change where you stop, not what you write or when you commit.
 
 Stubs only satisfy the compiler. They throw or return nothing, and never make a test pass.
 
