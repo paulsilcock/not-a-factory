@@ -49,6 +49,8 @@ In the test file: `acceptance(async () => new AppDsl(await createDriver()))`.
 - **Encode the real interaction.** This is where the interface is designed, from the outside in.
 - **Hold protocol state** that a `confirm...` method needs. Business state stays in the system.
 - **Fail clearly:** a `confirm...` method throws an `Error` that says what was expected and what was found.
+- **No wait without a limit.** Every wait gets a limit well under the test's timeout (for a browser, `context.setDefaultTimeout(10_000)`), and when it runs out, the error says what was expected and what the page shows. "Test timed out" explains nothing.
+- **When a test fails, find out why before you re-run it.** Read the error. If it does not say enough, make the driver's message say more, or take a screenshot (`page.screenshot`) at the step that fails. Never re-run a failing test in a loop to see whether it passes.
 - **No business rules, defaults or aliasing.** The DSL does those, and the system decides.
 
 ## When the system does not have it yet

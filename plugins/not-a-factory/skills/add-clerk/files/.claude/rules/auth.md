@@ -28,8 +28,11 @@ Two different things:
 
 ## Acceptance tests
 
-- `dsl.isSignedIn(name)` starts the test signed in, with no sign-in steps. It uses Clerk's test helper `clerk.signIn`, and creates the test user with Clerk's Backend API. **This is the one exception** to "drivers use only the app's public interfaces"; the code says so where it happens.
-- `signing-in.test.ts` tests sign-up and sign-in through our own pages, without that helper. Keep it.
+- **Two exceptions** to "drivers use only the app's public interfaces", both with Clerk's own test interfaces, and both commented where they happen:
+  1. `dsl.isSignedIn(name)` starts the test signed in with Clerk's test helper `clerk.signIn`, with no sign-in steps.
+  2. Test users are created with Clerk's Backend API: for `isSignedIn`, and before `signsIn` signs in on our page.
+- `signing-in.test.ts` tests sign-up and sign-in through our own pages, without `clerk.signIn`. Keep it.
+- Every Clerk step waits at most 10 seconds, and a stuck step fails with the page's address and Clerk's error text.
 - A name is the same person in every test of a file, and a different person in other files and runs: the address holds a run id and a file id.
 - Test users have `+clerk_test` addresses: Clerk sends them no email, and accepts the code `424242`. The global setup deletes old test users, and its teardown deletes this run's users: a development instance holds at most 100 users.
 - Use a Clerk development instance for tests only, so the clean-up never touches people you use by hand. Its keys go in `.env`, and in CI as the secrets `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.

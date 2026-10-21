@@ -1,4 +1,6 @@
 import { execSync } from "node:child_process";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 import type { TestProject } from "vitest/node";
 
@@ -22,6 +24,30 @@ const compose = (args: string) =>
     env: { ...process.env, DB_PORT: dbPort, APP_PORT: appPort },
   });
 
+// One run at a time uses the stack: a second run would restart the app under
+// the first. The lock holds the running process's id.
+const lockFile = join(import.meta.dirname, ".run.lock");
+function takeLock() {
+  if (existsSync(lockFile)) {
+    const pid = Number(readFileSync(lockFile, "utf8"));
+    if (isRunning(pid)) {
+      const message = `Another acceptance-test run (process ${pid}) is using the test stack. Wait for it to finish, or stop it.`;
+      console.error(message); // Vitest can fail to print an error from the global setup
+      throw new Error(message);
+    }
+  }
+  writeFileSync(lockFile, String(process.pid));
+  return () => rmSync(lockFile, { force: true });
+}
+function isRunning(pid: number) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function setup(project: TestProject) {
   const external = process.env.ACCEPTANCE_URL;
   if (external) {
@@ -29,6 +55,7 @@ export default function setup(project: TestProject) {
     return;
   }
 
+  const releaseLock = takeLock();
   try {
     compose("up -d --build --wait db");
     execSync("pnpm db:migrate", {
@@ -41,7 +68,9 @@ export default function setup(project: TestProject) {
     });
     compose("up -d --build --wait app");
     project.provide("acceptanceUrl", `http://localhost:${appPort}`);
+    return releaseLock;
   } catch (error) {
+    releaseLock();
     compose("down -v");
     throw error;
   }
