@@ -1,6 +1,6 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
-  "include": ["files", "exports", "classMembers"],
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "include": ["files", "exports"],
   "ignore": [
     ".claude/**",
     "web/src/components/ui/**",
@@ -11,8 +11,7 @@
   "workspaces": {
     "api": {
       "entry": ["src/main.ts!"],
-      "project": ["src/**/*.ts!"],
-      "ignoreMembers": ["handle", "toPersistence", "properties"]
+      "project": ["src/**/*.ts!"]
     },
     "web": {
       "entry": ["src/main.tsx!", "src/routes/**/*.tsx!"],
