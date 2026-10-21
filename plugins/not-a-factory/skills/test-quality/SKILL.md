@@ -35,6 +35,7 @@ Quick checks:
 
 REFACTOR is easy to skip. Check the production code that these tests drove, and give file, line and name for each finding:
 - **Unused code:** a method, export, parameter, type or file that no production code calls. A method that only its own test calls is unused, for example a repository finder that no use case or use-case test needs. If the project has a `knip` script, run it (`pnpm knip`) first: it finds unused files and exports, but not unused methods. For each new method, and without knip for every new name, search (`grep -rn`, or the language server's references) and ignore the test files.
+- **Business logic outside the domain:** a use case or entrypoint that parses, converts, calculates or decides, or a primitive (`string`, `number`) that carries a business rule, such as an amount. Name the missing value object.
 - **Fixed values:** a value in production code that only repeats what a test expects, where the system should store or compute it.
 - **Duplication** in production code that one name would remove.
 - **Names** that are not the business's words, or that no longer say what the code does.
