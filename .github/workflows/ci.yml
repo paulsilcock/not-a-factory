@@ -75,3 +75,39 @@ jobs:
         run: pnpm test:acceptance:down || true
       - name: Build
         run: pnpm build
+
+  clerk:
+    name: Generated app with Clerk
+    needs: plugin
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/../demo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Configure git
+        working-directory: .
+        run: |
+          git config --global user.name "CI"
+          git config --global user.email "ci@example.com"
+      - name: Create an app
+        working-directory: ${{ github.workspace }}/..
+        run: bash "$GITHUB_WORKSPACE/plugins/not-a-factory/skills/new-app/new-app.sh" demo
+      # The same script that the add-clerk skill runs. It fails if an edit does not apply.
+      - name: Add Clerk
+        run: node "$GITHUB_WORKSPACE/plugins/not-a-factory/skills/add-clerk/add-clerk.mjs"
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Unused code
+        run: pnpm knip
+      # The acceptance tests need a Clerk development instance, so CI here does not run them.
+      - name: Unit tests
+        run: pnpm test:unit
