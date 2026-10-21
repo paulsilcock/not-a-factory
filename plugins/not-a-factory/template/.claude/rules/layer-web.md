@@ -12,7 +12,7 @@ paths:
 - **A new app does not set up shadcn.** If `web/components.json` is missing, do not run `shadcn init` with defaults: the look (library, style, colour, font) is the developer's choice. Ask, then set it up as step 3 of the `new-feature` skill says.
 - No business rules in the client. If the client needs a decision, the API makes it.
 - **The app shell, the routes, the navigation and the look are the developer's decisions.** Ask before you add a route, a navigation entry or a layout. Build the shell and layouts with shadcn blocks, not by hand.
-- Before you change TanStack code, load the matching Intent skill (see `AGENTS.md`).
+- Before you change TanStack code, load the matching Intent skill (see Skill Loading in `CLAUDE.md`).
 
 ## Testing the UI
 
