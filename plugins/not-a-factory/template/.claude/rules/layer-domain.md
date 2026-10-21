@@ -19,6 +19,7 @@ paths:
 - **One aggregate changes per command.** Others react afterwards to a domain event.
 - **Domain events** (`addDomainEvent`) are past-tense facts in business words: `OrderPlaced`, not `SendConfirmationEmail`. Use one when another aggregate or a side effect must react and a short delay is acceptable. Not for a rule that must hold in the same transaction. How to react to one: "Domain event subscriptions" in `layer-entrypoints.md`.
 - **`ValueObject`** for values with rules but no identity (money, email address, date range). Immutable; checks itself in the constructor.
+- **No primitive carries a business rule.** A value with rules (an amount, a date, a quantity) is a value object from the first test, made from the format agreed in `domain-discovery` (for example `Money.fromPounds("12.30")`). It refuses bad input with a named `DomainError` (`AmountNotPositive`, not `ValidationError`). Never use floating-point numbers for money.
 - **Explicit states.** Name the states and the allowed moves. A broken rule throws a `DomainError` subclass with a business name (`BasketIsEmpty`, not `ValidationError`). `serve` maps it to an HTTP status by class name in `main.ts`.
 - IDs: `prefixedUlid("order")` from `@litmus-ts/core/id`, typed as `PrefixedUlid<"order">`.
 - Test domain objects directly, with no infrastructure. Most rules are tested here.

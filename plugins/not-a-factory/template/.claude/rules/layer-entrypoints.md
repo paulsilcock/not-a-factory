@@ -20,6 +20,7 @@ Examples, by kind (one folder each in `entrypoints/`):
 ## Every entrypoint
 
 - **Thin.** Parse and check the input, get the use case from the container, call `handle()`, and convert the result or the `DomainError` back. No business logic and no database access.
+- **The input schema states exactly what the system accepts,** in the format agreed in `domain-discovery`: a pattern for an amount, not `z.string()`; `.min(1)` for text that must not be empty. The schema checks the format, and the domain checks the business rules. Lint blocks parsing and calculating here, as in use cases.
 - **One use case for each call.** If an entrypoint must call several, the flow is a use case of its own.
 - **No test-only entrypoints.**
 - **Tests:** usually the acceptance tests cover entrypoints. Write an entrypoint test only for behaviour of that channel, such as an HTTP status, input checks, or a message that is acknowledged or retried.

@@ -9,6 +9,7 @@ A use case describes one way the system is used (Holub, after Bob Martin): the i
 
 - **Commands** (`CommandHandler<Command>`) perform an action on the system, usually with side effects. **Queries** (`QueryHandler<Query, Result>`) read, and have no side effects.
 - **One class per use case,** named as the intent: `BorrowBook`, `ListMemberLoans`. Put the zod schema for its input next to it, and export both.
+- **A use case never parses, converts, calculates or decides.** Code like `Math.round(Number(amount) * 100)` is a missing value object: move it to the domain, with its own test. Lint blocks `Math`, `Number`, `parseFloat`, `parseInt` and `Date` here. For a real exception, ask the developer, then write `// biome-ignore lint/style/noRestrictedGlobals: <reason>` on that line.
 - **A command is a dumb orchestrator in the application layer.** It loads an aggregate through its repository, asks the domain model to decide, saves the result, and calls services. Important decisions belong to the domain layer. External systems are reached through infrastructure services such as repositories, behind interfaces that this project owns.
 - **A query reads, and returns a result shaped for its consumer.** It can read the database directly, without repositories (see `repositories.md`).
 - **A reaction to a domain event is an ordinary command** (`CloseCart` after `OrderPlaced`). Make it idempotent: it can run twice with the same result. Test it through `handle()`; the acceptance test covers the wiring (see `layer-entrypoints.md`).

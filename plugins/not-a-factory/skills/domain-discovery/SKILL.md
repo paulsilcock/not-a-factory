@@ -24,6 +24,7 @@ Ask a few at a time, and only those that matter for the feature being built now.
 - **Words:** when you say "<term>", what exactly do you mean? When does an <A> become a <B>? Are <X> and <Y> the same thing?
 - **Rules:** what must always be true? What must be true before someone can <act>? What makes it wrong or impossible, and what happens then?
 - **Examples:** can you give me an example? And one where it is not allowed?
+- **Values:** for each value with rules (an amount, a date, a quantity, an email address): what is its unit, and its exact format? What precision? What is refused? For example: "Amount: pounds, as `12.30`; more than 0; exactly two decimals; anything else is refused." Each refusal is an example, so it becomes a test.
 - **Together or apart:** what must change at the same time to stay correct? If <A> changes now and <B> a moment later, does anything break?
 - **Is a model needed?** Is there a real rule, or does the app only store and show data? With no real rules, plain CRUD is right: agree the words and go to `tdd-cycle`.
 

@@ -51,6 +51,27 @@
           }
         }
       }
+    },
+    {
+      "includes": ["api/src/use-cases/**", "api/src/entrypoints/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "Math": "A use case or entrypoint does not calculate: put the rule in the domain, with a test.",
+                  "Number": "A use case or entrypoint does not parse or convert values: make a value object in the domain, with a test.",
+                  "parseFloat": "A use case or entrypoint does not parse or convert values: make a value object in the domain, with a test.",
+                  "parseInt": "A use case or entrypoint does not parse or convert values: make a value object in the domain, with a test.",
+                  "Date": "Time is an input: use the clock interface, and put date rules in the domain."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }
