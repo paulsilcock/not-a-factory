@@ -29,6 +29,7 @@ Quick checks:
 - Would the test still pass if the code returned a fixed value? Then it cannot tell real behaviour from a fake. Add an example with a different value.
 - Does the test name a class, function, table or framework? Rename it as behaviour.
 - Does a refactor make you change it? It is coupled to the implementation.
+- Does a use-case test call another use case, to set up data or to check the outcome? Then a bug in one fails the tests of both. Set up with the domain model and the repository, and check a command through its own repository.
 
 ## The code the tests drive
 
