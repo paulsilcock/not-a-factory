@@ -35,10 +35,20 @@ Which skill when:
 
 - Use the TypeScript language server (the `typescript-lsp` plugin) for definitions, references, types and JSDoc before you grep.
 - For Litmus, read the JSDoc through the language server and the `.d.mts` files in `node_modules/@litmus-ts/*`. Do not guess an API.
-- For TanStack libraries, use the TanStack Intent skills (see `AGENTS.md`). For UI components, use the `shadcn` skill, and run shadcn commands in `web/` (or with `-c web` from the root).
+- For TanStack libraries, use the TanStack Intent skills (see Skill Loading below). For UI components, use the `shadcn` skill, and run shadcn commands in `web/` (or with `-c web` from the root).
 
 ## Hooks
 
 A Stop hook runs typecheck and lint and blocks until they pass. A second Stop hook runs related unit tests and reports to the developer only. A PreToolUse hook blocks the commit of a unit test until the cycle has a complete entry in `tdd-log.md` (`.claude/hooks/cycle-gate.mjs`). Another asks the developer before a new dependency, or a change to `package.json`, Docker, CI or `.env` files (`.claude/hooks/change-gate.mjs`).
 
-@AGENTS.md
+<!-- intent-skills:start -->
+## Skill Loading
+
+Use the repository’s installed Intent. If it is unavailable, report the missing dependency instead of downloading a replacement.
+Before editing files for a substantial task:
+- Run `pnpm exec intent list` from the workspace root to see available local skills.
+- If a listed skill matches the task, run `pnpm exec intent load <package>#<skill>` before changing files.
+- Use the loaded `SKILL.md` guidance while making the change.
+- Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
+- Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
+<!-- intent-skills:end -->
