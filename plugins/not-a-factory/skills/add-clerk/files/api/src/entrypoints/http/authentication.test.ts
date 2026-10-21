@@ -4,19 +4,18 @@ import { createMiddleware } from "hono/factory";
 import { container } from "tsyringe";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import {
-  type ActorEnv,
-  AUTHENTICATION,
-  authentication,
-  notSignedIn,
-} from "#api/entrypoints/http/authentication.ts";
+import { type ActorEnv, notSignedIn } from "#api/entrypoints/http/actor.ts";
+import { authentication } from "#api/entrypoints/http/authentication.ts";
+import { ClerkAuthentication } from "#api/infra/auth/clerk-authentication.ts";
 
-// A stand-in for the identity provider: it knows one signed-in person.
-const fakeAuthentication = createMiddleware<ActorEnv>(async (c, next) => {
-  if (getCookie(c, "session") !== "ada") return notSignedIn(c);
-  c.set("actor", { id: "user_ada" });
-  await next();
-});
+// A stand-in for Clerk: it knows one signed-in person.
+const fakeClerk = {
+  middleware: createMiddleware<ActorEnv>(async (c, next) => {
+    if (getCookie(c, "session") !== "ada") return notSignedIn(c);
+    c.set("actor", { id: "user_ada" });
+    await next();
+  }),
+};
 
 const app = new Hono<ActorEnv>()
   .use("/api/*", authentication)
@@ -24,7 +23,7 @@ const app = new Hono<ActorEnv>()
 
 describe("routes behind sign-in", () => {
   beforeEach(() => {
-    container.registerInstance(AUTHENTICATION, fakeAuthentication);
+    container.registerInstance(ClerkAuthentication, fakeClerk);
   });
 
   it("know who the signed-in person is", async () => {

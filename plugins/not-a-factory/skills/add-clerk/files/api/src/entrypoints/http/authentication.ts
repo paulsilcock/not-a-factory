@@ -1,24 +1,13 @@
-import type { Context, MiddlewareHandler } from "hono";
 import { createMiddleware } from "hono/factory";
 import { container } from "tsyringe";
 
-import type { Actor } from "#api/use-cases/actor.ts";
-
-/** Routes behind `authentication` read the signed-in person with `c.get("actor")`. */
-export type ActorEnv = { Variables: { actor: Actor } };
+import type { ActorEnv } from "#api/entrypoints/http/actor.ts";
+import { ClerkAuthentication } from "#api/infra/auth/clerk-authentication.ts";
 
 /**
- * The token for the middleware that finds out who sent a request: it sets
- * `actor`, or answers with `notSignedIn` when nobody is signed in. `main.ts`
- * registers the real one (`infra/auth/`); unit tests register a fake.
+ * Sets `actor` for the routes after it, or answers 401 when nobody is signed
+ * in. `app.ts` mounts it. Unit tests register a fake for `ClerkAuthentication`.
  */
-export const AUTHENTICATION = "Authentication";
-
-/** Runs the registered authentication middleware. `app.ts` mounts it. */
 export const authentication = createMiddleware<ActorEnv>((c, next) =>
-  container.resolve<MiddlewareHandler<ActorEnv>>(AUTHENTICATION)(c, next),
+  container.resolve(ClerkAuthentication).middleware(c, next),
 );
-
-/** The answer to a request from someone who is not signed in. */
-export const notSignedIn = (c: Context) =>
-  c.json({ code: "NOT_SIGNED_IN", message: "Sign in first" }, 401);

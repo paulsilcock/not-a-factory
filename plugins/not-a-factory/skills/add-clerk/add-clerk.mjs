@@ -45,28 +45,14 @@ const before = (anchor, added) => (text) =>
   text.includes(anchor) ? text.replace(anchor, `${added}${anchor}`) : text;
 const appendLine = (line) => (text) => `${text.trimEnd()}\n${line}\n`;
 
-edit("api/src/main.ts", "clerkAuthentication", (text) =>
-  after('import { createApp } from "#api/app.ts";', [
-    "",
-    'import { AUTHENTICATION } from "#api/entrypoints/http/authentication.ts";',
-    'import { clerkAuthentication } from "#api/infra/auth/clerk-authentication.ts";',
-  ].join("\n"))(
-    after("DrizzleDbContext.register(drizzle(pool, { schema }));", `
+// ClerkAuthentication is a @singleton(), so tsyringe resolves it with no
+// registration. main.ts only checks Clerk's keys, so a missing key stops the start.
+edit("api/src/main.ts", "CLERK_SECRET_KEY", (text) =>
+  after("DrizzleDbContext.register(drizzle(pool, { schema }));", `
 
-// Who sent a request: Clerk in every deployment. Tests of the API register a fake.
-const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-const clerkPublishableKey = process.env.CLERK_PUBLISHABLE_KEY;
-if (!clerkSecretKey || !clerkPublishableKey) {
+if (!process.env.CLERK_SECRET_KEY || !process.env.CLERK_PUBLISHABLE_KEY) {
   throw new Error("CLERK_SECRET_KEY and CLERK_PUBLISHABLE_KEY must be set");
-}
-container.registerInstance(
-  AUTHENTICATION,
-  clerkAuthentication({
-    secretKey: clerkSecretKey,
-    publishableKey: clerkPublishableKey,
-  }),
-);`)(text),
-  ),
+}`)(text),
 );
 
 edit("api/src/app.ts", "authentication", (text) =>

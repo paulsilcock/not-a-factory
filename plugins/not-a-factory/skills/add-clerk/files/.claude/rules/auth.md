@@ -13,14 +13,14 @@ Two different things:
 
 ## How a request flows
 
-1. The `authentication` middleware (`entrypoints/http/authentication.ts`) runs the middleware registered for `AUTHENTICATION`: Clerk's (`infra/auth/clerk-authentication.ts`), registered in `main.ts` with tsyringe. It sets `actor`, or answers 401 when nobody is signed in. Routes that anyone may call go before it in `app.ts`.
+1. The `authentication` middleware (`entrypoints/http/authentication.ts`) resolves `ClerkAuthentication` (`infra/auth/`, a tsyringe `@singleton()`) and runs its middleware. It sets `actor`, or answers 401 when nobody is signed in. Routes that anyone may call go before it in `app.ts`.
 2. The route adds the actor to the command or query: `input: (body, c) => ({ ...body, actor: c.get("actor") })`. Routes never decide what the actor may do.
 3. The use case loads the person and their roles from our own data, keyed by `actor.id`, and lets the domain decide.
 4. A broken permission rule throws a `DomainError` with a business name (`CannotApproveOwnClaim`, not `Forbidden`). Map it to 403 in `main.ts`.
 
 ## Rules
 
-- **Never use Clerk types or calls outside `infra/auth/` and `main.ts`.** The use cases know only `Actor`.
+- **Never use Clerk types or calls outside `infra/auth/`.** The use cases know only `Actor`.
 - **Roles and permissions are our data,** not Clerk metadata. Then the rules are tested like any other rule, and the identity provider can change.
 - **Our data about a person** is created by the use case that first needs it, on that person's request. Use Clerk webhooks only for events that come without a request from the person (for example a user deleted in Clerk), with the `clerk-webhooks` skill.
 - **The web app** hides what the person cannot do, from what the API says. It never copies the rules.
