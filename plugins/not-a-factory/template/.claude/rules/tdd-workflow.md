@@ -26,7 +26,7 @@ The mode changes only where you stop. It never changes the steps.
 1. **Step (default):** stop after each RED, GREEN, REFACTOR, LIST and COMMIT.
 2. **Cycle:** stop after each full cycle.
 3. **Component:** stop when the component has no pending tests left, or when you are stuck.
-4. **Acceptance test:** stop when one acceptance test passes. One acceptance test takes many cycles.
+4. **Acceptance test:** stop when one acceptance test passes. It takes many cycles, and each one still has all five steps.
 
 ## 4. Every cycle, in this order
 
@@ -50,6 +50,8 @@ Write one line for each step as you do it. The line starts with the step name in
 **LIST:** removed "a loan can be extended twice" (the test above covers it). Next: an overdue loan cannot be extended. Still a question: can a member extend a loan when someone is waiting for the book?
 **COMMIT:** "a loan cannot be extended a third time".
 ```
+
+A cycle is not done until REFACTOR and LIST are done. A hook blocks the commit of a unit test until, since the last commit, the RED, GREEN, REFACTOR and LIST lines are written, `pnpm knip` has run after GREEN, and `pending-tests.md` has changed.
 
 Write all five lines for every cycle, in every mode, as you go, also when a step changed nothing. The modes only change where you stop, not what you write or when you commit. Never start the next test before you have written the REFACTOR, LIST and COMMIT lines, so that the developer can see that no step was skipped.
 
