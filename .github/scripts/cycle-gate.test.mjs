@@ -14,11 +14,13 @@ const hook = join(
 
 let ids = 0;
 const say = (text) => ({ type: "assistant", message: { content: [{ type: "text", text }] } });
-const bash = (command) => {
+const bash = (command, { failed = false } = {}) => {
   const id = `tool_${++ids}`;
+  const result = { type: "tool_result", tool_use_id: id, content: failed ? "Blocked" : "" };
+  if (failed) result.is_error = true;
   return [
     { type: "assistant", message: { content: [{ type: "tool_use", id, name: "Bash", input: { command } }] } },
-    { type: "user", message: { content: [{ type: "tool_result", tool_use_id: id, content: "" }] } },
+    { type: "user", message: { content: [result] } },
   ];
 };
 
@@ -101,4 +103,9 @@ test("allows a commit with no unit test in it, such as setup or an acceptance te
 
 test("ignores commands that do not commit", () => {
   assert.equal(gate(project(), [], "git status").permissionDecision, "allow");
+});
+
+test("a blocked or failed commit does not start a new cycle", () => {
+  const decision = gate(project(), [...fullCycle, ...bash('git commit -m "x"', { failed: true })]);
+  assert.equal(decision.permissionDecision, "allow");
 });
