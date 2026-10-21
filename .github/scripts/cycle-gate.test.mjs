@@ -1,7 +1,8 @@
 // Tests for the template's PreToolUse hook that blocks a commit of a unit test
-// until the cycle is complete. Run: node --test .github/scripts/*.test.mjs
+// until the cycle has a complete entry in tdd-log.md.
+// Run: node --test .github/scripts/*.test.mjs
 import { execSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -12,105 +13,92 @@ const hook = join(
   "../../plugins/not-a-factory/template/.claude/hooks/cycle-gate.mjs",
 );
 
-let ids = 0;
-const say = (text) => ({ type: "assistant", message: { content: [{ type: "text", text }] } });
-const bash = (command, { failed = false } = {}) => {
-  const id = `tool_${++ids}`;
-  const result = { type: "tool_result", tool_use_id: id, content: failed ? "Blocked" : "" };
-  if (failed) result.is_error = true;
-  return [
-    { type: "assistant", message: { content: [{ type: "tool_use", id, name: "Bash", input: { command } }] } },
-    { type: "user", message: { content: [result] } },
-  ];
-};
+const entry = (heading, lines) => `## ${heading}\n${lines.join("\n")}\n`;
+const complete = (heading = "a new loan is due in two weeks") =>
+  entry(heading, [
+    "RED: fails, no due date.",
+    "GREEN: a loan sets its due date.",
+    "REFACTOR: nothing to change; knip clean.",
+    "LIST: removed the due-date test. Learnt: nothing new. Next: extending a loan, because it matters most.",
+  ]);
 
-// A project with one commit an hour ago, and a new unit test in the working tree.
-function project({ unitTest = true, pendingUpdated = true } = {}) {
+// A git project with one commit, and a new unit test in the working tree.
+function project({ unitTest = true, log } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "gate-"));
-  const git = (args) => execSync(`git ${args}`, { cwd: dir, stdio: "pipe" });
-  writeFileSync(join(dir, "package.json"), JSON.stringify({ scripts: { knip: "knip" } }));
-  writeFileSync(join(dir, "pending-tests.md"), "# Pending tests\n");
+  const git = (args) => execSync(`git -c user.name=t -c user.email=t@t ${args}`, { cwd: dir, stdio: "pipe" });
+  writeFileSync(join(dir, "README.md"), "app\n");
   git("init -q");
   git("add -A");
-  const hourAgo = new Date(Date.now() - 3600_000).toISOString();
-  execSync(`git -c user.name=t -c user.email=t@t commit -q -m start --date=${hourAgo}`, {
-    cwd: dir,
-    env: { ...process.env, GIT_COMMITTER_DATE: hourAgo },
-  });
-  const old = new Date(Date.now() - 7200_000);
-  utimesSync(join(dir, "pending-tests.md"), old, old);
-  if (pendingUpdated) writeFileSync(join(dir, "pending-tests.md"), "# Pending tests\n- next\n");
+  git("commit -q -m start");
   mkdirSync(join(dir, "api"));
-  if (unitTest) writeFileSync(join(dir, "api/loan.test.ts"), "it('a new loan is due in two weeks')");
-  else writeFileSync(join(dir, "api/shell.tsx"), "export {}");
-  return dir;
+  writeFileSync(join(dir, unitTest ? "api/loan.test.ts" : "api/shell.tsx"), "export {}\n");
+  if (log !== undefined) writeFileSync(join(dir, "tdd-log.md"), log);
+  return { dir, git };
 }
 
-function gate(dir, entries, command = 'git add -A && git commit -m "a new loan is due in two weeks"') {
-  const transcript = join(dir, "t.jsonl");
-  writeFileSync(transcript, entries.flat().map((e) => JSON.stringify(e)).join("\n"));
-  const input = { tool_name: "Bash", tool_input: { command }, transcript_path: transcript, cwd: dir };
+function gate(dir, command = 'git add -A && git commit -m "a new loan is due in two weeks"') {
+  const input = { tool_name: "Bash", tool_input: { command }, cwd: dir };
   const out = spawnSync("node", [hook], { input: JSON.stringify(input), encoding: "utf8" });
   assert.equal(out.status, 0, out.stderr);
   return out.stdout.trim() ? JSON.parse(out.stdout).hookSpecificOutput : { permissionDecision: "allow" };
 }
 
-const fullCycle = [
-  say("**RED:** a new loan is due in two weeks. Fails: no due date."),
-  say("**GREEN:** a loan sets its due date."),
-  bash("pnpm knip"),
-  say("**REFACTOR:** nothing to change."),
-  say("**LIST:** removed the due-date test.\nLearnt: nothing new.\nNext: extending a loan, because it matters most."),
-];
-
-test("allows the commit of a complete cycle", () => {
-  assert.equal(gate(project(), fullCycle).permissionDecision, "allow");
+test("allows the commit when the newest log entry has every step", () => {
+  assert.equal(gate(project({ log: complete() }).dir).permissionDecision, "allow");
 });
 
-test("blocks the commit of a unit test when the REFACTOR and LIST lines are missing", () => {
-  const decision = gate(project(), fullCycle.slice(0, 3));
+test("blocks the commit when there is no log", () => {
+  const decision = gate(project().dir);
+  assert.equal(decision.permissionDecision, "deny");
+  assert.match(decision.permissionDecisionReason, /tdd-log\.md/);
+});
+
+test("blocks the commit when the newest entry misses steps", () => {
+  const decision = gate(project({ log: entry("a loan", ["RED: fails.", "GREEN: done."]) }).dir);
   assert.equal(decision.permissionDecision, "deny");
   assert.match(decision.permissionDecisionReason, /REFACTOR/);
   assert.match(decision.permissionDecisionReason, /LIST/);
 });
 
-test("blocks the commit when the GREEN line is missing", () => {
-  const decision = gate(project(), [fullCycle[0], ...fullCycle.slice(2)]);
-  assert.equal(decision.permissionDecision, "deny");
-  assert.match(decision.permissionDecisionReason, /GREEN/);
-});
-
-test("blocks the commit when knip did not run after GREEN", () => {
-  const decision = gate(project(), [fullCycle[0], bash("pnpm knip"), fullCycle[1], ...fullCycle.slice(3)]);
-  assert.equal(decision.permissionDecision, "deny");
-  assert.match(decision.permissionDecisionReason, /knip/);
-});
-
-test("allows the commit when the pending tests file was not touched", () => {
-  assert.equal(gate(project({ pendingUpdated: false }), fullCycle).permissionDecision, "allow");
-});
-
 test("blocks the commit when the LIST line does not say what was learnt and what is next", () => {
-  const decision = gate(project(), [...fullCycle.slice(0, 4), say("**LIST:** removed the due-date test.")]);
+  const log = entry("a loan", ["RED: fails.", "GREEN: done.", "REFACTOR: nothing.", "LIST: removed the test."]);
+  const decision = gate(project({ log }).dir);
   assert.equal(decision.permissionDecision, "deny");
   assert.match(decision.permissionDecisionReason, /Learnt/);
   assert.match(decision.permissionDecisionReason, /Next/);
 });
 
-test("only the conversation since the last commit counts", () => {
-  const decision = gate(project(), [...fullCycle, ...bash('git commit -m "one"'), say("**RED:** two.")]);
+test("blocks the reuse of an entry from an earlier commit", () => {
+  const { dir, git } = project({ log: complete() });
+  assert.equal(gate(dir).permissionDecision, "allow");
+  git("add -A");
+  git('commit -q -m "a new loan is due in two weeks"');
+  writeFileSync(join(dir, "api/extend.test.ts"), "export {}\n");
+  const decision = gate(dir);
   assert.equal(decision.permissionDecision, "deny");
+  assert.match(decision.permissionDecisionReason, /new entry/);
+});
+
+test("allows a new entry after an earlier commit", () => {
+  const { dir, git } = project({ log: complete() });
+  gate(dir);
+  git("add -A");
+  git('commit -q -m "a new loan is due in two weeks"');
+  writeFileSync(join(dir, "api/extend.test.ts"), "export {}\n");
+  writeFileSync(join(dir, "tdd-log.md"), complete() + complete("a loan can be extended"));
+  assert.equal(gate(dir).permissionDecision, "allow");
+});
+
+test("allows a retry when an allowed commit did not happen", () => {
+  const { dir } = project({ log: complete() });
+  assert.equal(gate(dir).permissionDecision, "allow");
+  assert.equal(gate(dir).permissionDecision, "allow");
 });
 
 test("allows a commit with no unit test in it, such as setup or an acceptance test", () => {
-  assert.equal(gate(project({ unitTest: false }), [say("Setting up the shell.")]).permissionDecision, "allow");
+  assert.equal(gate(project({ unitTest: false }).dir).permissionDecision, "allow");
 });
 
 test("ignores commands that do not commit", () => {
-  assert.equal(gate(project(), [], "git status").permissionDecision, "allow");
-});
-
-test("a blocked or failed commit does not start a new cycle", () => {
-  const decision = gate(project(), [...fullCycle, ...bash('git commit -m "x"', { failed: true })]);
-  assert.equal(decision.permissionDecision, "allow");
+  assert.equal(gate(project().dir, "git status").permissionDecision, "allow");
 });

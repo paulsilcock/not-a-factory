@@ -13,7 +13,7 @@ pnpm exec intent list | grep -q '@tanstack/router' || fail "No TanStack Router s
 # Our rules and skills only; the shadcn skill is third-party.
 docs=".claude CLAUDE.md"
 for f in $(grep -rohE --exclude-dir=shadcn '`[A-Za-z0-9_./-]+\.md`' $docs | tr -d '`' | sort -u); do
-  [ "$f" = pending-tests.md ] && continue # written while Claude works
+  case "$f" in pending-tests.md|tdd-log.md) continue ;; esac # written while Claude works
   [ -n "$(find . -name "$(basename "$f")" -not -path './node_modules/*' | head -1)" ] || fail "Missing file: $f"
 done
 for s in $(grep -rohE --exclude-dir=shadcn '`[a-z][a-z-]+` skill|skill `[a-z][a-z-]+`|use `[a-z][a-z-]+`' $docs | grep -oE '`[a-z-]+`' | tr -d '`' | sort -u); do

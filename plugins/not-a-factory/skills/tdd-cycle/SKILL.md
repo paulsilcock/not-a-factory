@@ -111,7 +111,7 @@ Improve the design without changing behaviour: names, separation of concerns, co
 ## 5. After every cycle, review the list
 
 The list is a guess, never the final list. Use what this cycle taught you:
-- Ask what this cycle taught you, then write it in the LIST line as `Learnt:` (or "nothing new") and `Next:` with the reason.
+- Ask what this cycle taught you, then write it in the LIST line in `tdd-log.md` as `Learnt:` (or "nothing new") and `Next:` with the reason.
 - Update `pending-tests.md`: remove the test you just wrote, and tests that are now redundant or wrong. Add the ones you found. Move a test from **Not sure yet** to **Sure** when its question is answered. Change the order if needed. Show what changed and why (for example "added: an empty order is refused"; "answered question 1: moved 'someone waiting' to Sure").
 - This includes tests that already exist. A failing test means a bug, behaviour that moved somewhere else, or behaviour that is no longer correct. Only in the last case, delete the test. In step and cycle mode, ask first.
 - New words or rules: use `domain-discovery`.

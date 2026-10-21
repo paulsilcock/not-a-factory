@@ -39,6 +39,6 @@ Which skill when:
 
 ## Hooks
 
-A Stop hook runs typecheck and lint and blocks until they pass. A second Stop hook runs related unit tests and reports to the developer only. A PreToolUse hook blocks the commit of a unit test until the TDD cycle is complete (`.claude/hooks/cycle-gate.mjs`).
+A Stop hook runs typecheck and lint and blocks until they pass. A second Stop hook runs related unit tests and reports to the developer only. A PreToolUse hook blocks the commit of a unit test until the cycle has a complete entry in `tdd-log.md` (`.claude/hooks/cycle-gate.mjs`).
 
 @AGENTS.md
