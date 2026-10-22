@@ -94,14 +94,15 @@ edit("web/src/main.tsx", "ClerkProvider", (text) => {
 });
 
 // Only a signed-in person sees the app's pages; anyone else goes to /sign-in.
-// The shell's sidebar button is for a signed-in person too.
+// The shell's header (sidebar button, breadcrumbs) is for a signed-in person too.
 edit("web/src/routes/__root.tsx", "SignedInOnly", (text) => {
   const guarded = before("import ", 'import { SignedInOnly } from "@/components/signed-in-only";\n')(
     swap("<Outlet />", "<SignedInOnly>\n<Outlet />\n</SignedInOnly>")(text),
   );
-  if (!guarded.includes("<SidebarTrigger />")) return guarded;
+  const header = guarded.match(/<header\b[\s\S]*?<SidebarTrigger[\s\S]*?<\/header>/);
+  if (!header) return guarded;
   return before("import ", 'import { Show } from "@clerk/react";\n')(
-    guarded.replace("<SidebarTrigger />", '<Show when="signed-in">\n<SidebarTrigger />\n</Show>'),
+    guarded.replace(header[0], `<Show when="signed-in">\n${header[0]}\n</Show>`),
   );
 });
 

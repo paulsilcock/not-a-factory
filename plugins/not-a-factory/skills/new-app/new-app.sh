@@ -57,7 +57,7 @@ pnpm db:generate
 pnpm dlx skills add shadcn/ui --skill shadcn --agent claude-code --yes
 if $shell; then
   (cd web && pnpm dlx shadcn@latest init --template vite --base base --preset "$preset" -y)
-  (cd web && pnpm dlx shadcn@latest add sidebar -y)
+  (cd web && pnpm dlx shadcn@latest add sidebar breadcrumb separator -y)
   pnpm --filter web generate-routes
   pnpm lint:fix
 fi
