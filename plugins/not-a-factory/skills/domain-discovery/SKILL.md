@@ -18,7 +18,7 @@ A domain model is part of the solution, not a copy of the business. It is our cu
 
 ## Questions
 
-Ask a few at a time, and only those that matter for the feature being built now.
+Ask a few at a time, and only those that matter for the feature being built now. Ask them as open questions in plain text, not as option lists: business answers seldom fit a list. Where you have a likely answer, say it, so that the developer can say "yes" or correct it. End each round with "What have I not asked that matters?"
 
 - **What happens:** walk me through it. What happens first? Then what? Who does it?
 - **Words:** when you say "<term>", what exactly do you mean? When does an <A> become a <B>? Are <X> and <Y> the same thing?

@@ -13,7 +13,7 @@ Create the app named in the arguments: `$ARGUMENTS`.
 The app is a copy of the plugin's `template/` folder, with the TDD skills.
 
 1. If no name was given, ask for one (lower case, letters, digits and `-`). Create it in the current directory unless the developer says otherwise.
-2. Ask two questions together (the `AskUserQuestion` tool):
+2. Ask two questions together (the `AskUserQuestion` tool). The developer can answer in their own words instead, for example another shell or another provider; then say what the script can do, and what must be done by hand afterwards:
    - **"Start with an app shell?"** Options: "Yes: a floating sidebar that collapses to icons (Recommended)", "No: a single page, decide later". The shell uses shadcn/ui with Base UI; also ask the style if they care (Nova by default; also Vega, Maia, Lyra, Mira).
    - **"Do you want sign-in?"** Options: "Yes, with Clerk", "Not now". Clerk is the only provider for now. With sign-in, the app has `/sign-in` and `/sign-up` pages, a person who is not signed in sees only those, and the sidebar has Clerk's user button (account, sign out).
 3. Run this skill's script, with `--shell` and `--auth clerk` as answered (`--preset <style>` for another style):

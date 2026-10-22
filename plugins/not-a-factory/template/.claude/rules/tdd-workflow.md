@@ -19,6 +19,13 @@ Load the skill before you write the first test. If you are not sure which row ap
 - Ask the developer which mode to use. Show the modes as a list of options (the `AskUserQuestion` tool), with step first, as the default. Keep to the mode until the developer changes it.
 - Find where we are: which tests fail, `git status` and `git diff`. Never rewrite code that the developer wrote. If it has no test, say so and ask.
 
+## How to ask the developer
+
+- **Open questions in plain text, not option lists.** Business questions, criteria, rules and examples are open: the developer often knows an answer that no list would hold. Ask them in a short numbered list in your reply, and say which answer you would give and why.
+- **Option lists (`AskUserQuestion`) only for closed choices** whose answers are known and few: the mode, yes or no, one of the criteria already listed. Put your recommendation first, with its reason. The options are suggestions: the developer can always answer in their own words.
+- **End each round of questions with:** "What have I not asked that matters?" Then use what the developer says, even when it changes the plan.
+- **Ask a few questions at a time,** only those that the next step needs.
+
 ## 3. Modes: where you stop
 
 The mode changes only where you stop. It never changes the steps.
