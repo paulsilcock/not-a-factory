@@ -2,8 +2,8 @@
 // its user button (<UserButton />), as a person would.
 //
 // The steps follow the Clerk instance's settings (see the add-clerk skill,
-// "Clerk instance settings"): an email address and a password, and an email
-// code at sign-up. Clerk can also ask for a code at sign-in, from a new
+// "Clerk instance settings"): first and last name, an email address and a
+// password, and an email code at sign-up. Clerk can also ask for a code at sign-in, from a new
 // device ("Client Trust"); signInThroughPage enters it when it is asked.
 // When the pages change (other settings, your own forms), change this file.
 import type { Page } from "playwright";
@@ -14,9 +14,15 @@ import { testPerson } from "#acceptance/support/clerk.ts";
 const testCode = "424242";
 
 export async function signUpThroughPage(page: Page, name: string) {
-  const { email, password } = testPerson(name);
+  const { email, password, firstName, lastName } = testPerson(name);
   await page.goto("/sign-up");
   await step(page, "fill in the sign-up form", async () => {
+    await page.getByLabel("Email address").waitFor();
+    // Clerk shows the name fields when the instance requires names.
+    if (await page.getByLabel("First name").isVisible()) {
+      await page.getByLabel("First name").fill(firstName);
+      await page.getByLabel("Last name").fill(lastName);
+    }
     await page.getByLabel("Email address").fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
     await continueButton(page).click();

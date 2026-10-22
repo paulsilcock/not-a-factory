@@ -171,9 +171,12 @@ export default async function setup(project: TestProject) {
 );
 
 edit("acceptance-tests/driver.ts", "loggedInAs", (text) =>
-  intoBody(/export interface AppDriver extends AsyncDisposable \{/, [
-    "  /** Signs the person in with no sign-in steps (Clerk's test helper), in place of whoever was signed in. */",
-    "  loggedInAs(name: string): Promise<void>;",
+  after('import { inject } from "vitest";', '\n\nimport type { TestMetadata } from "#acceptance/support/clerk.ts";')(intoBody(/export interface AppDriver extends AsyncDisposable \{/, [
+    "  /**",
+    "   * Signs the person in with no sign-in steps (Clerk's test helper), in place of",
+    "   * whoever was signed in, with this Clerk public metadata (none by default).",
+    "   */",
+    "  loggedInAs(name: string, metadata?: TestMetadata): Promise<void>;",
     "  confirmSignedInAs(name: string): Promise<void>;",
   ].join("\n"))(
     swap(
@@ -186,7 +189,7 @@ edit("acceptance-tests/driver.ts", "loggedInAs", (text) =>
         "  })",
       ].join("\n"),
     )(text),
-  ),
+  )),
 );
 
 edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
@@ -195,8 +198,8 @@ edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
     await allowClerkTesting(this.context);
   }
 
-  async loggedInAs(name: string) {
-    await signInDirectly(this.page, name);
+  async loggedInAs(name: string, metadata?: TestMetadata) {
+    await signInDirectly(this.page, name, metadata);
   }
 
   async confirmSignedInAs(name: string) {
@@ -209,6 +212,7 @@ edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
         "  allowClerkTesting,",
         "  signedInEmail,",
         "  signInDirectly,",
+        "  type TestMetadata,",
         "  testPerson,",
         '} from "#acceptance/support/clerk.ts";',
       ].join("\n"))(text),
@@ -220,6 +224,8 @@ edit("acceptance-tests/dsl.ts", "isSignedIn", (text) =>
   intoBody(/export class \w+ extends Dsl<AppDriver> \{/, `  /**
    * The person is signed in, with no sign-in steps. Call it again with another
    * name to switch people. A name is the same person in every test of a file.
+   * For a person with Clerk metadata, add a word in business terms that calls
+   * \`this.driver.loggedInAs(name, { team: "Sales" })\`.
    */
   async isSignedIn(name: string) {
     await this.driver.loggedInAs(name);

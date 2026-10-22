@@ -48,8 +48,14 @@ export function testPerson(name: string) {
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const email = `${slug}-${process.env.CLERK_TEST_RUN}${fileId}+clerk_test@example.com`;
   const password = `Test-${Buffer.from(email).toString("base64url").slice(-16)}-9`;
-  return { email, password };
+  return { email, password, firstName: name, lastName: "Test" };
 }
+
+/**
+ * Clerk's public metadata for a test person, as the API reads it
+ * (`infra/auth/actor-metadata.ts`). The DSL gives it in business words.
+ */
+export type TestMetadata = Record<string, unknown>;
 
 /**
  * Lets the test browser past Clerk's bot protection, and limits every wait to
@@ -60,21 +66,41 @@ export async function allowClerkTesting(context: BrowserContext) {
   await setupClerkTestingToken({ context });
 }
 
-/** Creates the test person in Clerk, unless they exist (exception 2). */
-export async function ensureTestUser(name: string) {
-  const { email, password } = testPerson(name);
+/**
+ * Creates the test person in Clerk, or updates them, with exactly this public
+ * metadata (exception 2). With none, the person has none, as after sign-up.
+ */
+export async function ensureTestUser(
+  name: string,
+  metadata: TestMetadata = {},
+) {
+  const { email, password, firstName, lastName } = testPerson(name);
   const found = await users().getUserList({ emailAddress: [email] });
-  if (found.data.length === 0) {
-    await users().createUser({ emailAddress: [email], password });
+  const user = found.data[0];
+  if (!user) {
+    await users().createUser({
+      emailAddress: [email],
+      password,
+      firstName,
+      lastName,
+      publicMetadata: metadata,
+    });
+  } else if (JSON.stringify(user.publicMetadata) !== JSON.stringify(metadata)) {
+    await users().updateUser(user.id, { publicMetadata: metadata });
   }
 }
 
 /**
- * Signs the person in with no sign-in steps (exception 1). Whoever was signed
- * in before is signed out first, so a test can switch people at any point.
+ * Signs the person in with no sign-in steps (exception 1), with this public
+ * metadata. Whoever was signed in before is signed out first, so a test can
+ * switch people, or sign the same person in again with other metadata.
  */
-export async function signInDirectly(page: Page, name: string) {
-  await ensureTestUser(name);
+export async function signInDirectly(
+  page: Page,
+  name: string,
+  metadata: TestMetadata = {},
+) {
+  await ensureTestUser(name, metadata);
   if (!page.url().startsWith("http")) await page.goto("/");
   if (await signedInEmail(page)) await clerk.signOut({ page });
   await clerk.signIn({ page, emailAddress: testPerson(name).email });

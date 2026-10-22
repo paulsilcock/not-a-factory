@@ -19,7 +19,7 @@ import type { Actor } from "#api/use-cases/actor.ts";
 const fakeClerk = {
   middleware: createMiddleware<ActorEnv>(async (c, next) => {
     if (getCookie(c, "session") !== "ada") return notSignedIn(c);
-    c.set("actor", { id: "user_ada" });
+    c.set("actor", { id: "user_ada", metadata: {} });
     await next();
   }),
 };
@@ -51,7 +51,7 @@ describe("routes behind sign-in", () => {
     const response = await app.request("/api/whoami", {
       headers: { cookie: "session=ada" },
     });
-    expect(await response.json()).toEqual({ id: "user_ada" });
+    expect(await response.json()).toEqual({ id: "user_ada", metadata: {} });
   });
 
   it("refuse a request from someone who is not signed in", async () => {
