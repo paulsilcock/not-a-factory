@@ -77,9 +77,12 @@ jobs:
         run: pnpm build
 
   clerk:
-    name: Generated app with Clerk
+    name: Generated app with Clerk ${{ matrix.shell && 'and the app shell' || 'and no shell' }}
     needs: plugin
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shell: ["", "--shell"]
     defaults:
       run:
         working-directory: ${{ github.workspace }}/../demo
@@ -96,12 +99,10 @@ jobs:
         run: |
           git config --global user.name "CI"
           git config --global user.email "ci@example.com"
-      - name: Create an app
+      # new-app runs the add-clerk script, which fails if an edit does not apply.
+      - name: Create an app with Clerk
         working-directory: ${{ github.workspace }}/..
-        run: bash "$GITHUB_WORKSPACE/plugins/not-a-factory/skills/new-app/new-app.sh" demo
-      # The same script that the add-clerk skill runs. It fails if an edit does not apply.
-      - name: Add Clerk
-        run: node "$GITHUB_WORKSPACE/plugins/not-a-factory/skills/add-clerk/add-clerk.mjs"
+        run: bash "$GITHUB_WORKSPACE/plugins/not-a-factory/skills/new-app/new-app.sh" demo ${{ matrix.shell }} --auth clerk
       - name: Typecheck
         run: pnpm typecheck
       - name: Lint

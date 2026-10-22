@@ -14,7 +14,7 @@ Two different things:
 ## How a request flows
 
 1. The `authentication` middleware (`entrypoints/http/authentication.ts`) resolves `ClerkAuthentication` (`infra/auth/`, a tsyringe `@singleton()`) and runs its middleware. It sets `actor`, or answers 401 when nobody is signed in. Routes that anyone may call go before it in `app.ts`.
-2. The route adds the actor to the command or query: `input: (body, c) => ({ ...body, actor: c.get("actor") })`. Routes never decide what the actor may do.
+2. The route adds the actor to the command or query, with `signedInRoute` (`entrypoints/http/actor.ts`) on a `new Hono<ActorEnv>()` router: `...signedInRoute.json(UseCase, Schema, { input: (body, c) => ({ ...body, actor: c.get("actor") }) })`. Then `c.get("actor")` is an `Actor`, not `any`. Routes never decide what the actor may do.
 3. The use case loads the person and their roles from our own data, keyed by `actor.id`, and lets the domain decide.
 4. A broken permission rule throws a `DomainError` with a business name (`CannotApproveOwnClaim`, not `Forbidden`). Map it to 403 in `main.ts`.
 
@@ -23,16 +23,18 @@ Two different things:
 - **Never use Clerk types or calls outside `infra/auth/`.** The use cases know only `Actor`.
 - **Roles and permissions are our data,** not Clerk metadata. Then the rules are tested like any other rule, and the identity provider can change.
 - **Our data about a person** is created by the use case that first needs it, on that person's request. Use Clerk webhooks only for events that come without a request from the person (for example a user deleted in Clerk), with the `clerk-webhooks` skill.
-- **The web app** hides what the person cannot do, from what the API says. It never copies the rules.
+- **The web app** shows its pages only to a signed-in person (`SignedInOnly` in `__root.tsx`); anyone else goes to `/sign-in`. A new public page goes in `publicPaths` (`components/signed-in-only.tsx`), with the developer's yes. Inside the app, it hides what the person cannot do, from what the API says. It never copies the rules.
 - **Ask the developer** who may do each new thing, and whether a person may act on their own records (`domain-discovery`).
 
 ## Acceptance tests
 
-- `acceptance-tests/support/clerk.ts` holds what does not depend on the pages: test people, the run's set-up and clean-up, and the sign-in without a page.
+- **Start signed in with `dsl.isSignedIn(name)`.** Call it again with another name to switch people. Sign-up, sign-in and sign-out through the pages are tested once, in `signing-in.test.ts`; never in other tests.
+- `dsl.hasAnAccount(name)` makes a person who has an account and is signed out.
+- `acceptance-tests/support/clerk.ts` holds what does not depend on the pages: test people, the run's set-up and clean-up, and the sign-in without a page. `acceptance-tests/driver/clerk-pages.ts` drives Clerk's forms and user button.
 - **Two exceptions** to "drivers use only the app's public interfaces", both Clerk's own test interfaces, commented in `support/clerk.ts`:
   1. `dsl.isSignedIn(name)` signs in with Clerk's test helper `clerk.signIn`, with no page.
-  2. Test users are created and deleted with Clerk's Backend API.
-- Sign-up and sign-in through the app's own pages are tested in acceptance tests of their own, driven by the app's driver, never with `clerk.signIn`. How: the add-clerk skill, section 5.
-- A name is the same person in every test of a file, and a different person in other files and runs.
-- Use a Clerk development instance for tests only, so the clean-up never touches people you use by hand.
+  2. Test users are created and deleted with Clerk's Backend API (`hasAnAccount`, and the clean-up).
+- A name is the same person in every test of a file, and a different person in other files and runs. Test addresses have `+clerk_test` in them: Clerk sends them no email, and accepts the code `424242`.
+- For each thing only some people may see or do, a test signs in as a person who may not, and confirms the app does not show it.
+- Use a Clerk development instance for tests only, so the clean-up never touches people you use by hand. Its settings: the add-clerk skill, section 3.
 - The browser driver uses the browser's own user agent (`userAgent: null`). Litmus's default user agent breaks Clerk's sign-in.

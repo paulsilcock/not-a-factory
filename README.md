@@ -44,9 +44,11 @@ claude --plugin-dir ./plugins/not-a-factory
 /not-a-factory:new-app my-app
 ```
 
+It asks whether to start with an app shell (a floating sidebar that collapses to icons) and whether you want sign-in (Clerk).
+
 Needs Node.js 24.14.1 or later, pnpm, git and Docker. Then open Claude Code in `my-app` and describe a feature: the `new-feature` skill takes it from there.
 
-To add sign-in with Clerk, run `/not-a-factory:add-clerk` in the app. It needs a Clerk development instance used only for tests.
+To add sign-in with Clerk to an app later, run `/not-a-factory:add-clerk` in the app. It needs a Clerk development instance used only for tests.
 
 ## Layout
 

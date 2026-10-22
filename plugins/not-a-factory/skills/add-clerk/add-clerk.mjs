@@ -4,20 +4,21 @@
 // safely, installs the packages, and lists any edit it could not make.
 // Usage: node add-clerk.mjs [--no-install]
 import { execSync } from "node:child_process";
-import { cpSync, existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const files = join(import.meta.dirname, "files");
 const skipped = [];
 const failed = [];
+const next = [];
 
 // 1. New files.
-function copy(dir) {
+function copy(dir, base = dir) {
   for (const name of readdirSync(dir)) {
     const from = join(dir, name);
-    const to = relative(files, from);
+    const to = relative(base, from);
     if (statSync(from).isDirectory()) {
-      copy(from);
+      copy(from, base);
     } else if (existsSync(to)) {
       skipped.push(to);
     } else {
@@ -92,6 +93,18 @@ edit("web/src/main.tsx", "ClerkProvider", (text) => {
   );
 });
 
+// Only a signed-in person sees the app's pages; anyone else goes to /sign-in.
+// The shell's sidebar button is for a signed-in person too.
+edit("web/src/routes/__root.tsx", "SignedInOnly", (text) => {
+  const guarded = before("import ", 'import { SignedInOnly } from "@/components/signed-in-only";\n')(
+    swap("<Outlet />", "<SignedInOnly>\n<Outlet />\n</SignedInOnly>")(text),
+  );
+  if (!guarded.includes("<SidebarTrigger />")) return guarded;
+  return before("import ", 'import { Show } from "@clerk/react";\n')(
+    guarded.replace("<SidebarTrigger />", '<Show when="signed-in">\n<SidebarTrigger />\n</Show>'),
+  );
+});
+
 // One .env at the project root, also for the web app's public key.
 edit("web/vite.config.ts", "envDir", after("defineConfig({", '\n  envDir: "..",'));
 
@@ -158,7 +171,7 @@ export default async function setup(project: TestProject) {
 
 edit("acceptance-tests/driver.ts", "loggedInAs", (text) =>
   intoBody(/export interface AppDriver extends AsyncDisposable \{/, [
-    "  /** Starts signed in as the person, with no sign-in steps (Clerk's test helper). */",
+    "  /** Signs the person in with no sign-in steps (Clerk's test helper), in place of whoever was signed in. */",
     "  loggedInAs(name: string): Promise<void>;",
     "  confirmSignedInAs(name: string): Promise<void>;",
   ].join("\n"))(
@@ -203,7 +216,10 @@ edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
 );
 
 edit("acceptance-tests/dsl.ts", "isSignedIn", (text) =>
-  intoBody(/export class \w+ extends Dsl<AppDriver> \{/, `  /** The person starts signed in. A name is the same person in every test of a file. */
+  intoBody(/export class \w+ extends Dsl<AppDriver> \{/, `  /**
+   * The person is signed in, with no sign-in steps. Call it again with another
+   * name to switch people. A name is the same person in every test of a file.
+   */
   async isSignedIn(name: string) {
     await this.driver.loggedInAs(name);
   }
@@ -213,6 +229,104 @@ edit("acceptance-tests/dsl.ts", "isSignedIn", (text) =>
   }`)(text),
 );
 
+// Sign-up, sign-in and sign-out through Clerk's own pages (driver/clerk-pages.ts).
+edit("acceptance-tests/driver.ts", "signUp(", (text) =>
+  intoBody(/export interface AppDriver extends AsyncDisposable \{/, [
+    "  signUp(name: string): Promise<void>;",
+    "  signIn(name: string): Promise<void>;",
+    "  signOut(): Promise<void>;",
+    "  /** Creates the person's account in Clerk, with no page (a Clerk test interface). */",
+    "  createAccount(name: string): Promise<void>;",
+    "  confirmSignedOut(): Promise<void>;",
+    "  openApp(): Promise<void>;",
+    "  confirmAskedToSignIn(): Promise<void>;",
+  ].join("\n"))(text),
+);
+
+edit("acceptance-tests/driver/browser.ts", "signUpThroughPage", (text) =>
+  after("  async confirmSignedInAs(name: string) {\n    expect(await signedInEmail(this.page)).toBe(testPerson(name).email);\n  }", `
+
+  async signUp(name: string) {
+    await signUpThroughPage(this.page, name);
+  }
+
+  async signIn(name: string) {
+    await signInThroughPage(this.page, name);
+  }
+
+  async signOut() {
+    await signOutThroughPage(this.page);
+  }
+
+  async createAccount(name: string) {
+    await ensureTestUser(name);
+  }
+
+  async confirmSignedOut() {
+    expect(await signedInEmail(this.page)).toBeNull();
+  }
+
+  async openApp() {
+    await this.page.goto("/");
+  }
+
+  async confirmAskedToSignIn() {
+    await confirmOnSignInPage(this.page);
+  }`)(
+    after('import type { AppDriver } from "#acceptance/driver.ts";', [
+      "",
+      "import {",
+      "  confirmOnSignInPage,",
+      "  signInThroughPage,",
+      "  signOutThroughPage,",
+      "  signUpThroughPage,",
+      '} from "#acceptance/driver/clerk-pages.ts";',
+      'import { ensureTestUser } from "#acceptance/support/clerk.ts";',
+    ].join("\n"))(text),
+  ),
+);
+
+edit("acceptance-tests/dsl.ts", "signsUp", (text) =>
+  after("    await this.driver.confirmSignedInAs(name);\n  }", `
+
+  async signsUp(name: string) {
+    await this.driver.signUp(name);
+  }
+
+  /** The person has an account and is signed out. */
+  async hasAnAccount(name: string) {
+    await this.driver.createAccount(name);
+  }
+
+  async signsIn(name: string) {
+    await this.driver.signIn(name);
+  }
+
+  async signsOut() {
+    await this.driver.signOut();
+  }
+
+  async confirmSignedOut() {
+    await this.driver.confirmSignedOut();
+  }
+
+  async opensTheApp() {
+    await this.driver.openApp();
+  }
+
+  /** The person sees only the sign-in page: none of the app. */
+  async confirmAskedToSignIn() {
+    await this.driver.confirmAskedToSignIn();
+  }`)(text),
+);
+
+// The test file uses the app's DSL class, whatever its name.
+const dslName = existsSync("acceptance-tests/dsl.ts")
+  && readFileSync("acceptance-tests/dsl.ts", "utf8").match(/export class (\w+) extends Dsl<AppDriver>/)?.[1];
+if (dslName && dslName !== "AppDsl") {
+  edit("acceptance-tests/signing-in.test.ts", `new ${dslName}(`, (text) => text.replaceAll("AppDsl", dslName));
+}
+
 edit(
   "CLAUDE.md",
   "auth.md",
@@ -221,6 +335,61 @@ edit(
     "Sign-in is Clerk, behind our own `Actor`; what a person may do is domain rules. Read `.claude/rules/auth.md` before you touch either.\n\n",
   ),
 );
+
+// The user button goes in the sidebar footer, where shadcn's sidebar blocks
+// put the user menu. It replaces the block's sample NavUser.
+const sidebar = "web/src/components/app-sidebar.tsx";
+if (existsSync(sidebar)) {
+  copy(join(import.meta.dirname, "sidebar"));
+  edit(sidebar, "SidebarUserButton", (text) => {
+    need(text, "<SidebarFooter>");
+    const navUser = text.match(/<NavUser\b[^>]*\/>/);
+    const placed = navUser
+      ? text
+          .replace(navUser[0], "<SidebarUserButton />")
+          .replace(/import \{ NavUser \} from "[^"]+";?\n/, "")
+      : text.replace("<SidebarFooter>", "<SidebarFooter>\n        <SidebarUserButton />");
+    return before(
+      "import ",
+      'import { SidebarUserButton } from "@/components/sidebar-user-button";\n',
+    )(placed);
+  });
+  // Signed out, there is no sidebar: the sign-in and sign-up pages stand alone.
+  edit(sidebar, 'when="signed-in"', (text) => {
+    const block = text.match(/return \(\s*(<Sidebar\b[\s\S]*?<\/Sidebar>)/);
+    if (!block) throw new Missing("return (<Sidebar");
+    return before("import ", 'import { Show } from "@clerk/react";\n')(
+      text.replace(block[1], `<Show when="signed-in">\n${block[1]}\n</Show>`),
+    );
+  });
+  const sample = "web/src/components/nav-user.tsx";
+  if (existsSync(sample) && !usedInWeb("nav-user")) {
+    rmSync(sample);
+    console.log(`removed ${sample}: the sample user menu, now unused`);
+  }
+} else {
+  // No sidebar: the user button goes at the top right of every page.
+  edit("web/src/routes/__root.tsx", "UserButton", (text) => {
+    const page = text.match(/<SignedInOnly>\s*<Outlet \/>/);
+    if (!page) throw new Missing("<SignedInOnly><Outlet />");
+    return before("import ", 'import { Show, UserButton } from "@clerk/react";\n')(
+      text.replace(
+        page[0],
+        `<SignedInOnly>\n<Show when="signed-in">\n<div className="fixed top-3 right-3">\n<UserButton />\n</div>\n</Show>\n<Outlet />`,
+      ),
+    );
+  });
+  next.push(
+    "The app has no sidebar (web/src/components/app-sidebar.tsx), so the user button is at the top right of every page. For an app shell, build it with a shadcn sidebar block (with a <SidebarFooter>), take the user button out of __root.tsx, and run this script again: it puts the button in the sidebar footer.",
+  );
+}
+function usedInWeb(name, dir = "web/src") {
+  return readdirSync(dir).some((entry) => {
+    const path = join(dir, entry);
+    if (statSync(path).isDirectory()) return usedInWeb(name, path);
+    return readFileSync(path, "utf8").includes(`/${name}"`);
+  });
+}
 
 // 3. Packages.
 if (!process.argv.includes("--no-install")) {
@@ -239,6 +408,7 @@ if (!process.argv.includes("--no-install")) {
 }
 
 for (const file of skipped) console.log(`skipped ${file}: it already exists`);
+for (const line of next) console.log(`\nNext: ${line}`);
 if (failed.length) {
   console.log("\nMake these changes by hand (see the add-clerk skill):");
   for (const line of failed) console.log(`- ${line}`);
