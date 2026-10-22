@@ -17,7 +17,7 @@ I'll add sign-in with Clerk:
 1. Install @clerk/hono (api), @clerk/react (web), @clerk/testing and @clerk/backend (acceptance tests).
 2. API: ClerkAuthentication in infra/auth/ (a tsyringe singleton, no registration); every /api route needs a signed-in person.
 3. Web: ClerkProvider, and /sign-in and /sign-up pages (move or restyle them as you like).
-4. Acceptance tests: dsl.isSignedIn(name), and tests of sign-up and sign-in through our pages.
+4. Acceptance tests: dsl.isSignedIn(name) starts a test signed in. After that, we write the sign-up and sign-in tests together, against your pages.
 5. Docker, CI and .env.example get the Clerk keys.
 You need a Clerk development instance used only for tests. The tests delete their own test users there.
 Shall I go ahead?
@@ -44,6 +44,18 @@ It adds the new files (never over existing ones), makes the edits, installs the 
 ## 4. Check
 
 Run `pnpm typecheck`, `pnpm lint`, `pnpm knip`, `pnpm test:unit` and `pnpm test:acceptance`. Show the developer `git diff --stat`, and say what users will see: "every page under /api needs a signed-in person; people sign up at /sign-up and sign in at /sign-in".
+
+## 5. Sign-up and sign-in acceptance tests
+
+The script ships no code that drives the sign-up and sign-in pages: they are the app's own, and the developer can restyle them, replace Clerk's components, or change the Clerk instance's settings. Write these tests with the developer, with `new-feature` and `acceptance-test`, one at a time, against the real pages:
+
+1. **Agree the criteria first,** for example "a new person signs up and is signed in", and "a person with an account signs in". Ask where the pages are and how they look.
+2. **Test people.** `testPerson(name)` (`support/clerk.ts`) gives an address and a password. The address ends in `+clerk_test@example.com`: Clerk treats such an address as a test address, sends it no email, and accepts the verification code **`424242`** for it. So a test can sign up and pass Clerk's email check without a real inbox.
+3. **The account for a sign-in test:** sign the person up through the sign-up page earlier in the same test, or create it with `ensureTestUser(name)`. That is exception 2: say so in a comment.
+4. **Clerk's steps depend on the instance's settings.** After the email address, Clerk may ask for a password, then for a code: for a new address when signing up, or for a new device when signing in. Find out which steps your instance asks for by looking at the page, not by guessing.
+5. **The code field:** find it by `input[autocomplete="one-time-code"]`, the web standard for one-time codes. Clerk shows it before it has finished sending the code, and can clear a code typed too early. Wait for its "Resend" countdown, which starts once the code is sent, then type `424242`.
+6. **Limits and messages:** `allowClerkTesting` limits every wait to 10 seconds. When a step does not come, fail with the page's address and what the page shows (Clerk's error text), never with "Test timed out".
+7. **Check the result** with `confirmSignedInAs(name)`.
 
 ## After that
 
