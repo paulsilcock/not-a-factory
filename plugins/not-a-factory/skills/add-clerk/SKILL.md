@@ -46,13 +46,24 @@ It adds the new files (never over existing ones), makes the edits, installs the 
 - In GitHub: the repository secrets `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
 - Railway or any other deployment: the same three variables, with that environment's own Clerk instance.
 
-The sign-up and sign-in tests drive Clerk's forms step by step. Tell the developer to set the test instance like this (Clerk Dashboard > User & authentication):
+Tell the developer to set the instance like this. The tests drive Clerk's forms step by step, and the API reads the person's metadata from the session token.
+
+Clerk Dashboard > User & authentication:
 - **Email address:** on, required, used to sign in, verified at sign-up with an **email verification code** (not a link).
 - **Password:** on.
-- **Everything else off:** no username, phone number, social connections, passkeys, or names required at sign-up. Each one adds a step to the forms.
+- **First and last name:** on and required. Clerk shows the name fields on the sign-up form only when they are required.
+- **Everything else off:** no username, phone number, social connections or passkeys. Each one adds a step to the forms.
+
+Clerk Dashboard > Sessions > Customize session token, add this claim (and save):
+
+```json
+{ "metadata": "{{user.public_metadata}}" }
+```
+
+Without it, every request to `/api` fails with a message that says so.
 
 Then the steps are fixed:
-- **Sign-up** (`/sign-up`): email address and password, Continue; the email code, `424242`.
+- **Sign-up** (`/sign-up`): first name, last name, email address and password, Continue; the email code, `424242`.
 - **Sign-in** (`/sign-in`): email address, Continue; password, Continue. If Clerk asks for a code from a new device ("Client Trust"), the driver enters `424242`.
 
 If the developer wants other settings, change `acceptance-tests/driver/clerk-pages.ts` to match, and run the tests.
@@ -83,7 +94,7 @@ The DSL words that add-clerk gives:
 
 | Word | What it does | How |
 |---|---|---|
-| `isSignedIn(name)` | The person is signed in. Call it again with another name to switch people. | Clerk's test helper, no pages (exception 1) |
+| `isSignedIn(name)` | The person is signed in, with the default role. Call it again with another name to switch people. | Clerk's test helper, no pages (exception 1) |
 | `hasAnAccount(name)` | The person has an account, and is signed out. | Clerk's Backend API (exception 2) |
 | `signsUp(name)` | Signs up through `/sign-up`, with the email code. | The forms |
 | `signsIn(name)` | Signs in through `/sign-in`. | The forms |
@@ -98,7 +109,44 @@ The DSL words that add-clerk gives:
 
 **When a sign-in step fails,** the error says where the page was and what Clerk said. Read it before you change anything. Each wait is at most 10 seconds (`allowClerkTesting`).
 
-## 6. The Actor in the API
+## 6. Roles (and other data about the person)
+
+Only when the brief needs them. A role is Clerk public metadata, for example `{ "role": "manager" }`. The app never writes it. No metadata means the default role. The rules are in `auth.md`.
+
+**1. The type** (`api/src/use-cases/actor.ts`):
+
+```ts
+export type ActorMetadata = { role: "staff" | "manager" };
+```
+
+**2. The check, with the default** (`api/src/infra/auth/actor-metadata.ts`):
+
+```ts
+export const actorMetadataSchema: z.ZodType<ActorMetadata, unknown> = z.object({
+  role: z.enum(["staff", "manager"]).default("staff"),
+});
+```
+
+If the two do not match, typecheck fails. If a person's metadata does not match the check (for example `"role": "boss"`), the request fails with an error that names the person.
+
+**3. The rule, in the domain.** The use case gets `actor` (section 7 shows the route) and gives `actor.metadata.role` to the domain: "only a manager can approve a claim" is a domain rule with its own tests. The domain error (`OnlyManagersCanApprove`) maps to 403 in `main.ts`.
+
+**4. The acceptance tests.** Add a DSL word in business terms:
+
+```ts
+/** A manager is signed in. */
+async isSignedInAsManager(name: string) {
+  await this.driver.loggedInAs(name, { role: "manager" });
+}
+```
+
+`isSignedIn(name)` gives no metadata, so the person has the default role. The driver creates the test person with exactly the metadata given, or changes it, and signs them in again. Test both sides: a manager can, and staff cannot.
+
+**5. The web app** hides what the person may not do. It asks the API (a query such as `GET /api/me` with its own use case), so the web app gets the same checked role, with its default, typed through the Hono client. It never reads Clerk's metadata itself.
+
+**6. In development,** set a person's role in the Clerk Dashboard: Users > the person > Metadata > Public, `{ "role": "manager" }`. The session token carries it within about a minute; signing in again shows it at once.
+
+## 7. The Actor in the API
 
 A route behind sign-in passes the actor to its use case with `signedInRoute` (`entrypoints/http/actor.ts`), on a `new Hono<ActorEnv>()` router. There, `c.get("actor")` is an `Actor`; with the plain `routeHandler` it would be `any`.
 
@@ -111,4 +159,4 @@ export const claims = new Hono<ActorEnv>().post(
 );
 ```
 
-The use case's command has `actor: Actor`. The `Actor` holds Clerk's user id only; our own data about the person (name, roles) is stored against it.
+The use case's command has `actor: Actor`: Clerk's user id, and the checked metadata (section 6). Our own data about the person is stored against the id.

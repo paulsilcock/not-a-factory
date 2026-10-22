@@ -1,4 +1,5 @@
 import { clerkMiddleware, getAuth } from "@clerk/hono";
+import type { Context } from "hono";
 import { every } from "hono/combine";
 import { createMiddleware } from "hono/factory";
 import { singleton } from "tsyringe";
@@ -20,11 +21,16 @@ export class ClerkAuthentication {
     createMiddleware<ActorEnv>(async (c, next) => {
       const { userId, sessionClaims } = getAuth(c);
       if (!userId) return notSignedIn(c);
-      const metadata = actorMetadataSchema.safeParse(
-        sessionClaims?.metadata ?? {},
-      );
+      if (!sessionClaims || !("metadata" in sessionClaims)) {
+        return misconfigured(
+          c,
+          'The Clerk session token has no "metadata" claim. In the Clerk Dashboard, Sessions > Customize session token, add: {"metadata": "{{user.public_metadata}}"}',
+        );
+      }
+      const metadata = actorMetadataSchema.safeParse(sessionClaims.metadata);
       if (!metadata.success) {
-        throw new Error(
+        return misconfigured(
+          c,
           `The Clerk metadata of ${userId} does not match actor-metadata.ts: ${metadata.error.message}`,
         );
       }
@@ -32,4 +38,10 @@ export class ClerkAuthentication {
       await next();
     }),
   );
+}
+
+// A set-up mistake, not the person's: log it, and say it in the answer.
+function misconfigured(c: Context, message: string) {
+  console.error(message);
+  return c.json({ code: "AUTH_MISCONFIGURED", message }, 500);
 }

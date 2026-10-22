@@ -11,6 +11,7 @@ export interface Actor {
 /**
  * What the identity provider keeps about the person for us (Clerk's public
  * metadata), checked when the request arrives. It starts empty. Add a field
- * here and in `infra/auth/actor-metadata.ts`, for example `team: string`.
+ * here and in `infra/auth/actor-metadata.ts`, for example
+ * `role: "staff" | "manager"`.
  */
 export type ActorMetadata = Record<string, never>;

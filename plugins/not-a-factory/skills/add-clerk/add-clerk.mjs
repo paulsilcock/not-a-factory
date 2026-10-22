@@ -225,7 +225,8 @@ edit("acceptance-tests/dsl.ts", "isSignedIn", (text) =>
    * The person is signed in, with no sign-in steps. Call it again with another
    * name to switch people. A name is the same person in every test of a file.
    * For a person with Clerk metadata, add a word in business terms that calls
-   * \`this.driver.loggedInAs(name, { team: "Sales" })\`.
+   * \`this.driver.loggedInAs(name, { role: "manager" })\`. With no metadata,
+   * the person has the default role.
    */
   async isSignedIn(name: string) {
     await this.driver.loggedInAs(name);
