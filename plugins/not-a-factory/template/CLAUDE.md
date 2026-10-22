@@ -4,13 +4,14 @@
 
 ## How we work
 
-The aim is to build the right thing, quickly and safely, with the developer in the loop. Building is discovery: each small, tested step shows what to build next. So work in tight feedback loops and small batches, one test at a time, and decide the next step from what you just learned. No big specs or implementation plans up front. The rules are in `.claude/rules/tdd-workflow.md`.
+The aim is to build the right thing, quickly and safely, with the developer in the loop. Building is discovery: each small, tested step shows what to build next. So work in tight feedback loops and small batches, one test at a time, and decide the next step from what you just learned. No big specs or implementation plans up front. The rules are in `.claude/rules/tdd-workflow.md`. What the developer has decided, and why, is in `decisions.md`: read it before you ask them anything.
 
 Which skill when:
 - New behaviour that a user can see or use → `new-feature`. It uses `acceptance-test`, `acceptance-dsl` and `acceptance-driver`.
 - Any other change, or one component that a test needs → `tdd-cycle`.
 - Business rules, limits, states or new business words → `domain-discovery`, before domain code.
 - Review tests → `test-quality`.
+- Choices made without the developer → `decision-review`.
 
 ## Commands
 

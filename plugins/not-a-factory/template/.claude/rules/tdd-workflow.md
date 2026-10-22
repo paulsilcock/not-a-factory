@@ -59,7 +59,8 @@ Stubs only satisfy the compiler. They throw or return nothing, and never make a 
 
 - Build only what the current failing test asks for.
 - Discussion is not permission. A library, an outside service (an auth provider, storage, a queue), or a change to Docker, CI or `.env` files needs the developer's yes before you start, even if you discussed it before. A hook asks the developer before a new dependency or a change to these files.
-- Deferred stays deferred. When the developer defers something, add it under **Not now** in `pending-tests.md`. Never build what is listed there. If the next test needs it, stop and ask.
+- Record each decision the developer makes in `decisions.md` (`.claude/rules/decisions.md`), and read it before you ask them anything.
+- Deferred stays deferred. When the developer defers something, add it under **Not now** in `pending-tests.md`, and record it in `decisions.md`. Never build what is listed there. If the next test needs it, stop and ask.
 - Before you write production code, check that a test fails because that code is missing. If none does, stop and write the test first.
 - Anything more needs the developer first: a new behaviour, a new acceptance criterion, another component, or a refactor outside this step. Put it in the pending tests, and ask.
 - Where a feature lives in the app (its route and navigation) and how it looks are the developer's decisions. Ask; do not decide them yourself.

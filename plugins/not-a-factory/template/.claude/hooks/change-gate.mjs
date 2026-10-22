@@ -16,7 +16,7 @@ function ask(what) {
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
         permissionDecision: "ask",
-        permissionDecisionReason: `${what} needs the developer's approval, even if it was discussed before. See section 5 of .claude/rules/tdd-workflow.md.`,
+        permissionDecisionReason: `${what} needs the developer's approval, even if it was discussed before. See section 5 of .claude/rules/tdd-workflow.md. If the developer says yes, record it in decisions.md.`,
       },
     }),
   );

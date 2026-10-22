@@ -11,6 +11,7 @@ A Claude Code plugin for building the right thing, with Claude as a partner and 
   - `tdd-cycle`: build one component test-first;
   - `domain-discovery`: talk through new business words and rules;
   - `test-quality`: review tests.
+  - `decision-review`: list the choices in the code that the developer did not decide.
 - **Hooks:** typecheck and lint must pass before Claude stops.
 
 The skills also work in other repositories when the plugin is installed. To add the TDD workflow and writing-tests rules to an existing project, run `/not-a-factory:adopt` in it.
