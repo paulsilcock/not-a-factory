@@ -14,6 +14,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "../styles.css";
 
+// The sidebar saves whether it is open in the "sidebar_state" cookie (shadcn's
+// sidebar does this). Read it back, so that a reload keeps it open or collapsed.
+const sidebarOpen = () =>
+  !document.cookie.split("; ").includes("sidebar_state=false");
+
 export const Route = createRootRoute({
   component: RootComponent,
 });
@@ -22,7 +27,7 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <TooltipProvider>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={sidebarOpen()}>
         <AppSidebar />
         <SidebarInset>
           <header className="flex h-12 shrink-0 items-center gap-2 px-4">
