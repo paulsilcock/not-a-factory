@@ -6,3 +6,4 @@ dist
 .DS_Store
 pending-tests.md
 tdd-log.md
+acceptance-tests/.run.lock

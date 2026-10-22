@@ -28,22 +28,49 @@ function copy(dir) {
 }
 copy(files);
 
-// 2. Edits to files from the template. Each edit finds its anchor, or is
+// 2. Edits to files from the template. Every part of an edit must find its
+// anchor: if one part does not, the file is left as it was, and the edit is
 // reported so that it can be made by hand. An edit already made is skipped.
+class Missing extends Error {}
 function edit(file, done, change) {
-  if (!existsSync(file)) return failed.push(`${file}: missing`);
+  if (!existsSync(file)) return failed.push(`${file}: the file is missing`);
   const text = readFileSync(file, "utf8");
   if (text.includes(done)) return;
-  const next = change(text);
-  if (next === text) return failed.push(`${file}: ${done}`);
-  writeFileSync(file, next);
-  console.log(`changed ${file}`);
+  try {
+    writeFileSync(file, change(text));
+    console.log(`changed ${file}`);
+  } catch (error) {
+    if (!(error instanceof Missing)) throw error;
+    failed.push(`${file}: no "${error.message}" found, so nothing was changed`);
+  }
 }
-const after = (anchor, added) => (text) =>
-  text.includes(anchor) ? text.replace(anchor, `${anchor}${added}`) : text;
-const before = (anchor, added) => (text) =>
-  text.includes(anchor) ? text.replace(anchor, `${added}${anchor}`) : text;
+const need = (text, anchor) => {
+  if (!text.includes(anchor)) throw new Missing(anchor.split("\n")[0]);
+};
+const swap = (anchor, replacement) => (text) => {
+  need(text, anchor);
+  return text.replace(anchor, replacement);
+};
+const after = (anchor, added) => swap(anchor, `${anchor}${added}`);
+const before = (anchor, added) => swap(anchor, `${added}${anchor}`);
 const appendLine = (line) => (text) => `${text.trimEnd()}\n${line}\n`;
+// Adds members at the start of a class or interface body, empty or not.
+const intoBody = (opening, members) => (text) => {
+  const found = text.match(opening);
+  if (!found) throw new Missing(String(opening));
+  const empty = text.slice(found.index + found[0].length).startsWith("}");
+  return text.replace(found[0], `${found[0]}\n${members}\n${empty ? "" : "\n"}`);
+};
+
+// The project's DSL class, which a project may have renamed (for example
+// ExpensesDsl). The new test file uses it.
+const dslClass =
+  existsSync("acceptance-tests/dsl.ts") &&
+  readFileSync("acceptance-tests/dsl.ts", "utf8").match(/export class (\w+) extends Dsl</)?.[1];
+const signingIn = "acceptance-tests/signing-in.test.ts";
+if (dslClass && dslClass !== "AppDsl" && existsSync(signingIn)) {
+  writeFileSync(signingIn, readFileSync(signingIn, "utf8").replaceAll("AppDsl", dslClass));
+}
 
 // ClerkAuthentication is a @singleton(), so tsyringe resolves it with no
 // registration. main.ts only checks Clerk's keys, so a missing key stops the start.
@@ -64,14 +91,14 @@ edit("api/src/app.ts", "authentication", (text) =>
 
 edit("web/src/main.tsx", "ClerkProvider", (text) => {
   const block = text.match(/( *)<QueryClientProvider[\s\S]*?<\/QueryClientProvider>/);
-  if (!block) return text;
+  if (!block) throw new Missing("<QueryClientProvider");
   const indent = block[1];
   const inner = block[0].replace(/^/gm, "  ");
   return before('import { QueryClient', 'import { ClerkProvider } from "@clerk/react";\n')(
-    text.replace(
+    swap(
       block[0],
       `${indent}<ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>\n${inner}\n${indent}</ClerkProvider>`,
-    ),
+    )(text),
   );
 });
 
@@ -89,10 +116,10 @@ edit("docker-compose.yml", "CLERK_SECRET_KEY", (text) =>
     "      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY:-}",
     "      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:-}",
   ].join("\n"))(
-    text.replace(
+    swap(
       "  app:\n    build: .",
       "  app:\n    build:\n      context: .\n      args:\n        VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY:-}",
-    ),
+    )(text),
   ),
 );
 
@@ -125,58 +152,47 @@ export default async function setup(project: TestProject) {
   startRun();
   await clerkSetup({ publishableKey: process.env.CLERK_PUBLISHABLE_KEY });
   await deleteTestUsers("old");
-  await startApp(project);
-  return () => deleteTestUsers("this run");
+  const stopApp = await startApp(project);
+  return async () => {
+    await deleteTestUsers("this run");
+    stopApp?.();
+  };
 }`)(
-    after('import { execSync } from "node:child_process";', '\nimport { existsSync } from "node:fs";\n\nimport { clerkSetup } from "@clerk/testing/playwright";\n\nimport { deleteTestUsers, startRun } from "#acceptance/clerk-test-users.ts";')(
-      text.replace("export default function setup(project: TestProject) {", "function startApp(project: TestProject) {"),
+    after(
+      'import { execSync } from "node:child_process";',
+      // Newer templates already import existsSync.
+      `${/import \{[^}]*\bexistsSync\b[^}]*\} from "node:fs"/.test(text) ? "" : '\nimport { existsSync } from "node:fs";'}\n\nimport { clerkSetup } from "@clerk/testing/playwright";\n\nimport { deleteTestUsers, startRun } from "#acceptance/clerk-test-users.ts";`,
+    )(
+      swap("export default function setup(project: TestProject) {", "function startApp(project: TestProject) {")(text),
     ),
   ),
 );
 
 edit("acceptance-tests/driver.ts", "loggedInAs", (text) =>
-  text
-    .replace(
-      '  const driver = new BrowserAppDriver({ baseUrl: inject("acceptanceUrl") });',
+  intoBody(/export interface AppDriver extends AsyncDisposable \{/, [
+    "  /** Starts signed in as the person, with no sign-in steps (Clerk's test helper). */",
+    "  loggedInAs(name: string): Promise<void>;",
+    "  /** Signs up on the sign-up page. */",
+    "  signsUp(name: string): Promise<void>;",
+    "  /** Signs in on the sign-in page. */",
+    "  signsIn(name: string): Promise<void>;",
+    "  confirmSignedInAs(name: string): Promise<void>;",
+  ].join("\n"))(
+    swap(
+      'new BrowserAppDriver({ baseUrl: inject("acceptanceUrl") })',
       [
-        "  // Litmus's default user agent breaks Clerk's sign-in, so use the browser's own.",
-        "  const driver = new BrowserAppDriver({",
+        "new BrowserAppDriver({",
+        "    // Litmus's default user agent breaks Clerk's sign-in, so use the browser's own.",
         '    baseUrl: inject("acceptanceUrl"),',
         "    userAgent: null,",
-        "  });",
+        "  })",
       ].join("\n"),
-    )
-    .replace(
-      "export interface AppDriver extends AsyncDisposable {}",
-      `export interface AppDriver extends AsyncDisposable {
-  /** Starts signed in as the person, with no sign-in steps (Clerk's test helper). */
-  loggedInAs(name: string): Promise<void>;
-  /** Signs up on the sign-up page. */
-  signsUp(name: string): Promise<void>;
-  /** Signs in on the sign-in page. */
-  signsIn(name: string): Promise<void>;
-  confirmSignedInAs(name: string): Promise<void>;
-}`,
-    ),
+    )(text),
+  ),
 );
 
 edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
-  after('import { BrowserDriver } from "@litmus-ts/test";', '\nimport { expect } from "vitest";')(
-    after('import type { AppDriver } from "#acceptance/driver.ts";', [
-      "",
-      "import {",
-      "  allowClerkTesting,",
-      "  signedInEmail,",
-      "  signInDirectly,",
-      "  signInOnPage,",
-      "  signUpOnPage,",
-      "  testEmail,",
-      '} from "#acceptance/driver/clerk-session.ts";',
-    ].join("\n"))(
-      text.replace(
-        "export class BrowserAppDriver extends BrowserDriver implements AppDriver {}",
-        `export class BrowserAppDriver extends BrowserDriver implements AppDriver {
-  override async init() {
+  intoBody(/export class BrowserAppDriver extends BrowserDriver implements AppDriver \{/, `  override async init() {
     await super.init();
     await allowClerkTesting(this.context);
   }
@@ -195,18 +211,25 @@ edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
 
   async confirmSignedInAs(name: string) {
     expect(await signedInEmail(this.page)).toBe(testEmail(name));
-  }
-}`,
-      ),
+  }`)(
+    after('import { BrowserDriver } from "@litmus-ts/test";', '\nimport { expect } from "vitest";')(
+      after('import type { AppDriver } from "#acceptance/driver.ts";', [
+        "",
+        "import {",
+        "  allowClerkTesting,",
+        "  signedInEmail,",
+        "  signInDirectly,",
+        "  signInOnPage,",
+        "  signUpOnPage,",
+        "  testEmail,",
+        '} from "#acceptance/driver/clerk-session.ts";',
+      ].join("\n"))(text),
     ),
   ),
 );
 
 edit("acceptance-tests/dsl.ts", "signsUp", (text) =>
-  text.replace(
-    "export class AppDsl extends Dsl<AppDriver> {}",
-    `export class AppDsl extends Dsl<AppDriver> {
-  /** The person starts signed in. A name is the same person in every test of a file. */
+  intoBody(/export class \w+ extends Dsl<AppDriver> \{/, `  /** The person starts signed in. A name is the same person in every test of a file. */
   async isSignedIn(name: string) {
     await this.driver.loggedInAs(name);
   }
@@ -221,9 +244,7 @@ edit("acceptance-tests/dsl.ts", "signsUp", (text) =>
 
   async confirmSignedInAs(name: string) {
     await this.driver.confirmSignedInAs(name);
-  }
-}`,
-  ),
+  }`)(text),
 );
 
 edit(
@@ -244,7 +265,11 @@ if (!process.argv.includes("--no-install")) {
   run("pnpm --filter api add @clerk/hono@^0.1.92");
   run("pnpm --filter web add @clerk/react@^6.18.0");
   run("pnpm --filter acceptance-tests add -D @clerk/testing@^2.2.48 @clerk/backend@^3.26.0");
-  run("pnpm lint:fix");
+  try {
+    run("pnpm lint:fix");
+  } catch {
+    failed.push("pnpm lint:fix left problems it could not fix: run pnpm lint to see them");
+  }
 }
 
 for (const file of skipped) console.log(`skipped ${file}: it already exists`);

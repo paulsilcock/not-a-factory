@@ -1,10 +1,13 @@
 // Test users in the Clerk development instance.
 //
-// EXCEPTION to "drivers use only the app's public interfaces": this file and
-// `loggedInAs` call Clerk's Backend API with the secret key. Clerk is part of
-// the system, and this is Clerk's own interface for tests. It creates test
-// users, and deletes them again, because a development instance holds at most
-// 100 users. Sign-up and sign-in themselves are tested through our pages.
+// EXCEPTIONS to "drivers use only the app's public interfaces". Both call
+// Clerk's Backend API with the secret key: Clerk is part of the system, and
+// this is Clerk's own interface for tests.
+// 1. `loggedInAs` signs in with a token from Clerk, not through our page.
+// 2. Test users are created here (for `loggedInAs`, and before a test signs in
+//    on our page), and deleted again: a development instance holds at most
+//    100 users.
+// Sign-up and sign-in themselves are tested through our pages.
 import { randomUUID } from "node:crypto";
 
 import { createClerkClient } from "@clerk/backend";
