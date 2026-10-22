@@ -10,7 +10,10 @@
       "**",
       "!**/routeTree.gen.ts",
       "!**/drizzle/meta",
-      "!.claude/skills/shadcn"
+      "!.claude/skills/shadcn",
+      "!web/src/components/ui",
+      "!web/src/hooks/use-mobile.ts",
+      "!web/src/lib/utils.ts"
     ]
   },
   "formatter": {
@@ -42,16 +45,6 @@
     }
   },
   "overrides": [
-    {
-      "includes": ["web/src/components/ui/**"],
-      "linter": {
-        "rules": {
-          "a11y": {
-            "noLabelWithoutControl": "off"
-          }
-        }
-      }
-    },
     {
       "includes": ["api/src/use-cases/**", "api/src/entrypoints/**"],
       "linter": {

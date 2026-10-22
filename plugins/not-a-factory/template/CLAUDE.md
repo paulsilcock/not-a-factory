@@ -35,7 +35,7 @@ Which skill when:
 
 - Use the TypeScript language server (the `typescript-lsp` plugin) for definitions, references, types and JSDoc before you grep.
 - For Litmus, read the JSDoc through the language server and the `.d.mts` files in `node_modules/@litmus-ts/*`. Do not guess an API.
-- For TanStack libraries, use the TanStack Intent skills (see Skill Loading below). For UI components, use the `shadcn` skill, and run shadcn commands in `web/` (or with `-c web` from the root).
+- For TanStack libraries, use the TanStack Intent skills (see Skill Loading below). Run `intent` from the root, or as `pnpm -w exec intent …`: inside `web/`, `intent` is another package's command, and it fails. For UI components, use the `shadcn` skill, and run shadcn commands in `web/` (or with `-c web` from the root).
 
 ## Hooks
 
