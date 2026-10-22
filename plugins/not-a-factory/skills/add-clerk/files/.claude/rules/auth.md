@@ -28,12 +28,11 @@ Two different things:
 
 ## Acceptance tests
 
-- **Two exceptions** to "drivers use only the app's public interfaces", both with Clerk's own test interfaces, and both commented where they happen:
-  1. `dsl.isSignedIn(name)` starts the test signed in with Clerk's test helper `clerk.signIn`, with no sign-in steps.
-  2. Test users are created with Clerk's Backend API: for `isSignedIn`, and before `signsIn` signs in on our page.
-- `signing-in.test.ts` tests sign-up and sign-in through our own pages, without `clerk.signIn`. Keep it.
-- Every Clerk step waits at most 10 seconds, and a stuck step fails with the page's address and Clerk's error text.
-- A name is the same person in every test of a file, and a different person in other files and runs: the address holds a run id and a file id.
-- Test users have `+clerk_test` addresses: Clerk sends them no email, and accepts the code `424242`. The global setup deletes old test users, and its teardown deletes this run's users: a development instance holds at most 100 users.
-- Use a Clerk development instance for tests only, so the clean-up never touches people you use by hand. Its keys go in `.env`, and in CI as the secrets `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
+- `acceptance-tests/support/clerk.ts` holds what does not depend on the pages: test people, the run's set-up and clean-up, and the sign-in without a page.
+- **Two exceptions** to "drivers use only the app's public interfaces", both Clerk's own test interfaces, commented in `support/clerk.ts`:
+  1. `dsl.isSignedIn(name)` signs in with Clerk's test helper `clerk.signIn`, with no page.
+  2. Test users are created and deleted with Clerk's Backend API.
+- Sign-up and sign-in through the app's own pages are tested in acceptance tests of their own, driven by the app's driver, never with `clerk.signIn`. How: the add-clerk skill, section 5.
+- A name is the same person in every test of a file, and a different person in other files and runs.
+- Use a Clerk development instance for tests only, so the clean-up never touches people you use by hand.
 - The browser driver uses the browser's own user agent (`userAgent: null`). Litmus's default user agent breaks Clerk's sign-in.

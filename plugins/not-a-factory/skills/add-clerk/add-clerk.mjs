@@ -62,16 +62,6 @@ const intoBody = (opening, members) => (text) => {
   return text.replace(found[0], `${found[0]}\n${members}\n${empty ? "" : "\n"}`);
 };
 
-// The project's DSL class, which a project may have renamed (for example
-// ExpensesDsl). The new test file uses it.
-const dslClass =
-  existsSync("acceptance-tests/dsl.ts") &&
-  readFileSync("acceptance-tests/dsl.ts", "utf8").match(/export class (\w+) extends Dsl</)?.[1];
-const signingIn = "acceptance-tests/signing-in.test.ts";
-if (dslClass && dslClass !== "AppDsl" && existsSync(signingIn)) {
-  writeFileSync(signingIn, readFileSync(signingIn, "utf8").replaceAll("AppDsl", dslClass));
-}
-
 // ClerkAuthentication is a @singleton(), so tsyringe resolves it with no
 // registration. main.ts only checks Clerk's keys, so a missing key stops the start.
 edit("api/src/main.ts", "CLERK_SECRET_KEY", (text) =>
@@ -143,25 +133,23 @@ edit(
   ].join("\n")),
 );
 
-edit("acceptance-tests/global-setup.ts", "clerkSetup", (text) =>
+edit("acceptance-tests/global-setup.ts", "clerkTestRun", (text) =>
   appendLine(`
 // Clerk: the test helpers read the keys from the environment, and the test
 // workers start after this, so they get the run id and Clerk's testing token.
 export default async function setup(project: TestProject) {
   if (existsSync(\`\${root}/.env\`)) process.loadEnvFile(\`\${root}/.env\`);
-  startRun();
-  await clerkSetup({ publishableKey: process.env.CLERK_PUBLISHABLE_KEY });
-  await deleteTestUsers("old");
-  const stopApp = await startApp(project);
+  await clerkTestRun.start();
+  const stopApp = startApp(project);
   return async () => {
-    await deleteTestUsers("this run");
+    await clerkTestRun.finish();
     stopApp?.();
   };
 }`)(
     after(
       'import { execSync } from "node:child_process";',
       // Newer templates already import existsSync.
-      `${/import \{[^}]*\bexistsSync\b[^}]*\} from "node:fs"/.test(text) ? "" : '\nimport { existsSync } from "node:fs";'}\n\nimport { clerkSetup } from "@clerk/testing/playwright";\n\nimport { deleteTestUsers, startRun } from "#acceptance/clerk-test-users.ts";`,
+      `${/import \{[^}]*\bexistsSync\b[^}]*\} from "node:fs"/.test(text) ? "" : '\nimport { existsSync } from "node:fs";'}\n\nimport { clerkTestRun } from "#acceptance/support/clerk.ts";`,
     )(
       swap("export default function setup(project: TestProject) {", "function startApp(project: TestProject) {")(text),
     ),
@@ -172,10 +160,6 @@ edit("acceptance-tests/driver.ts", "loggedInAs", (text) =>
   intoBody(/export interface AppDriver extends AsyncDisposable \{/, [
     "  /** Starts signed in as the person, with no sign-in steps (Clerk's test helper). */",
     "  loggedInAs(name: string): Promise<void>;",
-    "  /** Signs up on the sign-up page. */",
-    "  signsUp(name: string): Promise<void>;",
-    "  /** Signs in on the sign-in page. */",
-    "  signsIn(name: string): Promise<void>;",
     "  confirmSignedInAs(name: string): Promise<void>;",
   ].join("\n"))(
     swap(
@@ -201,16 +185,8 @@ edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
     await signInDirectly(this.page, name);
   }
 
-  async signsUp(name: string) {
-    await signUpOnPage(this.page, name);
-  }
-
-  async signsIn(name: string) {
-    await signInOnPage(this.page, name);
-  }
-
   async confirmSignedInAs(name: string) {
-    expect(await signedInEmail(this.page)).toBe(testEmail(name));
+    expect(await signedInEmail(this.page)).toBe(testPerson(name).email);
   }`)(
     after('import { BrowserDriver } from "@litmus-ts/test";', '\nimport { expect } from "vitest";')(
       after('import type { AppDriver } from "#acceptance/driver.ts";', [
@@ -219,27 +195,17 @@ edit("acceptance-tests/driver/browser.ts", "loggedInAs", (text) =>
         "  allowClerkTesting,",
         "  signedInEmail,",
         "  signInDirectly,",
-        "  signInOnPage,",
-        "  signUpOnPage,",
-        "  testEmail,",
-        '} from "#acceptance/driver/clerk-session.ts";',
+        "  testPerson,",
+        '} from "#acceptance/support/clerk.ts";',
       ].join("\n"))(text),
     ),
   ),
 );
 
-edit("acceptance-tests/dsl.ts", "signsUp", (text) =>
+edit("acceptance-tests/dsl.ts", "isSignedIn", (text) =>
   intoBody(/export class \w+ extends Dsl<AppDriver> \{/, `  /** The person starts signed in. A name is the same person in every test of a file. */
   async isSignedIn(name: string) {
     await this.driver.loggedInAs(name);
-  }
-
-  async signsUp(name: string) {
-    await this.driver.signsUp(name);
-  }
-
-  async signsIn(name: string) {
-    await this.driver.signsIn(name);
   }
 
   async confirmSignedInAs(name: string) {
