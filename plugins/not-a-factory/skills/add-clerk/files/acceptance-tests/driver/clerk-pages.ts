@@ -16,12 +16,13 @@ const testCode = "424242";
 export async function signUpThroughPage(page: Page, name: string) {
   const { email, password } = testPerson(name);
   await page.goto("/sign-up");
+  const sent = codeSent(page);
   await step(page, "fill in the sign-up form", async () => {
     await page.getByLabel("Email address").fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
     await continueButton(page).click();
   });
-  await enterCode(page);
+  await enterCode(page, sent);
   await leaves(page, "/sign-up");
 }
 
@@ -32,6 +33,7 @@ export async function signInThroughPage(page: Page, name: string) {
     await page.getByLabel("Email address").fill(email);
     await continueButton(page).click();
   });
+  const sent = codeSent(page);
   await step(page, "give the password", async () => {
     await page.getByRole("heading", { name: "Enter your password" }).waitFor();
     await page.getByLabel("Password", { exact: true }).fill(password);
@@ -45,7 +47,7 @@ export async function signInThroughPage(page: Page, name: string) {
       .waitForURL((url) => !url.pathname.startsWith("/sign-in"))
       .then(() => false),
   ]).catch(() => false);
-  if (codeAsked) await enterCode(page);
+  if (codeAsked) await enterCode(page, sent);
   await leaves(page, "/sign-in");
 }
 
@@ -76,13 +78,29 @@ const codeField = (page: Page) =>
 const continueButton = (page: Page) =>
   page.getByRole("button", { name: "Continue", exact: true });
 
-// Clerk shows the code field before it has sent the code, and can clear a
-// code typed too early. The "Resend" countdown starts once the code is sent.
-async function enterCode(page: Page) {
-  await step(page, "enter the email code", async () => {
-    await page.getByRole("button", { name: /Resend/ }).waitFor();
-    await codeField(page).pressSequentially(testCode);
-  });
+// Clerk's server has sent a code: the answer to the browser's "prepare"
+// request. Start waiting before the click that leads to the code page.
+function codeSent(page: Page) {
+  const sent = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      /\/v1\/client\/sign_(ups|ins)\/[^/]+\/prepare_(verification|first_factor|second_factor)$/.test(
+        new URL(response.url()).pathname,
+      ) &&
+      response.ok(),
+  );
+  // When Clerk asks for no code, nobody awaits it.
+  sent.catch(() => {});
+  return sent;
+}
+
+// Clerk shows the code field, and even its "Resend" countdown, before its
+// server has sent the code; a code typed then is refused. So wait for the send.
+async function enterCode(page: Page, sent: Promise<unknown>) {
+  await step(page, "wait for Clerk to send the email code", () => sent);
+  await step(page, "enter the email code", () =>
+    codeField(page).pressSequentially(testCode),
+  );
 }
 
 // Clerk goes to the app once the person is signed in.
