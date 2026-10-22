@@ -1,12 +1,19 @@
+import { QueryHandler } from "@litmus-ts/core";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { container } from "tsyringe";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, expectTypeOf, it } from "vitest";
+import { z } from "zod";
 
-import { type ActorEnv, notSignedIn } from "#api/entrypoints/http/actor.ts";
+import {
+  type ActorEnv,
+  notSignedIn,
+  signedInRoute,
+} from "#api/entrypoints/http/actor.ts";
 import { authentication } from "#api/entrypoints/http/authentication.ts";
 import { ClerkAuthentication } from "#api/infra/auth/clerk-authentication.ts";
+import type { Actor } from "#api/use-cases/actor.ts";
 
 // A stand-in for Clerk: it knows one signed-in person.
 const fakeClerk = {
@@ -17,16 +24,30 @@ const fakeClerk = {
   }),
 };
 
-const app = new Hono<ActorEnv>()
-  .use("/api/*", authentication)
-  .get("/api/whoami", (c) => c.json(c.get("actor")));
+// A use case that answers with the actor it was given.
+class WhoAmI extends QueryHandler<{ actor: Actor }, Actor> {
+  async handle({ actor }: { actor: Actor }) {
+    return actor;
+  }
+}
+
+const app = new Hono<ActorEnv>().use("/api/*", authentication).get(
+  "/api/whoami",
+  ...signedInRoute.json(WhoAmI, z.object({}), {
+    target: "query",
+    input: (_query, c) => {
+      expectTypeOf(c.get("actor")).toEqualTypeOf<Actor>();
+      return { actor: c.get("actor") };
+    },
+  }),
+);
 
 describe("routes behind sign-in", () => {
   beforeEach(() => {
     container.registerInstance(ClerkAuthentication, fakeClerk);
   });
 
-  it("know who the signed-in person is", async () => {
+  it("pass the signed-in person to the use case", async () => {
     const response = await app.request("/api/whoami", {
       headers: { cookie: "session=ada" },
     });

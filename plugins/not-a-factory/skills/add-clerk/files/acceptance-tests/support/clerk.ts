@@ -1,6 +1,6 @@
 // Clerk support for the acceptance tests: what does not depend on how the
-// app's pages look. Driving the sign-up and sign-in pages is the app's own
-// driver code (see the add-clerk skill).
+// app's pages look. Driving the sign-up and sign-in pages is in
+// driver/clerk-pages.ts.
 //
 // EXCEPTIONS to "drivers use only the app's public interfaces". Clerk is part
 // of the system, and these are Clerk's own interfaces for tests:
@@ -69,11 +69,16 @@ export async function ensureTestUser(name: string) {
   }
 }
 
-/** Starts the browser signed in as the person, with no sign-in steps (exception 1). */
+/**
+ * Signs the person in with no sign-in steps (exception 1). Whoever was signed
+ * in before is signed out first, so a test can switch people at any point.
+ */
 export async function signInDirectly(page: Page, name: string) {
   await ensureTestUser(name);
-  await page.goto("/");
+  if (!page.url().startsWith("http")) await page.goto("/");
+  if (await signedInEmail(page)) await clerk.signOut({ page });
   await clerk.signIn({ page, emailAddress: testPerson(name).email });
+  await page.goto("/");
 }
 
 /** The address of the person signed in on the page, or `null`. */
